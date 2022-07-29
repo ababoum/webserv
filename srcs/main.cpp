@@ -6,11 +6,11 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/07/22 20:54:42 by mababou          ###   ########.fr       */
+/*   Updated: 2022/07/29 18:43:29 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "webserv.hpp"
+#include "../includes/webserv.hpp"
 
 int main(int ac, char **av)
 {
@@ -20,13 +20,15 @@ int main(int ac, char **av)
 	socklen_t peer_addr_size;
 	
 
-	if (ac != 2)
+	if (ac < 2)
 	{
-		std::cerr << "Webserv only needs a configuration file to be launched\n"
+		std::cerr << "Webserv needs a configuration file to be launched\n"
 			<< "usage: ./webserv [file.conf]" << std::endl;
 		
 		return (EXIT_FAILURE);
 	}
+
+	(void)av;
 	
 	socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_fd == -1)
@@ -43,31 +45,43 @@ int main(int ac, char **av)
 	if (bind(socket_fd, (struct sockaddr*)&sockaddr, sizeof(sockaddr)) == -1)
 		handle_error("bind");
 
-	if (listen(socket_fd, MAX_CONNECTIONS) == -1)
+	if (listen(socket_fd, DEFAULT_MAX_CONNECTIONS) == -1)
 		handle_error("listen");
 
 	//  Now we can accept incoming connections one
-    //           at a time using accept(2)
+    //           at a time using accept
 
 	peer_addr_size = sizeof(sockaddr);
-	connection_fd = accept(socket_fd, 
-		(struct sockaddr*)&sockaddr,
-		&peer_addr_size);
-	
-	if (connection_fd == -1)
-		handle_error("accept");
 
-	// Read from the connection
-	char buffer[1024];
-	read(connection_fd, buffer, 1024);
-	std::cout << "The message was: " << buffer;
+	while (1)
+	{
+		std::cout << "Waiting for a new connection...\n";
+		
+		connection_fd = accept(socket_fd, 
+			(struct sockaddr*)&sockaddr,
+			&peer_addr_size);
+		
+		if (connection_fd == -1)
+			handle_error("accept");
 
-	// Send a message to the connection
-	std::string response = "Good talking to you\n";
-	send(connection_fd, response.c_str(), response.size(), 0);
+		// Read from the connection
+		char buffer[1024] = {0};
+		read(connection_fd, buffer, 1024);
+		std::cout << "The message was: " << \
+			BLUE_TXT << buffer << RESET_TXT;
 
-	// Close the connections
-	close(connection_fd);
+		// Send a message to the connection
+		std::string response = "<html> \
+			<head></head> \
+			<body>Good talking to you!</body> \
+			</html>";
+		send(connection_fd, response.c_str(), response.size(), 0);
+
+		// Close the connection
+		close(connection_fd);
+	}
+
+	// close the socket
 	close(socket_fd);
 
 	return (EXIT_SUCCESS);

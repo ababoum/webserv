@@ -4,10 +4,11 @@ CXXFLAGS	= -Wall -Werror -Wextra -g -std=c++98
 
 NAME 		= webserv
 
-SRCS		= main.cpp \
-				utils.cpp
+SRCS		= srcs/main.cpp \
+				srcs/utils.cpp
 
-INCL		= webserv.hpp
+INCL		= includes/webserv.hpp \
+
 
 OBJS		= $(SRCS:.cpp=.o)
 

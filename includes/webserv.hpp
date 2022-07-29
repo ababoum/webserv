@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/07/22 20:46:28 by mababou          ###   ########.fr       */
+/*   Updated: 2022/07/29 16:56:57 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,9 @@
 #include <string>
 #include <iostream>
 
-#define MAX_CONNECTIONS	1024
+#define DEFAULT_MAX_CONNECTIONS	1024
 
+// C aliases
 typedef struct sockaddr_in t_sockaddr_in;
 
 

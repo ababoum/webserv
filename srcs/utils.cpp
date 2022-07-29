@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/07/22 20:40:06 by mababou          ###   ########.fr       */
+/*   Updated: 2022/07/29 16:58:40 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,5 @@ void ft_memset(void *ptr, int data, size_t len)
 	char *tmp = (char *)ptr;
 
 	for (size_t i = 0; i < len; ++i)
-		tmp[i] = data;	
+		tmp[i] = data;
 }
-

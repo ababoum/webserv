@@ -6,17 +6,16 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/01 16:35:16 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/01 20:42:15 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GLOBALCONFIGURATION_HPP
 # define GLOBALCONFIGURATION_HPP
 
-# include <iostream>
-# include <string>
-# include <vector>
-# include "../includes/Server.hpp"
+# include "../includes/webserv.hpp"
+
+class Server;
 
 class GlobalConfiguration
 {
@@ -38,12 +37,14 @@ class GlobalConfiguration
 
 		// methods & setters
 
+		void	addServer(void);
 		void	addServer(Server & server);
 		void	setAllowedConnections(int nbConnectionsMax);
 
 		// accessors
 		
 		int		getAllowedConnections() const;
+		std::vector<Server> & getServersList();
 
 };
 

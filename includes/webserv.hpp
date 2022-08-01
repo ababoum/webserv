@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/07/29 18:21:17 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/01 20:59:57 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,18 @@
 # include <string>
 # include <iostream>
 
+# include <vector>
+# include <map>
+# include <set>
+# include <fstream>
+# include <string>
+# include <iostream>
+# include <sstream> 
+
+# include "ConfigurationParser.hpp"
+# include "GlobalConfiguration.hpp"
+# include "Location.hpp"
+# include "Server.hpp"
 
 # define RED_TXT	"\e[31m"
 # define GREEN_TXT	"\e[32m"
@@ -47,6 +59,11 @@ void handle_error(const char * msg);
 
 // Libft Equivalent
 void ft_memset(void *ptr, int data, size_t len);
+
+
+// CPP functions
+std::vector<std::string> split(const std::string &str, char delim);
+std::vector<std::string> split(const std::string &str, const char *set_delim);
 
 
 #endif

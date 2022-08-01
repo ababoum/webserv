@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:14:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/01 16:20:52 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/01 21:11:43 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,25 +23,6 @@ static bool isNumber(const std::string &str)
 		   (str.find_first_not_of("0123456789") == std::string::npos);
 }
 
-static std::vector<string> split(const std::string &str, char delim)
-{
-	std::size_t i = 0;
-	std::vector<std::string> list;
-
-	std::size_t pos = str.find(delim);
-
-	while (pos != std::string::npos)
-	{
-		list.push_back(str.substr(i, pos - i));
-		i = ++pos;
-		pos = str.find(delim, pos);
-	}
-
-	list.push_back(str.substr(i, str.length()));
-
-	return list;
-}
-
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
@@ -49,9 +30,9 @@ static std::vector<string> split(const std::string &str, char delim)
 Server::Server() {}
 
 Server::Server(const Server &src)
-	: _name(src._name), _IP(src._IP), _port(src._port),
-	  _allowedMethods(src._allowedMethods), _indexPage(src._indexPage),
-	  _errorPages(src._errorPages), _clientBufferSize(src._clientBufferSize) {}
+{
+	*this = src;
+}
 
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------
@@ -67,14 +48,12 @@ Server &Server::operator=(Server const &rhs)
 {
 	if (this != &rhs)
 	{
-		_name = src._name;
-		_IP = src._IP;
-		_port = src._port;
-		_allowedMethods = src._allowedMethods;
-		_indexPage = src._indexPage;
-		_autoindex = src._autoindex;
-		_errorPages = src._errorPages;
-		_clientBufferSize = src._clientBufferSize;
+		_name = rhs._name;
+		_IP = rhs._IP;
+		_port = rhs._port;
+		_errorPages = rhs._errorPages;
+		_clientBufferSize = rhs._clientBufferSize;
+		_routes = rhs._routes;
 	}
 	return *this;
 }
@@ -84,10 +63,11 @@ Server &Server::operator=(Server const &rhs)
 */
 
 // Setters
+
 void Server::setName(std::string name)
 {
 	if (name.empty())
-		throw std::invalid_argument("Server name cannot be empty\n")
+		throw std::invalid_argument("Server name cannot be empty\n");
 	else
 		_name = name;
 }
@@ -95,7 +75,7 @@ void Server::setName(std::string name)
 void Server::setIP(std::string IP)
 {
 	if (!_isIPValid(IP))
-		throw std::invalid_argument("IP address is not valid\n")
+		throw std::invalid_argument("IP address is not valid\n");
 	else
 		_IP = IP;
 }
@@ -103,29 +83,9 @@ void Server::setIP(std::string IP)
 void Server::setPort(std::string port)
 {
 	if (!isNumber(port))
-		throw std::invalid_argument("Port number is not valid\n")
+		throw std::invalid_argument("Port number is not valid\n");
 	else
-		_port = std::atoi(port);
-}
-
-void Server::addAllowedMethod(std::string method)
-{
-	if (method.compare("GET") && 
-		method.compare("POST") && 
-		method.compare("DELETE"))
-		throw std::invalid_argument("Listed method is not managed (valid methods: GET, POST, DELETE)\n")
-	
-	_allowedMethods.insert(method);
-}
-
-void Server::setIndexPage(std::string indexPagePath)
-{
-	_indexPage = indexPagePath;	
-}
-
-void Server::setAutoindex(bool on_off)
-{
-	_autoindex = on_off;
+		_port = std::atoi(port.c_str());
 }
 
 void Server::addErrorPage(int error_code, std::string filePath)
@@ -138,15 +98,10 @@ void Server::setClientBufferSize(std::size_t buffer_max)
 	_clientBufferSize = buffer_max;
 }
 
-// Methods
-
-bool Server::isAllowedMethod(std::string method) const
+Location & Server::addLocation()
 {
-	_allowedMethods::iterator find_result = _allowedMethods.find();
-	if (find_result == _allowedMethods.end())
-		return false;
-	else
-		return true;
+	_routes.push_back(Location());
+	return _routes.back();
 }
 
 // Private Helpers
@@ -160,7 +115,7 @@ bool Server::_isIPValid(std::string IP) const
 		return false;
 
 	// split the string into tokens
-	std::vector<std::string> list = split(ip, '.');
+	std::vector<std::string> list = split(IP, '.');
 
 	// if the token size is not equal to four
 	if (list.size() != 4)
@@ -169,7 +124,7 @@ bool Server::_isIPValid(std::string IP) const
 	}
 
 	// validate each token
-	for (list::iterator it == list.begin(); it != list.end(); ++it)
+	for (std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
 	{
 		// verify that the string is a number or not, and the numbers
 		// are in the valid range
@@ -202,19 +157,9 @@ int Server::getPort() const
 	return _port;
 }
 
-std::string Server::getIndexPage() const
-{
-	return _indexPage;
-}
-
-bool Server::isAutoindexed() const
-{
-	return _autoindex;
-}
-
 std::string Server::getErrorPagePath(int error_code) const
 {
-	_errorPages::iterator it = _errorPages.find(error_code);
+	std::map<int, std::string>::const_iterator it = _errorPages.find(error_code);
 	
 	if (it == _errorPages.end())
 		return "";

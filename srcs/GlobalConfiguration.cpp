@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/01 16:34:47 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/01 20:42:53 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ GlobalConfiguration::~GlobalConfiguration() {}
 ** --------------------------------- OVERLOAD ---------------------------------
 */
 
-GlobalConfiguration &				GlobalConfiguration::operator=( GlobalConfiguration const & rhs )
+GlobalConfiguration &	GlobalConfiguration::operator=( GlobalConfiguration const & rhs )
 {
 	if ( this != &rhs )
 	{
@@ -53,6 +53,11 @@ void	GlobalConfiguration::addServer(Server & server)
 	_serversList.push_back(server);
 }
 
+void	GlobalConfiguration::addServer(void)
+{
+	_serversList.push_back(Server());
+}
+
 void	GlobalConfiguration::setAllowedConnections(int nbConnectionsMax)
 {
 	_nbAllowedConnections = nbConnectionsMax;
@@ -65,6 +70,11 @@ void	GlobalConfiguration::setAllowedConnections(int nbConnectionsMax)
 int		GlobalConfiguration::getAllowedConnections() const
 {
 	return _nbAllowedConnections;
+}
+
+std::vector<Server> & GlobalConfiguration::getServersList()
+{
+	return _serversList;
 }
 
 /* ************************************************************************** */

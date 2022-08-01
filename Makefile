@@ -5,9 +5,17 @@ CXXFLAGS	= -Wall -Werror -Wextra -g -std=c++98
 NAME 		= webserv
 
 SRCS		= srcs/main.cpp \
-				srcs/utils.cpp
+				srcs/utils.cpp \
+				srcs/ConfigurationParser.cpp \
+				srcs/GlobalConfiguration.cpp \
+				srcs/Location.cpp \
+				srcs/Server.cpp
 
 INCL		= includes/webserv.hpp \
+				includes/ConfigurationParser.hpp \
+				includes/GlobalConfiguration.hpp \
+				includes/Location.hpp \
+				includes/Server.hpp
 
 
 OBJS		= $(SRCS:.cpp=.o)

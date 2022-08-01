@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/07/29 18:43:29 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/01 11:40:23 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,7 @@ int main(int ac, char **av)
 			BLUE_TXT << buffer << RESET_TXT;
 
 		// Send a message to the connection
-		std::string response = "<html> \
-			<head></head> \
-			<body>Good talking to you!</body> \
-			</html>";
+		std::string response = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 		send(connection_fd, response.c_str(), response.size(), 0);
 
 		// Close the connection

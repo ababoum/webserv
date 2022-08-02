@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:14:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/02 14:11:45 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/02 18:08:19 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ static bool isNumber(const std::string &str)
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Server::Server() {}
+Server::Server()
+	:_port(-1) {}
 
 Server::Server(const Server &src)
 {
@@ -167,6 +168,11 @@ std::string Server::getErrorPagePath(int error_code) const
 std::size_t Server::getClientBufferSize() const
 {
 	return _clientBufferSize;
+}
+
+std::vector<Location> & 	Server::getRoutes()
+{
+	return _routes;
 }
 
 /* ************************************************************************** */

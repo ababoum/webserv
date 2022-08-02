@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/02 14:32:07 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/02 18:51:29 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,7 @@ void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items
 	if (line_items.size() == 1 && line_items[0] == "}")
 	{
 		_context = "main";
+		_checkCurrentServerIntegrity(line_nb);
 		return ;
 	}
 
@@ -103,20 +104,33 @@ void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items
 	else if (line_items.back().at(line_items.back().size() - 1) != ';')
 	{
 		std::cerr << "Missing ';' at the end of line " << line_nb << '\n';
-		this->~ConfigurationParser();
 		throw syntax_error();
 	}
 
-	// fill port
+	// fill port and host (IP)
 	else if (line_items[0] == "listen" && line_items.size() == 2)
 	{
 		while(line_items.back().at(line_items.back().size() - 1) == ';')
-			line_items.back().pop_back();
-		_currentServer->setPort(std::atoi(line_items.back().c_str()));
+			line_items.back().resize(line_items.back().size() - 1);
+
+		_currentServer->setIP(split(line_items.back(), ':')[0]);
+		_currentServer->setPort(split(line_items.back(), ':')[1]);
 	}
 
-	// 
-	
+	// fill server names
+	else if (line_items[0] == "server_name" && line_items.size() >= 2)
+	{
+		for (std::size_t i = 1; i < line_items.size(); ++i)
+			_currentServer->addName(line_items[i]);
+	}
+
+	// fill error pages
+	else if (line_items[0] == "error_page" && line_items.size() == 3)
+	{
+		_currentServer->addErrorPage(
+			std::atoi(line_items[1].c_str()),
+			line_items[2]);
+	}	
 }
 
 
@@ -141,7 +155,6 @@ void	ConfigurationParser::_parseLine(std::vector<std::string> & line_items, std:
 		else if (line_items.size() == 1 && line_items[0] == "}")
 		{
 			std::cerr << "Syntax error: extra '}' in the configuration file\n";
-			this->~ConfigurationParser();
 			throw syntax_error();
 		}
 		else
@@ -150,7 +163,6 @@ void	ConfigurationParser::_parseLine(std::vector<std::string> & line_items, std:
 			ss << line_nb;
 			std::string line_nb_str;
 			ss >> line_nb_str;
-			this->~ConfigurationParser();
 			throw parsing_error(line_nb_str.c_str());
 		}
 	}
@@ -202,11 +214,24 @@ void	ConfigurationParser::_parseFile()
 	if (_context != "main")
 	{
 		std::cerr << "Syntax error: missing '}' in the configuration file\n";
-		this->~ConfigurationParser();
 		throw syntax_error();
 	}
 	
 	inputStream.close();
+}
+
+void	ConfigurationParser::_checkCurrentServerIntegrity(std::size_t line_nb) const
+{
+	if (_currentServer->getPort() == -1)
+	{
+		std::cerr << "Error: server doesn't have a designated port: line " << line_nb << '\n';
+		throw std::logic_error("port-less server\n");
+	}
+	if (_currentServer->getRoutes().empty())
+	{
+		std::cerr << "Error: server doesn't have any route: line " << line_nb << '\n';
+		throw std::logic_error("route-less server\n");
+	}
 }
 
 /*

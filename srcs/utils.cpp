@@ -6,18 +6,11 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/01 18:15:19 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/02 18:30:11 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/webserv.hpp"
-
-// ERROR HANDLING
-void handle_error(const char *msg)
-{
-	perror(msg);
-	exit(EXIT_FAILURE);
-}
 
 // LIBFT EQUIVALENT
 void ft_memset(void *ptr, int data, size_t len)

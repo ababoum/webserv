@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/01 20:59:57 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/02 18:41:04 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@
 # include "GlobalConfiguration.hpp"
 # include "Location.hpp"
 # include "Server.hpp"
+# include "ServerEngine.hpp"
 
 # define RED_TXT	"\e[31m"
 # define GREEN_TXT	"\e[32m"
@@ -49,13 +50,6 @@
 
 
 # define DEFAULT_MAX_CONNECTIONS	1024
-
-// C aliases
-typedef struct sockaddr_in t_sockaddr_in;
-
-
-// errors
-void handle_error(const char * msg);
 
 // Libft Equivalent
 void ft_memset(void *ptr, int data, size_t len);

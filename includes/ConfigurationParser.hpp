@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/02 14:27:44 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/02 18:07:03 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 # include "../includes/webserv.hpp"
 
 class GlobalConfiguration;
+class Server;
+class Location;
 
 class ConfigurationParser
 {
@@ -66,6 +68,7 @@ class ConfigurationParser
 		void	_parseLine(std::vector<std::string> & line_items, std::size_t line_nb);
 		void	_parseServerLine(std::vector<std::string> & line_items, std::size_t line_nb);
 		void	_parseLocationLine(std::vector<std::string> & line_items, std::size_t line_nb);
+		void	_checkCurrentServerIntegrity(std::size_t line_nb) const;
 
 	private:
 		std::string				_inputFilePath;
@@ -76,7 +79,7 @@ class ConfigurationParser
 		// used for the parsing
 		std::string				_context;
 		Server*					_currentServer;
-		Location				_currentLocation;
+		Location*				_currentLocation;
 
 };
 

@@ -9,13 +9,15 @@ SRCS		= srcs/main.cpp \
 				srcs/ConfigurationParser.cpp \
 				srcs/GlobalConfiguration.cpp \
 				srcs/Location.cpp \
-				srcs/Server.cpp
+				srcs/Server.cpp \
+				srcs/ServerEngine.cpp
 
 INCL		= includes/webserv.hpp \
 				includes/ConfigurationParser.hpp \
 				includes/GlobalConfiguration.hpp \
 				includes/Location.hpp \
-				includes/Server.hpp
+				includes/Server.hpp \
+				includes/ServerEngine.hpp
 
 
 OBJS		= $(SRCS:.cpp=.o)

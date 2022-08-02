@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:14:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/01 21:07:18 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/02 14:11:51 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,11 @@ class Server
 		Server( Server const & src );
 		~Server();
 
-		Server &		operator=( Server const & rhs );
+		Server &	operator=( Server const & rhs );
 
 	private:
 
-		std::string					_name;
+		std::vector<std::string>	_names;
 		std::string					_IP;
 		int							_port;
 		std::map<int, std::string>	_errorPages;
@@ -41,7 +41,7 @@ class Server
 
 		// Setters
 		
-		void			setName(std::string name);
+		void			addName(std::string name);
 		void			setIP(std::string IP); // can be equal to 'localhost'
 		void			setPort(std::string port);
 		void			addErrorPage(int error_code, std::string filePath);
@@ -50,12 +50,12 @@ class Server
 
 		// Accessors
 		
-		std::string		getName() const;
-		std::string		getIP() const;
-		int				getPort() const;
-		std::string		getErrorPagePath(int error_code) const;
-		std::size_t		getClientBufferSize() const;
-		std::vector<Location> & getRoutes();
+		std::vector<std::string> & 	getNames();
+		std::string					getIP() const;
+		int							getPort() const;
+		std::string					getErrorPagePath(int error_code) const;
+		std::size_t					getClientBufferSize() const;
+		std::vector<Location> & 	getRoutes();
 
 
 	private:

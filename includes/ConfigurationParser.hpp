@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/01 21:06:46 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/02 14:27:44 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ class ConfigurationParser
 			
 			public:
 				parsing_error(const char * error_line): _err_line(error_line) {}
-				const char * what () const throw ()
+				virtual const char * what () const throw ()
 				{
 					std::string msg("Parsing error in line ");
 					msg.append(_err_line);
@@ -43,8 +43,9 @@ class ConfigurationParser
 			private:
 				const char * _msg;
 			public:
+				syntax_error() {}
 				syntax_error(const char * msg): _msg(msg) {}
-				const char * what () const throw ()
+				virtual const char * what () const throw ()
 				{
 					return _msg;
 				}
@@ -74,6 +75,8 @@ class ConfigurationParser
 
 		// used for the parsing
 		std::string				_context;
+		Server*					_currentServer;
+		Location				_currentLocation;
 
 };
 

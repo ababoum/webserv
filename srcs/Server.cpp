@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:14:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/01 21:11:43 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/02 14:11:45 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ Server &Server::operator=(Server const &rhs)
 {
 	if (this != &rhs)
 	{
-		_name = rhs._name;
+		_names = rhs._names;
 		_IP = rhs._IP;
 		_port = rhs._port;
 		_errorPages = rhs._errorPages;
@@ -64,12 +64,9 @@ Server &Server::operator=(Server const &rhs)
 
 // Setters
 
-void Server::setName(std::string name)
+void Server::addName(std::string name)
 {
-	if (name.empty())
-		throw std::invalid_argument("Server name cannot be empty\n");
-	else
-		_name = name;
+	_names.push_back(name);
 }
 
 void Server::setIP(std::string IP)
@@ -142,9 +139,9 @@ bool Server::_isIPValid(std::string IP) const
 ** --------------------------------- ACCESSOR ---------------------------------
 */
 
-std::string Server::getName() const
+std::vector<std::string> & Server::getNames()
 {
-	return _name;
+	return _names;
 }
 
 std::string Server::getIP() const

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/01 21:05:55 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/02 14:32:07 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,15 +69,54 @@ ConfigurationParser &	ConfigurationParser::operator=( ConfigurationParser const 
 
 void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_items, std::size_t line_nb)
 {
-	(void)line_items;
 	(void)line_nb;
+	
+	if (line_items.size() == 1 && line_items[0] == "}")
+	{
+		_context = "server";
+		return ;
+	}
 }
 
 
 void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items, std::size_t line_nb)
 {
-	(void)line_items;
-	(void)line_nb;
+
+	// end of scope
+	if (line_items.size() == 1 && line_items[0] == "}")
+	{
+		_context = "main";
+		return ;
+	}
+
+	// start of location scope
+	else if (line_items.size() == 3 && line_items[0] == "location" && line_items[2] == "{")
+	{
+		_context = "location";
+		Location *new_route = &(_globalConf.getServersList().back().addLocation());
+		new_route->setPrefix(line_items[1]);
+		_currentLocation = &(_currentServer->getRoutes().back());
+		return ;
+	}
+
+	// check if ';' closes the line
+	else if (line_items.back().at(line_items.back().size() - 1) != ';')
+	{
+		std::cerr << "Missing ';' at the end of line " << line_nb << '\n';
+		this->~ConfigurationParser();
+		throw syntax_error();
+	}
+
+	// fill port
+	else if (line_items[0] == "listen" && line_items.size() == 2)
+	{
+		while(line_items.back().at(line_items.back().size() - 1) == ';')
+			line_items.back().pop_back();
+		_currentServer->setPort(std::atoi(line_items.back().c_str()));
+	}
+
+	// 
+	
 }
 
 
@@ -97,24 +136,21 @@ void	ConfigurationParser::_parseLine(std::vector<std::string> & line_items, std:
 		{
 			_context = "server";
 			_globalConf.addServer();
+			_currentServer = &(_globalConf.getServersList().back());
 		}
-		
-		else if (line_items.size() == 3 && line_items[0] == "location" && line_items[2] == "{")
+		else if (line_items.size() == 1 && line_items[0] == "}")
 		{
-			_context = "location";
-			Location *new_route = &(_globalConf.getServersList().back().addLocation());
-			new_route->setPrefix(line_items[1]);
+			std::cerr << "Syntax error: extra '}' in the configuration file\n";
+			this->~ConfigurationParser();
+			throw syntax_error();
 		}
-		else if (line_items.size() == 1 && line_items[0] == "}" && _context == "location")
-			_context = "server";
-		else if (line_items.size() == 1 && line_items[0] == "}" && _context == "server")
-			_context = "main";
 		else
 		{
 			std::stringstream ss;
 			ss << line_nb;
 			std::string line_nb_str;
 			ss >> line_nb_str;
+			this->~ConfigurationParser();
 			throw parsing_error(line_nb_str.c_str());
 		}
 	}
@@ -123,9 +159,10 @@ void	ConfigurationParser::_parseLine(std::vector<std::string> & line_items, std:
 void	ConfigurationParser::_parseFile()
 {
 	std::ifstream	inputStream;
-	std::size_t	line_nb = 1;
+	std::size_t		line_nb = 0;
+	std::string 	currentLine;
 	
-	inputStream.open(_inputFilePath.c_str(), std::ifstream::in);
+	inputStream.open(_inputFilePath.c_str());
 
 	// check file opening integrity
 	if (inputStream.fail() || inputStream.eof() || inputStream.bad())
@@ -134,12 +171,11 @@ void	ConfigurationParser::_parseFile()
 	}
 
 	// start parsing the file
-	while (!inputStream.eof())
+	while (std::getline(inputStream, currentLine, '\n'))
 	{
-		std::string 				currentLine;
 		std::vector<std::string>	line_items;
 		
-		std::getline(inputStream, currentLine, '\n');
+		++line_nb;
 		line_items = split(currentLine, " \t");
 
 		// empty line in the middle of the file
@@ -150,7 +186,7 @@ void	ConfigurationParser::_parseFile()
 		else if (line_items[0][0] == '#')
 			continue ;
 		
-		// erase end-of-line comment
+		// erase end-of-line comment then parse the rest of the line
 		else
 		{
 			std::size_t comment_index = find_comment(line_items);
@@ -161,12 +197,16 @@ void	ConfigurationParser::_parseFile()
 			}
 			_parseLine(line_items, line_nb);
 		}
-		
-		++line_nb;
+	}
+
+	if (_context != "main")
+	{
+		std::cerr << "Syntax error: missing '}' in the configuration file\n";
+		this->~ConfigurationParser();
+		throw syntax_error();
 	}
 	
-	if (_context != "main")
-		throw syntax_error("Syntax error: missing '}' in the configuration file\n");
+	inputStream.close();
 }
 
 /*

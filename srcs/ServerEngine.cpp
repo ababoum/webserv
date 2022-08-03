@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/03 13:38:40 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/03 15:37:03 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,12 @@
 */
 
 ServerEngine::ServerEngine(const Server & server):_server(server)
-{	
+{
+	
+	// init params
+	_client_fd = -1;
+	_pending_response = false;
+	
 	// open the socket
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket_fd == -1)
@@ -25,6 +30,10 @@ ServerEngine::ServerEngine(const Server & server):_server(server)
 		std::cerr << "Error while opening socket\n";
 		throw std::runtime_error("socket");
 	}
+
+	_in_fd.fd = _socket_fd;
+	_in_fd.events = POLLIN;
+	_out_fd.fd = -1;
 
 	// Clear socket structure
 	ft_memset(&_sockaddr, 0, sizeof(_sockaddr));
@@ -71,15 +80,13 @@ ServerEngine::~ServerEngine()
 ** --------------------------------- METHODS ----------------------------------
 */
 
-void	ServerEngine::run()
+void	ServerEngine::stream_in()
 {
-	int connection_fd;
-	
-	connection_fd = accept(_socket_fd, 
+	_client_fd = accept(_socket_fd, 
 		(struct sockaddr*)&_sockaddr,
 		&_peer_addr_size);
 	
-	if (connection_fd == -1)
+	if (_client_fd == -1)
 	{
 		std::cerr << "Error while listening to socket\n";
 		throw std::runtime_error("accept");
@@ -87,10 +94,17 @@ void	ServerEngine::run()
 
 	// Read from the connection
 	char buffer[1024] = {0};
-	read(connection_fd, buffer, 1024);
+	read(_client_fd, buffer, 1024);
 	std::cout << "The message was: " << \
 		BLUE_TXT << buffer << RESET_TXT;
+	
+	_pending_response = true;
+	_out_fd.fd = _client_fd;
+	_out_fd.events = POLLOUT;
+}
 
+void	ServerEngine::stream_out()
+{
 	// Send a message to the connection
 	std::string response;
 	std::string port_str = SSTR("" << _server.getPort() << "\n");
@@ -99,10 +113,18 @@ void	ServerEngine::run()
 	response.append("HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: \n\n");
 	response.insert(response.size() - 2, body_size);
 	response.append(body);
-	send(connection_fd, response.c_str(), response.size(), 0);
+	send(_client_fd, response.c_str(), response.size(), 0);
 
 	// Close the connection
-	close(connection_fd);
+	close(_client_fd);
+	_client_fd = -1;
+	_out_fd.fd = -1;
+	_pending_response = false;
+}
+
+bool	ServerEngine::responseIsPending() const
+{
+	return _pending_response;
 }
 
 /*
@@ -114,5 +136,14 @@ int		ServerEngine::getSocketFd() const
 	return _socket_fd;
 }
 
+struct pollfd	* ServerEngine::getInFdPtr()
+{
+	return &_in_fd;
+}
+
+struct pollfd	* ServerEngine::getOutFdPtr()
+{
+	return &_out_fd;
+}
 
 /* ************************************************************************** */

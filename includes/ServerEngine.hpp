@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/03 13:36:43 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/03 15:34:53 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,11 +33,20 @@ class ServerEngine
 		t_sockaddr_in	_sockaddr;
 		socklen_t		_peer_addr_size;
 		const Server &	_server;
+		int				_client_fd;
+		bool			_pending_response;
+		struct pollfd	_in_fd;
+		struct pollfd	_out_fd;
 
 	public:
 
-		void	run();
-		int		getSocketFd() const;
+		void			stream_in();
+		void			stream_out();
+		int				getSocketFd() const;
+		bool			responseIsPending() const;
+		struct pollfd	* getInFdPtr();
+		struct pollfd	* getOutFdPtr();
+
 };
 
 #endif /* **************************************************** SERVERENGINE_H */

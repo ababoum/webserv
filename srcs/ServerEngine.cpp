@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/02 18:46:31 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/03 13:38:40 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ServerEngine::ServerEngine(const Server & Server)
-{
+ServerEngine::ServerEngine(const Server & server):_server(server)
+{	
 	// open the socket
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket_fd == -1)
@@ -31,8 +31,8 @@ ServerEngine::ServerEngine(const Server & Server)
 	
 	// Populate structure
 	_sockaddr.sin_family = AF_INET;
-	_sockaddr.sin_addr.s_addr = inet_addr(Server.getIP().c_str());
-	_sockaddr.sin_port = htons(Server.getPort());
+	_sockaddr.sin_addr.s_addr = inet_addr(_server.getIP().c_str());
+	_sockaddr.sin_port = htons(_server.getPort());
 	
 
 	// bind socket to given host:port
@@ -73,40 +73,46 @@ ServerEngine::~ServerEngine()
 
 void	ServerEngine::run()
 {
-	while (1)
+	int connection_fd;
+	
+	connection_fd = accept(_socket_fd, 
+		(struct sockaddr*)&_sockaddr,
+		&_peer_addr_size);
+	
+	if (connection_fd == -1)
 	{
-		int connection_fd;
-		
-		std::cout << "Waiting for a new connection...\n";
-		
-		connection_fd = accept(_socket_fd, 
-			(struct sockaddr*)&_sockaddr,
-			&_peer_addr_size);
-		
-		if (connection_fd == -1)
-		{
-			std::cerr << "Error while listening to socket\n";
-			throw std::runtime_error("accept");
-		}
-
-		// Read from the connection
-		char buffer[1024] = {0};
-		read(connection_fd, buffer, 1024);
-		std::cout << "The message was: " << \
-			BLUE_TXT << buffer << RESET_TXT;
-
-		// Send a message to the connection
-		std::string response = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-		send(connection_fd, response.c_str(), response.size(), 0);
-
-		// Close the connection
-		close(connection_fd);
+		std::cerr << "Error while listening to socket\n";
+		throw std::runtime_error("accept");
 	}
+
+	// Read from the connection
+	char buffer[1024] = {0};
+	read(connection_fd, buffer, 1024);
+	std::cout << "The message was: " << \
+		BLUE_TXT << buffer << RESET_TXT;
+
+	// Send a message to the connection
+	std::string response;
+	std::string port_str = SSTR("" << _server.getPort() << "\n");
+	std::string body("Hello world!\nI'm on port "); body.append(port_str);
+	std::string body_size = SSTR("" << body.size());
+	response.append("HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: \n\n");
+	response.insert(response.size() - 2, body_size);
+	response.append(body);
+	send(connection_fd, response.c_str(), response.size(), 0);
+
+	// Close the connection
+	close(connection_fd);
 }
 
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
+
+int		ServerEngine::getSocketFd() const
+{
+	return _socket_fd;
+}
 
 
 /* ************************************************************************** */

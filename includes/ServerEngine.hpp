@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/02 18:41:20 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/03 13:36:43 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,12 @@ class ServerEngine
 		int				_socket_fd;
 		t_sockaddr_in	_sockaddr;
 		socklen_t		_peer_addr_size;
+		const Server &	_server;
 
 	public:
 
 		void	run();
+		int		getSocketFd() const;
 };
 
 #endif /* **************************************************** SERVERENGINE_H */

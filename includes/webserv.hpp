@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/02 18:41:04 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/03 12:15:23 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@
 # include <arpa/inet.h> // For inet_addr
 # include <unistd.h>
 # include <stdio.h>
-# include <cstdlib>
-# include <string>
-# include <iostream>
+# include <poll.h> // for poll
 
+
+# include <cstdlib>
 # include <vector>
 # include <map>
 # include <set>
@@ -50,6 +50,9 @@
 
 
 # define DEFAULT_MAX_CONNECTIONS	1024
+
+# define SSTR( x ) static_cast< std::ostringstream & >( \
+        ( std::ostringstream() << std::dec << x ) ).str()
 
 // Libft Equivalent
 void ft_memset(void *ptr, int data, size_t len);

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/04 12:18:46 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/04 16:28:20 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,22 +71,22 @@ int main(int ac, char **av)
 		
 			if (fds[0].revents & POLLIN)
 			{
-				std::cout << "stream_in on server 0\n";	
+				// std::cout << "stream_in on server 0\n";	
 				engine1.stream_in();
 			}
 			else if (fds[1].revents & POLLOUT)
 			{
-				std::cout << "stream_out on server 0\n";
+				// std::cout << "stream_out on server 0\n";
 				engine1.stream_out();
 			}
 			else if (fds[2].revents & POLLIN)
 			{
-				std::cout << "stream_in on server 1\n";
+				// std::cout << "stream_in on server 1\n";
 				engine2.stream_in();
 			}
 			else if (fds[3].revents & POLLOUT)
 			{
-				std::cout << "stream_out on server 1\n";	
+				// std::cout << "stream_out on server 1\n";	
 				engine2.stream_out();
 			}
 		}

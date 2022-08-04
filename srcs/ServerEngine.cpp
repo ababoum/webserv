@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/03 15:37:03 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/04 16:24:30 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,16 +105,24 @@ void	ServerEngine::stream_in()
 
 void	ServerEngine::stream_out()
 {
-	// Send a message to the connection
-	std::string response;
+	// Send a response to the connection
+
+	_resp = new Response;
+
+	_resp->setStatusCode(200);
+	_resp->setStatusMsg("OK");
+	_resp->setContentType("text/plain");
+
 	std::string port_str = SSTR("" << _server.getPort() << "\n");
 	std::string body("Hello world!\nI'm on port "); body.append(port_str);
-	std::string body_size = SSTR("" << body.size());
-	response.append("HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: \n\n");
-	response.insert(response.size() - 2, body_size);
-	response.append(body);
-	send(_client_fd, response.c_str(), response.size(), 0);
+	
+	_resp->setBody(body);
+	_resp->setContentLength(body.size());
 
+	send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
+
+
+	delete _resp;
 	// Close the connection
 	close(_client_fd);
 	_client_fd = -1;

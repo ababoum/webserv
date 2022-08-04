@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/03 15:34:53 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/04 16:08:26 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 # include "../includes/webserv.hpp"
 
 class Server;
+class Request;
+class Response;
 
 class ServerEngine
 {
@@ -37,6 +39,11 @@ class ServerEngine
 		bool			_pending_response;
 		struct pollfd	_in_fd;
 		struct pollfd	_out_fd;
+
+		// request / response
+		// Request			*_req;
+		Response		*_resp;
+
 
 	public:
 

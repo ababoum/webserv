@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/04 12:37:25 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/04 15:28:08 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,31 +38,9 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Request::Request( std::string requestData ):_error(NO_ERROR), _validRequest(true)
+Request::Request(): _validRequest(true), _error(NO_ERROR)
 {
-	std::string	line;
-	std::size_t	line_index = 1;
 
-	while(std::getline(requestData, line, '\n'))
-	{
-		std::vector<std::string> line_items = split(line, ' ');
-		if (line_index == 1)
-		{
-			if ((line_items[0] != "GET" && line_items[0] != "POST" && line_items[0] != "DELETE") ||
-				line_items.size() != 3)
-			{
-				_error = BAD_REQUEST;
-				_validRequest = false;
-				return ;
-			}
-			else
-			{
-				_header.method = line_items[0];
-				_header.URL = line_items[1];	
-			}
-		}
-		++line_index;
-	}
 }
 
 
@@ -85,6 +63,33 @@ Request::~Request()
 ** --------------------------------- METHODS ----------------------------------
 */
 
+void	Request::parseData(std::string requestData)
+{
+	std::istringstream data(requestData);
+	std::string	line;
+	std::size_t	line_index = 1;
+
+	while(std::getline(data, line, '\n'))
+	{
+		std::vector<std::string> line_items = split(line, ' ');
+		if (line_index == 1)
+		{
+			if ((line_items[0] != "GET" && line_items[0] != "POST" && line_items[0] != "DELETE") ||
+				line_items.size() != 3)
+			{
+				_error = BAD_REQUEST;
+				_validRequest = false;
+				return ;
+			}
+			else
+			{
+				_header.method = line_items[0];
+				_header.URL = line_items[1];	
+			}
+		}
+		++line_index;
+	}
+}
 		
 /*
 ** --------------------------------- ACCESSOR ---------------------------------

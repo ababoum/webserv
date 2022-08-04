@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/03 15:39:57 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/04 12:18:46 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,6 @@ int main(int ac, char **av)
 		fds_ptr.push_back(engine2.getInFdPtr());
 		fds_ptr.push_back(engine2.getOutFdPtr());
 
-		for (int i = 0; i < 4; ++i)
-			std::cout << "fd " << (i % 2 ? "out ":"in ") << fds_ptr[i]->fd << '\n';
 
 		int ready;
 		
@@ -55,18 +53,13 @@ int main(int ac, char **av)
 			for (std::vector<struct pollfd *>::iterator it = fds_ptr.begin(); it != fds_ptr.end() ; ++it)
 				fds.push_back(**it);
 
-			std::cout << "Waiting for a new connection...\n";
-			
-			for (int i = 0; i < 4; ++i)
-				std::cout << "fd " << (i % 2 ? "out ":"in ") << fds[i].fd << '\n';
-			
-			sleep(1);
+			// std::cout << "Waiting for a new connection...\n";
 
-			ready = poll(fds.data(), nfds, 1000 * 10); // timeout = 10s
+			ready = poll(fds.data(), nfds, 1000 * 30); // timeout = 30s
 			if (ready == 0)
 			{
 				std::cerr << RED_TXT
-				<< "webserv timed out: cannot stay idle for more than 10s" 
+				<< "webserv timed out: cannot stay idle for more than 30s" 
 				<< RESET_TXT << '\n';
 				return (EXIT_SUCCESS);
 			}

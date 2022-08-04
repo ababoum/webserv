@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/03 12:15:23 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/04 12:26:39 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@
 # include "Location.hpp"
 # include "Server.hpp"
 # include "ServerEngine.hpp"
+# include "Request.hpp"
 
 # define RED_TXT	"\e[31m"
 # define GREEN_TXT	"\e[32m"
@@ -48,8 +49,11 @@
 
 # define RESET_TXT	"\e[0m"
 
-
 # define DEFAULT_MAX_CONNECTIONS	1024
+
+enum REQUEST_ERROR {
+	NO_ERROR = 0,
+	BAD_REQUEST = 400}
 
 # define SSTR( x ) static_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/02 14:18:44 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/08 14:51:45 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,6 @@
 */
 
 GlobalConfiguration::GlobalConfiguration() {}
-
-GlobalConfiguration::GlobalConfiguration( const GlobalConfiguration & src )
-{
-	*this = src;
-}
 
 
 /*
@@ -34,15 +29,7 @@ GlobalConfiguration::~GlobalConfiguration() {}
 ** --------------------------------- OVERLOAD ---------------------------------
 */
 
-GlobalConfiguration &	GlobalConfiguration::operator=( GlobalConfiguration const & rhs )
-{
-	if ( this != &rhs )
-	{
-		_serversList = rhs._serversList;
-		_nbAllowedConnections = rhs._nbAllowedConnections;
-	}
-	return *this;
-}
+
 
 /*
 ** --------------------------------- METHODS ----------------------------------
@@ -63,6 +50,31 @@ void	GlobalConfiguration::setAllowedConnections(int nbConnectionsMax)
 	_nbAllowedConnections = nbConnectionsMax;
 }
 
+void	GlobalConfiguration::startEngines()
+{
+	for (std::size_t i = 0; i < _serversList.size(); ++i)
+	{
+		_serverEngines.push_back(new ServerEngine(getServersList()[i]));
+		_fds_ptr.push_back(_serverEngines.back()->getInFdPtr());
+		_fds_ptr.push_back(_serverEngines.back()->getOutFdPtr());
+	}
+}
+
+void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
+{
+	for (std::size_t i = 0; i < fds.size(); ++i)
+	{
+		if (i % 2 == 0 && fds[i].revents & POLLIN)
+		{
+			_serverEngines[i / 2]->stream_in();
+		}
+		else if (i % 2 == 1 && fds[i].revents & POLLOUT)
+		{
+			_serverEngines[i / 2]->stream_out();
+		}
+	}
+}
+
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
@@ -76,5 +88,16 @@ std::vector<Server> & GlobalConfiguration::getServersList()
 {
 	return _serversList;
 }
+
+std::vector<ServerEngine *> &		GlobalConfiguration::getEngines()
+{
+	return _serverEngines;
+}
+
+std::vector<struct pollfd *> &	GlobalConfiguration::getFdsPtr()
+{
+	return _fds_ptr;	
+}
+
 
 /* ************************************************************************** */

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/08 12:19:12 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/08 14:52:31 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,28 +32,19 @@ int main(int ac, char **av)
 		std::string inputPath(av[1]);
 		GlobalConfiguration globalConf;
 		ConfigurationParser parser(inputPath, globalConf);	
+		globalConf.startEngines();
 
-		ServerEngine	engine1(globalConf.getServersList()[0]);
-		ServerEngine	engine2(globalConf.getServersList()[1]);
-
-		nfds_t nfds = globalConf.getServersList().size() * 2;
-		std::vector<struct pollfd *> fds_ptr;
-
-		fds_ptr.push_back(engine1.getInFdPtr());
-		fds_ptr.push_back(engine1.getOutFdPtr());
-		fds_ptr.push_back(engine2.getInFdPtr());
-		fds_ptr.push_back(engine2.getOutFdPtr());
-
+		nfds_t nfds = globalConf.getFdsPtr().size();
+		std::vector<struct pollfd *> *fds_ptr = &globalConf.getFdsPtr();
 
 		int ready;
 		
 		while (42)
 		{
 			std::vector<struct pollfd> fds;
-			for (std::vector<struct pollfd *>::iterator it = fds_ptr.begin(); it != fds_ptr.end() ; ++it)
+			for (std::vector<struct pollfd *>::iterator it = fds_ptr->begin(); it != fds_ptr->end() ; ++it)
 				fds.push_back(**it);
 
-			// std::cout << "Waiting for a new connection...\n";
 
 			ready = poll(fds.data(), nfds, 1000 * 30); // timeout = 30s
 			if (ready == 0)
@@ -68,27 +59,8 @@ int main(int ac, char **av)
 				std::cerr << RED_TXT << "poll failed to execute" << RESET_TXT << '\n';
 				return (EXIT_SUCCESS);
 			}
-		
-			if (fds[0].revents & POLLIN)
-			{
-				// std::cout << "stream_in on server 0\n";	
-				engine1.stream_in();
-			}
-			else if (fds[1].revents & POLLOUT)
-			{
-				// std::cout << "stream_out on server 0\n";
-				engine1.stream_out();
-			}
-			else if (fds[2].revents & POLLIN)
-			{
-				// std::cout << "stream_in on server 1\n";
-				engine2.stream_in();
-			}
-			else if (fds[3].revents & POLLOUT)
-			{
-				// std::cout << "stream_out on server 1\n";	
-				engine2.stream_out();
-			}
+
+			globalConf.dispatchStream(fds);
 		}
 	}
 

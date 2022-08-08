@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/08 12:13:20 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/08 14:14:12 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class ServerEngine
 		typedef struct sockaddr_in t_sockaddr_in;
 
 	public:
-
+		// ServerEngine(const ServerEngine & src);
 		ServerEngine(const Server & server);
 		~ServerEngine();
 

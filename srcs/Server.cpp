@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:14:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/02 18:08:19 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/08 15:25:48 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void Server::addName(std::string name)
 void Server::setIP(std::string IP)
 {
 	if (!_isIPValid(IP))
-		throw std::invalid_argument("IP address is not valid\n");
+		throw std::invalid_argument("IP address is not valid");
 	else
 		_IP = IP;
 }
@@ -81,7 +81,7 @@ void Server::setIP(std::string IP)
 void Server::setPort(std::string port)
 {
 	if (!isNumber(port))
-		throw std::invalid_argument("Port number is not valid\n");
+		throw std::invalid_argument("Port number is not valid");
 	else
 		_port = std::atoi(port.c_str());
 }

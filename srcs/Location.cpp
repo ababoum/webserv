@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/01 21:08:44 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/08 15:25:43 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void Location::addAllowedMethod(std::string method)
 	if (method.compare("GET") && 
 		method.compare("POST") && 
 		method.compare("DELETE"))
-		throw std::invalid_argument("Listed method is not managed (valid methods: GET, POST, DELETE)\n");
+		throw std::invalid_argument("Listed method is not managed (valid methods: GET, POST, DELETE)");
 	
 	_allowedMethods.insert(method);
 }

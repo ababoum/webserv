@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/04 16:24:30 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/08 12:13:02 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,6 @@ void	ServerEngine::stream_in()
 	std::cout << "The message was: " << \
 		BLUE_TXT << buffer << RESET_TXT;
 	
-	_pending_response = true;
 	_out_fd.fd = _client_fd;
 	_out_fd.events = POLLOUT;
 }
@@ -109,7 +108,7 @@ void	ServerEngine::stream_out()
 
 	_resp = new Response;
 
-	_resp->setStatusCode(200);
+	_resp->setStatusCode(SUCCESS_OK);
 	_resp->setStatusMsg("OK");
 	_resp->setContentType("text/plain");
 
@@ -127,12 +126,6 @@ void	ServerEngine::stream_out()
 	close(_client_fd);
 	_client_fd = -1;
 	_out_fd.fd = -1;
-	_pending_response = false;
-}
-
-bool	ServerEngine::responseIsPending() const
-{
-	return _pending_response;
 }
 
 /*

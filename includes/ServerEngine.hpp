@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/04 16:08:26 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/08 12:13:20 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ class ServerEngine
 		socklen_t		_peer_addr_size;
 		const Server &	_server;
 		int				_client_fd;
-		bool			_pending_response;
 		struct pollfd	_in_fd;
 		struct pollfd	_out_fd;
 
@@ -50,7 +49,6 @@ class ServerEngine
 		void			stream_in();
 		void			stream_out();
 		int				getSocketFd() const;
-		bool			responseIsPending() const;
 		struct pollfd	* getInFdPtr();
 		struct pollfd	* getOutFdPtr();
 

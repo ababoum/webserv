@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/08 12:13:02 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/08 13:10:39 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ ServerEngine::ServerEngine(const Server & server):_server(server)
 	
 	// init params
 	_client_fd = -1;
-	_pending_response = false;
 	
 	// open the socket
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);

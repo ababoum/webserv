@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Webserv test</title>
+</head>
+<body>
+	<h1>Webserv test</h1>
+	<h2>Get test</h2>
+	<form action="a.out" method="GET">
+		<label for="fname">First name:</label>
+		<input type="text" id="fname" name="fname"><br><br>
+		<label for="lname">Last name:</label>
+		<input type="text" id="lname" name="lname"><br><br>
+		<input type="submit" value="Submit">
+	</form>
+	<br/>
+	<form action="cgi_bin/test.cgi" method="GET">
+		<input type="radio" id="c" name="fav_language" value="c" checked="checked">
+		<label for="c">C</label><br>
+		<input type="radio" id="cpp" name="fav_language" value="cpp">
+		<label for="cpp">C++</label><br>
+		<input type="radio" id="another" name="fav_language" value="another">
+		<label for="another">Another</label><br><br>
+		<input type="submit" value="Submit">
+	</form>
+	<br>
+	<h2>Post test</h2>
+	<h2>Delete test</h2>
+	<h2>Cookie test</h2>
+	<button onclick="random_color()">Click me !</button>
+	<script>
+		function random_color()
+		{
+			let red = Math.floor(Math.random() * 256);
+			let green = Math.floor(Math.random() * 256);
+			let blue = Math.floor(Math.random() * 256);
+			let bg = "rgb(" + red + "," + green + "," + blue + ")";
+			document.body.style.background = bg;
+			document.cookie = bg;
+		}
+		let background = "rgb(" + 255 + "," + 255 + "," + 255 + ")";
+		document.body.style.background = background;
+		if (document.cookie)
+			document.body.style.background = document.cookie;
+	</script>
+</body>
+</html>

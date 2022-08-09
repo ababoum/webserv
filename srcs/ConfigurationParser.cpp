@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigurationParser.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/08 18:29:02 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/09 14:45:34 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,13 +69,58 @@ ConfigurationParser &	ConfigurationParser::operator=( ConfigurationParser const 
 
 void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_items, std::size_t line_nb)
 {
-	(void)line_nb;
-	
+
 	if (line_items.size() == 1 && line_items[0] == "}")
 	{
 		_context = "server";
 		return ;
 	}
+
+	// check if ';' closes the line
+	else if (line_items.back().at(line_items.back().size() - 1) != ';')
+	{
+		std::cerr << RED_TXT << "Missing ';' at the end of line " 
+			<< line_nb << '\n' << RESET_TXT;
+		throw syntax_error();
+	}
+
+	// fill root
+	else if (line_items[0] == "root" && line_items.size() == 2)
+	{
+		line_items[1].resize(line_items[1].size() - 1);
+		_currentLocation->setRoot(line_items[1]);
+	}
+
+	// fill allowed methods
+	else if (line_items[0] == "methods" && line_items.size() >= 2)
+	{
+		line_items.back().resize(line_items.back().size() - 1);
+		for (std::size_t i = 1; i < line_items.size(); ++i)
+			_currentLocation->addAllowedMethod(line_items[i]);
+	}
+
+	// fill autoindex
+	else if (line_items[0] == "autoindex" && line_items.size() == 2)
+	{
+		line_items[1].resize(line_items[1].size() - 1);
+		_currentLocation->setAutoindex(line_items[1]);
+	}
+
+	// fill indexPage
+	else if (line_items[0] == "index" && line_items.size() == 2)
+	{
+		line_items[1].resize(line_items[1].size() - 1);
+		_currentLocation->setIndexPage(line_items[1]);
+	}
+
+	// fill cgi?
+	else if (line_items[0] == "fastcgi_pass" && line_items.size() == 2)
+	{
+		line_items[1].resize(line_items[1].size() - 1);
+		_currentLocation->setCGI(line_items[1]);
+	}
+
+	// else: parsing error
 }
 
 

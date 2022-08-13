@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/08/13 11:23:04 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/13 17:23:04 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,12 @@
 
 CgiEngine::CgiEngine(Request req)
 {	
+	_body = req.getBody().content;
+	
 	_env["SERVER_SOFTWARE"] = "";
 	_env["SERVER_NAME"] = "";
 	_env["GATEWAY_INTERFACE"] = "";
-	_env["SERVER_PROTOCOL"] = "";
+	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	_env["SERVER_PORT"] = "";
 	_env["REQUEST_METHOD"] = req.getHeader().method;
 	_env["PATH_INFO"] = "";
@@ -60,11 +62,19 @@ void	CgiEngine::exec()
 {
 	pid_t pid;
 	char **env = mapToStr(_env);
+	int cgi_pipe_read[2];
+	int cgi_pipe_write[2];
+	pipe(cgi_pipe_read);
+	pipe(cgi_pipe_write);
 	pid = fork();
 	// if (pid == -1)
 	// 	return;
 	if (pid == 0)
+	{
+		dup2(cgi_pipe_read[0], STDIN_FILENO);
+		dup2(cgi_pipe_write[1], STDOUT_FILENO);
 		execve("../www/test.cgi", NULL, env);
+	}
 	// else
 	// 	return;
 	for (size_t i = 0; env[i]; i++)

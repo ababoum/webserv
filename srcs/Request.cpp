@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/04 15:28:08 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/13 20:42:20 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,9 +65,9 @@ Request::~Request()
 
 void	Request::parseData(std::string requestData)
 {
-	std::istringstream data(requestData);
-	std::string	line;
-	std::size_t	line_index = 1;
+	std::istringstream 	data(requestData);
+	std::string			line;
+	size_t				line_index = 1;
 
 	while(std::getline(data, line, '\n'))
 	{
@@ -90,7 +90,58 @@ void	Request::parseData(std::string requestData)
 		++line_index;
 	}
 }
+
+void	Request::findLocation(Server & serv)
+{
+	std::string	prefix;
+	
+	// find the right location
+	for (size_t i = 0; i < serv.getRoutes().size(); ++i)
+	{
+		prefix = serv.getRoutes()[i].getPrefix();
 		
+		// check if the location matches
+		if (_header.URL == prefix)
+		{
+			_targetLocation = &serv.getRoutes()[i];
+			return ;
+		}
+		else if (prefix[prefix.size() - 1] == '*')
+		{
+			prefix.erase(prefix.end() - 1);
+			if (prefix.compare(0, prefix.size(), _header.URL))
+			{
+				_targetLocation = &serv.getRoutes()[i];
+				return ;
+			}
+		}
+		else if (prefix[0] == '*' && _header.URL.size() >= prefix.size())
+		{
+			prefix.erase(prefix.begin());
+			if (_header.URL.compare(_header.URL.size() - prefix.size(), prefix.size(), prefix))
+			{
+				_targetLocation = &serv.getRoutes()[i];
+				return ; 
+			}
+		}
+	}
+
+	// if no location checks
+	_validRequest = false;
+	_error = NOT_FOUND;
+}
+
+void			Request::setError(int err)
+{
+	_error = err;
+}
+
+void			Request::setIsRequestValid(bool val)
+{
+	_validRequest = val;
+}
+
+
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
@@ -113,6 +164,11 @@ bool			Request::isValid() const
 int				Request::getError() const
 {
 	return _error;	
+}
+
+const Location *Request::getTargetLocation()
+{
+	return _targetLocation;
 }
 
 /* ************************************************************************** */

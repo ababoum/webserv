@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:14:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/02 14:11:51 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/13 20:41:54 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,7 @@ class Server
 		int							getPort() const;
 		std::string					getErrorPagePath(int error_code) const;
 		std::size_t					getClientBufferSize() const;
-		std::vector<Location> & 	getRoutes();
-
+		std::vector<Location> 	&	getRoutes();
 
 	private:
 

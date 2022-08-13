@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/04 16:23:41 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/13 20:25:25 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ std::string		ResponseHeader::getText() const
 
 Response::Response()
 {
+	_from_cgi = false;
 }
 
 /*
@@ -103,6 +104,16 @@ void	Response::setBody(std::string body)
 	_body.content = body;
 }
 
+void	Response::setFromCGI(bool val)
+{
+	_from_cgi = val;
+}
+
+void	Response::setCGIText(std::string CGI_text)
+{
+	_cgi_output = CGI_text;
+}
+
 void	Response::reset()
 {
 	_header.status_code = 0;
@@ -135,7 +146,20 @@ std::string	Response::getText() const
 
 std::size_t	Response::size() const
 {
-	return _header.getText().size() + _body.content.size() + 1;
+	if (_from_cgi == false)
+		return _header.getText().size() + _body.content.size() + 1;
+	else
+		return _cgi_output.size();
+}
+
+bool		Response::isFromCGI() const
+{
+	return _from_cgi;
+}
+
+std::string		Response::getCGIText() const
+{
+	return _cgi_output;
 }
 
 

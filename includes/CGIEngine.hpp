@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CgiEngine.hpp                                      :+:      :+:    :+:   */
+/*   CGIEngine.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:15:19 by tidurand          #+#    #+#             */
-/*   Updated: 2022/08/13 10:28:50 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/13 19:49:41 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,19 @@
 
 class Request;
 
-class CgiEngine
+class CGIEngine
 {
 	public:
-		CgiEngine(Request req);
-		~CgiEngine();
+		CGIEngine(Request *req);
+		~CGIEngine();
 		
-		void	exec();
-		char	**mapToStr(std::map<std::string, std::string> env);
+		std::string		exec();
+		char			**mapToStr(std::map<std::string, std::string> env);
 		
 	private:
-		std::map<std::string, std::string> _env;
-		std::string _body;
+		std::map<std::string, std::string>	_env;
+		std::string 						_body;
+		Request								*_req;
 };
 
 

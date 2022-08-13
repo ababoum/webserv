@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/08 14:14:12 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/13 20:42:55 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ class ServerEngine
 
 	public:
 		// ServerEngine(const ServerEngine & src);
-		ServerEngine(const Server & server);
+		ServerEngine(Server & server);
 		~ServerEngine();
 
 	private:
@@ -34,15 +34,16 @@ class ServerEngine
 		int				_socket_fd;
 		t_sockaddr_in	_sockaddr;
 		socklen_t		_peer_addr_size;
-		const Server &	_server;
+		Server &		_server;
 		int				_client_fd;
 		struct pollfd	_in_fd;
 		struct pollfd	_out_fd;
 
 		// request / response
-		// Request			*_req;
+		Request			*_req;
 		Response		*_resp;
 
+		void			_buildResponseOnRequest();
 
 	public:
 
@@ -51,6 +52,7 @@ class ServerEngine
 		int				getSocketFd() const;
 		struct pollfd	* getInFdPtr();
 		struct pollfd	* getOutFdPtr();
+		
 
 };
 

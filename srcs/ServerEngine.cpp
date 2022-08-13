@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/13 17:55:26 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/13 20:52:33 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ServerEngine::ServerEngine(const Server & server):_server(server)
+ServerEngine::ServerEngine(Server & server):_server(server)
 {
 	
 	// init params
@@ -79,6 +79,21 @@ ServerEngine::~ServerEngine()
 ** --------------------------------- METHODS ----------------------------------
 */
 
+void	ServerEngine::_buildResponseOnRequest()
+{
+	// build response if error case
+
+
+
+	// else
+	if (!_req->getTargetLocation()->getCGI().empty())
+	{
+		CGIEngine cgi(_req);
+		_resp->setFromCGI(true);
+		_resp->setCGIText(cgi.exec());
+	}
+}
+
 void	ServerEngine::stream_in()
 {
 	_client_fd = accept(_socket_fd, 
@@ -92,13 +107,28 @@ void	ServerEngine::stream_in()
 	}
 
 	// Read from the connection
-	char buffer[1024] = {0};
-	read(_client_fd, buffer, 1024);
-	std::cout << "The message was: " << \
-		BLUE_TXT << buffer << RESET_TXT;
+	char buffer[REQUEST_BUFFER_SIZE + 1] = {0};
+	std::string		request_data;
+	int r = 0;
+	
+	while ((r = recv(_client_fd, buffer, REQUEST_BUFFER_SIZE, MSG_DONTWAIT)) > 0)
+	{
+		sleep(1);
+		std::cout << r << '\n';
+		request_data.append(buffer);
+	}
+	std::cout << "The request data was: " << \
+		BLUE_TXT << request_data << RESET_TXT;
 	
 	_out_fd.fd = _client_fd;
 	_out_fd.events = POLLOUT;
+
+	// parse the request
+
+	_req = new Request;
+	_req->parseData(request_data);
+	_req->findLocation(_server);
+	
 }
 
 void	ServerEngine::stream_out()
@@ -107,20 +137,28 @@ void	ServerEngine::stream_out()
 
 	_resp = new Response;
 
-	_resp->setStatusCode(SUCCESS_OK);
-	_resp->setStatusMsg("OK");
-	_resp->setContentType("text/plain");
+	_buildResponseOnRequest();
+	if (_resp->isFromCGI())
+	{
+		send(_client_fd, _resp->getCGIText().c_str(), _resp->size(), 0);
+	}
+	else
+	{
+		_resp->setStatusCode(SUCCESS_OK);
+		_resp->setStatusMsg("OK");
+		_resp->setContentType("text/plain");
 
-	std::string port_str = SSTR("" << _server.getPort() << "\n");
-	std::string body("Hello world!\nI'm on port "); body.append(port_str);
-	
-	_resp->setBody(body);
-	_resp->setContentLength(body.size());
+		std::string port_str = SSTR("" << _server.getPort() << "\n");
+		std::string body("Hello world!\nI'm on port "); body.append(port_str);
+		
+		_resp->setBody(body);
+		_resp->setContentLength(body.size());
 
-	send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
-
+		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
+	}
 
 	delete _resp;
+	delete _req;
 	// Close the connection
 	close(_client_fd);
 	_client_fd = -1;

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/04 15:16:01 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/13 20:42:26 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,16 +39,21 @@ class Request
 		RequestBody		_body;
 		bool			_validRequest;
 		int				_error;
+		const Location	*_targetLocation;
 
 	public:
 
 		void	parseData(std::string requestData);
+		void	findLocation(Server & serv);
 
 		RequestHeader &	getHeader();
 		RequestBody &	getBody();
+		const Location	*getTargetLocation();
 		bool			isValid() const;
 		int				getError() const;
 
+		void			setError(int err);
+		void			setIsRequestValid(bool val);
 };
 
 

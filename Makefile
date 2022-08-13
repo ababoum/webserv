@@ -12,7 +12,8 @@ SRCS		= srcs/main.cpp \
 				srcs/Server.cpp \
 				srcs/ServerEngine.cpp \
 				srcs/Request.cpp \
-				srcs/Response.cpp
+				srcs/Response.cpp \
+				srcs/CGIEngine.cpp
 
 INCL		= includes/webserv.hpp \
 				includes/ConfigurationParser.hpp \
@@ -21,7 +22,8 @@ INCL		= includes/webserv.hpp \
 				includes/Server.hpp \
 				includes/ServerEngine.hpp \
 				includes/Request.hpp \
-				includes/Response.hpp
+				includes/Response.hpp \
+				includes/CGIEngine.hpp
 
 
 OBJS		= $(SRCS:.cpp=.o)

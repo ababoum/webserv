@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigurationParser.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/09 14:45:34 by lcalvie          ###   ########.fr       */
+/*   Updated: 2022/08/13 20:41:31 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,7 +178,20 @@ void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items
 			line_items[2]);
 	}
 
+	// fill maxBody size
+	else if (line_items[0] == "client_max_body_size" && line_items.size() == 2)
+	{
+		_currentServer->setClientBufferSize(
+			std::atoi(line_items[1].c_str()));
+	}
+
 	// else: parsing error
+	else
+	{
+		std::cerr << RED_TXT << "Parsing error in line " << line_nb << RESET_TXT << '\n';
+			throw parsing_error("invalid line");
+	}
+	
 }
 
 

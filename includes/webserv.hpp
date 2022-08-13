@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/13 10:41:03 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/13 20:16:49 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <poll.h> // for poll
 #include <string.h>
+#include <sys/wait.h>
 
 #include <cstdlib>
 #include <vector>
@@ -38,6 +39,7 @@
 #include "Request.hpp"
 #include "Response.hpp"
 #include "ServerEngine.hpp"
+#include "CGIEngine.hpp"
 
 #define RED_TXT "\e[31m"
 #define GREEN_TXT "\e[32m"
@@ -51,6 +53,8 @@
 #define RESET_TXT "\e[0m"
 
 #define DEFAULT_MAX_CONNECTIONS 1024
+#define	REQUEST_BUFFER_SIZE		1024
+#define	CGI_BUFFER_SIZE			1024
 
 enum REQUEST_ERROR
 {
@@ -63,7 +67,9 @@ enum HTTP_RESPONSE
 	SUCCESS_OK = 200, // GET, POST
 	CREATED = 201, // POST
 	BAD_REQUEST = 400,
-	FORBIDDEN = 403
+	FORBIDDEN = 403,
+	NOT_FOUND = 404,
+	SERVER_ERROR = 500
 };
 
 #define SSTR(x) static_cast<std::ostringstream &>(           \

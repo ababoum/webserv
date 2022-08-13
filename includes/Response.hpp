@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/04 16:23:56 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/13 08:39:07 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ class Response
 
 		std::string		getText() const;
 		std::size_t		size() const;
-
 
 		void			setStatusCode(int code);
 		void			setStatusMsg(std::string msg);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/04 15:12:54 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/13 10:41:03 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <poll.h> // for poll
+#include <string.h>
 
 #include <cstdlib>
 #include <vector>

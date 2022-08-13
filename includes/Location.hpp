@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/01 19:54:31 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/09 14:43:18 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ class Location
 		std::set<std::string>		_allowedMethods;
 		std::string					_indexPage;
 		bool						_autoindex;
+		std::string					_cgi;
 
 	public:
 
@@ -42,13 +43,15 @@ class Location
 		void			setRoot(std::string path);
 		void			addAllowedMethod(std::string method);
 		void			setIndexPage(std::string indexPagePath);
-		void			setAutoindex(bool on_off);
+		void			setAutoindex(std::string on_off);
+		void			setCGI(std::string cgiPath);
 
 		// Accessors
 
 		std::string		getPrefix() const;
 		std::string		getIndexPage() const;
 		bool			isAutoindexed() const;
+		std::string		getCGI() const;
 	
 		// Methods
 		

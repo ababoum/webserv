@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/08 13:10:39 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/08 15:25:05 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ ServerEngine::ServerEngine(const Server & server):_server(server)
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket_fd == -1)
 	{
-		std::cerr << "Error while opening socket\n";
+		std::cerr << RED_TXT << "Error while opening socket\n" << RESET_TXT;
 		throw std::runtime_error("socket");
 	}
 
@@ -46,13 +46,13 @@ ServerEngine::ServerEngine(const Server & server):_server(server)
 	// bind socket to given host:port
 	if (bind(_socket_fd, (struct sockaddr*)(&_sockaddr), sizeof(sockaddr)) == -1)
 	{
-		std::cerr << "Error while binding socket\n";
+		std::cerr << RED_TXT << "Error while binding socket\n" << RESET_TXT;
 		throw std::runtime_error("bind");
 	}
 
 	if (listen(_socket_fd, DEFAULT_MAX_CONNECTIONS) == -1)
 	{
-		std::cerr << "Error while listening to socket\n";
+		std::cerr << RED_TXT << "Error while listening to socket\n" << RESET_TXT;
 		throw std::runtime_error("listen");
 	}
 
@@ -87,7 +87,7 @@ void	ServerEngine::stream_in()
 	
 	if (_client_fd == -1)
 	{
-		std::cerr << "Error while listening to socket\n";
+		std::cerr << RED_TXT << "Error while listening to socket\n" << RESET_TXT;
 		throw std::runtime_error("accept");
 	}
 

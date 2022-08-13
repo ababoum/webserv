@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/02 18:07:03 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/08 18:13:35 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,25 +22,21 @@ class Location;
 class ConfigurationParser
 {
 	public:
-		class parsing_error: std::exception
+		class parsing_error: public std::exception
 		{
 			private:
-				const char * _err_line;
+				const char * _msg;
 			
 			public:
-				parsing_error(const char * error_line): _err_line(error_line) {}
+				parsing_error() {}
+				parsing_error(const char * msg): _msg(msg) {}
 				virtual const char * what () const throw ()
 				{
-					std::string msg("Parsing error in line ");
-					msg.append(_err_line);
-					msg.append("\n");
-
-					const char *output = msg.c_str();
-					return output;
+					return _msg;
 				}
 		};
 
-		class syntax_error: std::exception
+		class syntax_error: public std::exception
 		{
 			private:
 				const char * _msg;
@@ -68,6 +64,7 @@ class ConfigurationParser
 		void	_parseLine(std::vector<std::string> & line_items, std::size_t line_nb);
 		void	_parseServerLine(std::vector<std::string> & line_items, std::size_t line_nb);
 		void	_parseLocationLine(std::vector<std::string> & line_items, std::size_t line_nb);
+		void	_checkServerDuplicate();
 		void	_checkCurrentServerIntegrity(std::size_t line_nb) const;
 
 	private:

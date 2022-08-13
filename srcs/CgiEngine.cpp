@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/08/13 10:48:40 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/13 11:23:04 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,15 @@ char	**CgiEngine::mapToStr(std::map<std::string, std::string> env)
 void	CgiEngine::exec()
 {
 	pid_t pid;
+	char **env = mapToStr(_env);
 	pid = fork();
-	if (pid == -1)
-		return;
+	// if (pid == -1)
+	// 	return;
 	if (pid == 0)
-		execve("../www/test.cgi", NULL, mapToStr(_env));
-	else
-		return;
+		execve("../www/test.cgi", NULL, env);
+	// else
+	// 	return;
+	for (size_t i = 0; env[i]; i++)
+		delete env[i];
+	delete [] env;
 }

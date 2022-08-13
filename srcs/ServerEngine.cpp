@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/13 10:14:42 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/13 11:37:39 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ void	ServerEngine::stream_out()
 	_resp->setContentType("text/plain");
 
 	std::string port_str = SSTR("" << _server.getPort() << "\n");
-	std::string body("<h1>Hello world!\nI'm on port "); body.append(port_str);
+	std::string body("Hello world!\nI'm on port "); body.append(port_str);
 	
 	_resp->setBody(body);
 	_resp->setContentLength(body.size());

@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 15:13:12 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/15 15:15:01 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ void	ServerEngine::stream_out()
 		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getTargetLocation()->getIndexPage();
 		std::fstream	file;
 		
-		file.open("www/index.html", std::ios::in);
+		file.open(path, std::ios::in);
 		for (std::string line; std::getline(file, line);)
 		{
 			body.append(line);

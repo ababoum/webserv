@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 17:50:52 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/15 19:50:05 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,11 @@ void	Request::findLocation(Server & serv)
 		
 		// check if the location matches
 		if (_header.URL == prefix)
+		{
+			_targetLocation = &serv.getRoutes()[i];
+			return ;
+		}
+		if (_header.URL == "/favicon.ico" && prefix == "/")
 		{
 			_targetLocation = &serv.getRoutes()[i];
 			return ;

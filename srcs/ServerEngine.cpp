@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 19:27:52 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/15 19:58:40 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,7 @@ void	ServerEngine::stream_out()
 	{
 		send(_client_fd, _resp->getCGIText().c_str(), _resp->size(), 0);
 	}
-	else if (_req->isValid())
+	else if (_req->isValid() && _req->getHeader().URL == "/")
 	{
 		_resp->setStatusCode(SUCCESS_OK);
 		_resp->setStatusMsg("OK");
@@ -177,6 +177,20 @@ void	ServerEngine::stream_out()
 			body.append(line);
 		}
 				
+		_resp->setBody(body);
+		_resp->setContentLength(body.size());
+
+		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
+	}
+	else if (_req->isValid() && _req->getHeader().URL == "/favicon.ico")
+	{
+		_resp->setStatusCode(SUCCESS_OK);
+		_resp->setStatusMsg("OK");
+		_resp->setContentType("image/ico");
+
+		std::vector<char> img_bytes = img_to_chars("www/favicon.ico");		
+		std::string body(img_bytes.begin(), img_bytes.end());
+		
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());
 

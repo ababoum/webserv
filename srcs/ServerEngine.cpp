@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/13 20:52:33 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/15 10:50:44 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,10 +146,16 @@ void	ServerEngine::stream_out()
 	{
 		_resp->setStatusCode(SUCCESS_OK);
 		_resp->setStatusMsg("OK");
-		_resp->setContentType("text/plain");
+		_resp->setContentType("text/html");
 
 		std::string port_str = SSTR("" << _server.getPort() << "\n");
-		std::string body("Hello world!\nI'm on port "); body.append(port_str);
+		std::string body;
+		int fd = open("www/index.html", O_RDONLY);
+		char buffer[REQUEST_BUFFER_SIZE + 1];
+		while (read(fd, buffer, REQUEST_BUFFER_SIZE) > 0)
+		{
+			body.append(buffer);
+		}
 		
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());

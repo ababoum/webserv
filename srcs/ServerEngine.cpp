@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 10:50:44 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/15 11:55:37 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,12 +86,12 @@ void	ServerEngine::_buildResponseOnRequest()
 
 
 	// else
-	if (!_req->getTargetLocation()->getCGI().empty())
-	{
-		CGIEngine cgi(_req);
-		_resp->setFromCGI(true);
-		_resp->setCGIText(cgi.exec());
-	}
+	// if (!_req->getTargetLocation()->getCGI().empty())
+	// {
+	// 	CGIEngine cgi(_req);
+	// 	_resp->setFromCGI(true);
+	// 	_resp->setCGIText(cgi.exec());
+	// }
 }
 
 void	ServerEngine::stream_in()
@@ -150,8 +150,10 @@ void	ServerEngine::stream_out()
 
 		std::string port_str = SSTR("" << _server.getPort() << "\n");
 		std::string body;
-		int fd = open("www/index.html", O_RDONLY);
+		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getTargetLocation()->getIndexPage();
+		int fd = open(path.c_str(), O_RDONLY);
 		char buffer[REQUEST_BUFFER_SIZE + 1];
+		
 		while (read(fd, buffer, REQUEST_BUFFER_SIZE) > 0)
 		{
 			body.append(buffer);

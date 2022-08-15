@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 09:06:14 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/15 11:48:38 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,11 @@ bool Location::isAutoindexed() const
 std::string Location::getCGI() const
 {
 	return _cgi;
+}
+
+std::string Location::getRoot() const
+{
+	return _root;
 }
 
 

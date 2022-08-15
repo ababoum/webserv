@@ -100,12 +100,12 @@ void	ServerEngine::_buildResponseOnRequest()
 
 
 	// else
-	// if (!_req->getTargetLocation()->getCGI().empty())
-	// {
-	// 	CGIEngine cgi(_req);
-	// 	_resp->setFromCGI(true);
-	// 	_resp->setCGIText(cgi.exec());
-	// }
+	if (!_req->getTargetLocation()->getCGI().empty())
+	{
+		CGIEngine cgi(_req);
+		_resp->setFromCGI(true);
+		_resp->setCGIText(cgi.exec());
+	}
 }
 
 void	ServerEngine::stream_in()
@@ -176,7 +176,7 @@ void	ServerEngine::stream_out()
 		{
 			body.append(line);
 		}
-				
+		file.close();
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());
 
@@ -200,10 +200,19 @@ void	ServerEngine::stream_out()
 	{
 		_resp->setStatusCode(SERVER_ERROR);
 		_resp->setStatusMsg("Internal Server Error");
-		_resp->setContentType("text/plain");
+		_resp->setContentType("text/html");
 
-		_resp->setBody("Error\n");
-		_resp->setContentLength(6);
+		std::string body;
+		std::fstream	file;
+		
+		file.open("www/error_pages/500.html", std::ios::in);
+		for (std::string line; std::getline(file, line);)
+		{
+			body.append(line);
+		}
+		file.close();
+		_resp->setBody(body);
+		_resp->setContentLength(body.size());
 
 		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
 	}

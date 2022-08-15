@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 19:11:30 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/15 19:27:52 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,11 +126,9 @@ void	ServerEngine::stream_in()
 	int r;
 	
 	readloop:
-	usleep(10);
 	r = read(_client_fd, buffer, REQUEST_BUFFER_SIZE);
 	if (r > 0)
 	{
-		std::cerr << r << '\n';
 		request_data.append(buffer);
 		memset(buffer, 0, REQUEST_BUFFER_SIZE);
 		fd_set_blocking(_client_fd, 0);

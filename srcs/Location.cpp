@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 11:48:38 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/15 14:10:48 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ Location &				Location::operator=( Location const & rhs )
 		_allowedMethods = rhs._allowedMethods;
 		_indexPage = rhs._indexPage;
 		_autoindex = rhs._autoindex;
+		_cgi = rhs._cgi;
 	}
 	return *this;
 }

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/08 18:10:41 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/15 17:51:41 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ int main(int ac, char **av)
 			std::cerr << RED_TXT << "Warning: any argument after the first one will be ignored\n"
 				<< RESET_TXT << "usage: ./webserv [file.conf]" << std::endl;
 		}
+
+		signal(SIGINT, ft_exit);
 		
 		std::string inputPath(av[1]);
 		GlobalConfiguration globalConf;
@@ -46,12 +48,11 @@ int main(int ac, char **av)
 				fds.push_back(**it);
 
 
-			ready = poll(fds.data(), nfds, 1000 * 30); // timeout = 30s
+			ready = poll(fds.data(), nfds, -1); // timeout = never
 			if (ready == 0)
 			{
 				std::cerr << RED_TXT
-				<< "webserv timed out: cannot stay idle for more than 30s" 
-				<< RESET_TXT << '\n';
+				<< "webserv timed out" << RESET_TXT << '\n';
 				return (EXIT_SUCCESS);
 			}
 			else if (ready == -1)
@@ -68,5 +69,5 @@ int main(int ac, char **av)
 		std::cerr << RED_TXT << e.what() << '\n' << RESET_TXT;
 	}
 	
-	return 0;
+	return (EXIT_SUCCESS);
 }

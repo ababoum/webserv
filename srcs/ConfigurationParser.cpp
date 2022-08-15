@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigurationParser.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 09:00:43 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/15 15:26:13 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,9 +139,9 @@ void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items
 	else if (line_items.size() == 3 && line_items[0] == "location" && line_items[2] == "{")
 	{
 		_context = "location";
-		Location *new_route = &(_globalConf.getServersList().back().addLocation());
+		Location *new_route = &(_currentServer->addLocation());
 		new_route->setPrefix(line_items[1]);
-		_currentLocation = &(_currentServer->getRoutes().back());
+		_currentLocation = new_route;
 		return ;
 	}
 

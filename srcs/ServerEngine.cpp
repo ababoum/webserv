@@ -3,14 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 15:15:01 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/15 19:11:30 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ServerEngine.hpp"
+
+
+static int fd_set_blocking(int fd, int blocking) {
+    /* Save the current flags */
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1)
+        return 0;
+
+    if (blocking)
+        flags &= ~O_NONBLOCK;
+    else
+        flags |= O_NONBLOCK;
+    return fcntl(fd, F_SETFL, flags) != -1;
+}
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -23,19 +37,19 @@ ServerEngine::ServerEngine(Server & server):_server(server)
 	_client_fd = -1;
 	
 	// open the socket
-	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+	_socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if (_socket_fd == -1)
 	{
 		std::cerr << RED_TXT << "Error while opening socket\n" << RESET_TXT;
 		throw std::runtime_error("socket");
 	}
-
+	
 	_in_fd.fd = _socket_fd;
 	_in_fd.events = POLLIN;
 	_out_fd.fd = -1;
 
 	// Clear socket structure
-	ft_memset(&_sockaddr, 0, sizeof(_sockaddr));
+	memset(&_sockaddr, 0, sizeof(_sockaddr));
 	
 	// Populate structure
 	_sockaddr.sin_family = AF_INET;
@@ -107,16 +121,22 @@ void	ServerEngine::stream_in()
 	}
 
 	// Read from the connection
-	char buffer[REQUEST_BUFFER_SIZE + 1] = {0};
+	char 			buffer[REQUEST_BUFFER_SIZE + 1] = {0};
 	std::string		request_data;
-	int r = 0;
+	int r;
 	
-	while ((r = recv(_client_fd, buffer, REQUEST_BUFFER_SIZE, MSG_DONTWAIT)) > 0)
+	readloop:
+	usleep(10);
+	r = read(_client_fd, buffer, REQUEST_BUFFER_SIZE);
+	if (r > 0)
 	{
-		sleep(1);
-		std::cout << r << '\n';
+		std::cerr << r << '\n';
 		request_data.append(buffer);
+		memset(buffer, 0, REQUEST_BUFFER_SIZE);
+		fd_set_blocking(_client_fd, 0);
+		goto readloop;
 	}
+	
 	std::cout << "The request data was: " << \
 		BLUE_TXT << request_data << RESET_TXT;
 	
@@ -142,7 +162,7 @@ void	ServerEngine::stream_out()
 	{
 		send(_client_fd, _resp->getCGIText().c_str(), _resp->size(), 0);
 	}
-	else
+	else if (_req->isValid())
 	{
 		_resp->setStatusCode(SUCCESS_OK);
 		_resp->setStatusMsg("OK");
@@ -153,15 +173,25 @@ void	ServerEngine::stream_out()
 		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getTargetLocation()->getIndexPage();
 		std::fstream	file;
 		
-		file.open(path, std::ios::in);
+		file.open(path.c_str(), std::ios::in);
 		for (std::string line; std::getline(file, line);)
 		{
 			body.append(line);
 		}
-		
-		
+				
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());
+
+		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
+	}
+	else
+	{
+		_resp->setStatusCode(SERVER_ERROR);
+		_resp->setStatusMsg("Internal Server Error");
+		_resp->setContentType("text/plain");
+
+		_resp->setBody("Error\n");
+		_resp->setContentLength(6);
 
 		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
 	}
@@ -194,3 +224,4 @@ struct pollfd	* ServerEngine::getOutFdPtr()
 }
 
 /* ************************************************************************** */
+

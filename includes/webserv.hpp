@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 10:43:33 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/15 19:11:35 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,9 +77,8 @@ enum HTTP_RESPONSE
 					(std::ostringstream() << std::dec << x)) \
 					.str()
 
-// Libft Equivalent
-void
-ft_memset(void *ptr, int data, size_t len);
+// C functions
+void	ft_exit(int sig_code);
 
 // CPP functions
 std::vector<std::string> split(const std::string &str, char delim);

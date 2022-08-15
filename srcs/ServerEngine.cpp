@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 13:57:03 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/15 15:13:12 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,13 +151,14 @@ void	ServerEngine::stream_out()
 		std::string port_str = SSTR("" << _server.getPort() << "\n");
 		std::string body;
 		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getTargetLocation()->getIndexPage();
-		int fd = open(path.c_str(), O_RDONLY);
-		char buffer[REQUEST_BUFFER_SIZE + 1];
+		std::fstream	file;
 		
-		while (read(fd, buffer, REQUEST_BUFFER_SIZE) > 0)
+		file.open("www/index.html", std::ios::in);
+		for (std::string line; std::getline(file, line);)
 		{
-			body.append(buffer);
+			body.append(line);
 		}
+		
 		
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());

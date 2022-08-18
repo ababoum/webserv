@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 18:53:57 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 19:33:01 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h> // For sockaddr_in
 #include <arpa/inet.h>	// For inet_addr
+#include <sys/stat.h> // For directory testing
 #include <unistd.h>
 #include <stdio.h>
 #include <poll.h> // for poll

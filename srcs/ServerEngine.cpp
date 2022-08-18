@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 19:20:04 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 19:44:01 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,9 @@ void	ServerEngine::_buildResponseOnRequest()
 		_resp->setStatusMsg("OK");
 		_resp->setContentType("text/html");
 
-		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getTargetLocation()->getIndexPage();
+		std::string path = _req->getTargetLocation()->getRoot();
+		path += (_req->getTargetLocation()->getIndexPage()[0] == '/' ? "" : "/");
+		path += _req->getTargetLocation()->getIndexPage();
 		std::string body = htmlPath_to_string(path.c_str());
 
 		_resp->setBody(body);
@@ -141,7 +143,9 @@ void	ServerEngine::_buildResponseOnRequest()
 		_resp->setStatusMsg("OK");
 		_resp->setContentType(_req->getBody().type);
 
-		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getHeader().resource_path;
+		std::string path = _req->getTargetLocation()->getRoot();
+		path += (_req->getHeader().resource_path[0] == '/' ? "" : "/");
+		path += _req->getHeader().resource_path;
 		std::string body = htmlPath_to_string(path.c_str());
 
 		_resp->setBody(body);
@@ -153,7 +157,9 @@ void	ServerEngine::_buildResponseOnRequest()
 		_resp->setStatusMsg("OK");
 		_resp->setContentType(_req->getBody().type);
 
-		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getHeader().resource_path;
+		std::string path = _req->getTargetLocation()->getRoot();
+		path += (_req->getHeader().resource_path[0] == '/' ? "" : "/");
+		path += _req->getHeader().resource_path;
 		std::string body = media_to_string(path.c_str());
 		
 		_resp->setBody(body);

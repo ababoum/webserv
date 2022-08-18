@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 19:30:03 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 19:50:01 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,11 +152,14 @@ void	Request::checkAccess()
 {
 	if (isValid())
 	{
-		std::string absolute_path = _targetLocation->getRoot() + "/" + _header.resource_path;
+		std::string absolute_path = _targetLocation->getRoot() + 
+			(_header.resource_path[0] == '/' ? "" : "/") + _header.resource_path;
+		std::cerr << absolute_path << '\n';
+
 		int 		check = 0;
 		struct stat sb;
 
-		if (access(absolute_path.c_str(), F_OK) || (
+		if (!access(absolute_path.c_str(), F_OK) || (
 			stat(absolute_path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)
 		))
 		{

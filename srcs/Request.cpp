@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 19:50:05 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 16:46:01 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,17 +84,24 @@ void	Request::parseData(std::string requestData)
 			else
 			{
 				_header.method = line_items[0];
-				_header.URL = line_items[1];	
+				_header.URL = line_items[1];
+				_parseURL();	
 			}
 		}
 		++line_index;
 	}
 }
 
+
+// GET /YoupiBanane/blabla.prout
+
 void	Request::findLocation(Server & serv)
 {
+	std::string URL_to_check = _header.resource_path;
 	std::string	prefix;
 	
+	location_parse_loop:
+
 	// find the right location
 	for (size_t i = 0; i < serv.getRoutes().size(); ++i)
 	{
@@ -102,11 +109,6 @@ void	Request::findLocation(Server & serv)
 		
 		// check if the location matches
 		if (_header.URL == prefix)
-		{
-			_targetLocation = &serv.getRoutes()[i];
-			return ;
-		}
-		if (_header.URL == "/favicon.ico" && prefix == "/")
 		{
 			_targetLocation = &serv.getRoutes()[i];
 			return ;
@@ -131,9 +133,40 @@ void	Request::findLocation(Server & serv)
 		}
 	}
 
-	// if no location checks
-	_validRequest = false;
-	_error = NOT_FOUND;
+	URL_to_check.erase(URL_to_check.end() - 1);
+	if (URL_to_check.empty())
+	{
+		// if no location checks
+		_validRequest = false;
+		_error = NOT_FOUND;
+	}
+	else
+	{
+		while(URL_to_check[URL_to_check.size() - 1] != '/')
+			URL_to_check.erase(URL_to_check.end() - 1);
+		goto location_parse_loop;
+	}
+}
+
+void			Request::_parseURL()
+{
+	std::vector<std::string> path_and_query = split(_header.URL, '?');
+	
+	if (path_and_query.size() == 2)
+	{
+		_header.resource_path = path_and_query[0];
+		_header.query_string = path_and_query[1];
+		// parsing query string into the map
+	}
+	else if (path_and_query.size() == 1)
+	{
+		_header.resource_path = path_and_query[0];
+	}
+	else
+	{
+		_validRequest = false;
+		_error = BAD_REQUEST;
+	}
 }
 
 void			Request::setError(int err)

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/13 20:42:55 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 16:41:40 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,9 @@ class Response;
 class ServerEngine
 {
 	public:
-		typedef struct sockaddr_in t_sockaddr_in;
+		typedef struct sockaddr_in			t_sockaddr_in;
+		static std::map<int, std::string>	err_dictionary;
+		static	void						init_dictionary();
 
 	public:
 		// ServerEngine(const ServerEngine & src);

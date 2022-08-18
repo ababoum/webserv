@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/08/13 20:45:04 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 16:35:19 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ std::string		CGIEngine::exec()
 	char		buffer[CGI_BUFFER_SIZE + 1] = {0};
 	std::string	cgi_path;
 
-	cgi_path.append("www/");
+	cgi_path.append(_req->getTargetLocation()->getRoot() + "/");
 	cgi_path.append(_req->getTargetLocation()->getCGI());
 
 	env = mapToStr(_env);

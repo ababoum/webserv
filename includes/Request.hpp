@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/13 20:42:26 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 15:52:12 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,11 @@
 
 struct RequestHeader
 {
-	std::string		method;
-	std::string		URL;
+	std::string							method;
+	std::string							URL;
+	std::string							resource_path;
+	std::string							query_string;
+	std::map<std::string, std::string>	query_variables;
 };
 
 struct RequestBody
@@ -39,7 +42,7 @@ class Request
 		RequestBody		_body;
 		bool			_validRequest;
 		int				_error;
-		const Location	*_targetLocation;
+		const Location	*_targetLocation;		
 
 	public:
 
@@ -54,6 +57,9 @@ class Request
 
 		void			setError(int err);
 		void			setIsRequestValid(bool val);
+
+	private:
+		void			_parseURL();
 };
 
 

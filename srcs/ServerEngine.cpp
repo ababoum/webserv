@@ -3,14 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 15:12:21 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/18 16:59:38 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ServerEngine.hpp"
+
+
+void ServerEngine::init_dictionary()
+{
+	err_dictionary.insert(make_pair(200, "OK"));
+	err_dictionary.insert(make_pair(400, "Bad Request"));
+	err_dictionary.insert(make_pair(404, "Resource Not Found"));
+	err_dictionary.insert(make_pair(500, "Internal Server Error"));
+}
 
 
 static int fd_set_blocking(int fd, int blocking) {
@@ -95,17 +104,79 @@ ServerEngine::~ServerEngine()
 
 void	ServerEngine::_buildResponseOnRequest()
 {
-	// build response if error case
-
-
-
-	// else
 	if (!_req->getTargetLocation()->getCGI().empty())
 	{
 		CGIEngine cgi(_req);
 		_resp->setFromCGI(true);
 		_resp->setCGIText(cgi.exec());
+		
+		if (_req->isValid())
+			return ;
 	}
+	else if (_req->isValid() && _req->getHeader().URL == "/")
+	{
+		_resp->setStatusCode(SUCCESS_OK);
+		_resp->setStatusMsg("OK");
+		_resp->setContentType("text/html");
+
+		std::string body;
+		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getTargetLocation()->getIndexPage();
+		std::fstream	file;
+		
+		file.open(path.c_str(), std::ios::in);
+		for (std::string line; std::getline(file, line);)
+		{
+			body.append(line);
+		}
+		file.close();
+
+		_resp->setBody(body);
+		_resp->setContentLength(body.size());
+
+		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
+	}
+	else if (_req->isValid() && _req->getHeader().URL == "/favicon.ico")
+	{
+		_resp->setStatusCode(SUCCESS_OK);
+		_resp->setStatusMsg("OK");
+		_resp->setContentType("image/ico");
+
+		std::vector<char> img_bytes = img_to_chars("www/favicon.ico");		
+		std::string body(img_bytes.begin(), img_bytes.end());
+		
+		_resp->setBody(body);
+		_resp->setContentLength(body.size());
+
+		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
+	}
+
+	
+	// build response if error case
+	if (!_req->isValid())
+	{
+		_resp->setStatusCode(_req->getError());
+		_resp->setStatusMsg(err_dictionary.find(_req->getError())->second);
+		_resp->setContentType("text/html");
+
+		std::string		body;
+		std::fstream	file;
+		std::string		path;
+		
+		if (_server.getErrorPagePath(_req->getError()) == "")
+		{
+			path = "www/error_pages/";
+			path += SSTR("" << _req->getError());
+			path += ".html";
+		}
+		else
+			path = _server.getErrorPagePath(_req->getError());
+		
+		body = htmlPath_to_string(path.c_str);
+
+		_resp->setBody(body);
+		_resp->setContentLength(body.size());
+	}
+
 }
 
 void	ServerEngine::stream_in()
@@ -156,73 +227,16 @@ void	ServerEngine::stream_out()
 	_resp = new Response;
 
 	_buildResponseOnRequest();
+	
 	if (_resp->isFromCGI())
 	{
 		send(_client_fd, _resp->getCGIText().c_str(), _resp->size(), 0);
 	}
-	else if (_req->isValid() && _req->getHeader().URL == "/")
-	{
-		_resp->setStatusCode(SUCCESS_OK);
-		_resp->setStatusMsg("OK");
-		_resp->setContentType("text/html");
-
-		std::string port_str = SSTR("" << _server.getPort() << "\n");
-		std::string body;
-		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getTargetLocation()->getIndexPage();
-		std::fstream	file;
-		
-		file.open(path.c_str(), std::ios::in);
-		for (std::string line; std::getline(file, line);)
-		{
-			body.append(line);
-		}
-		file.close();
-
-		size_t size;
-		if (!_server.getClientBufferSize() || body.size() < _server.getClientBufferSize())
-			size = body.size();
-		else
-			size = _server.getClientBufferSize();
-		_resp->setBody(body);
-		_resp->setContentLength(size);
-
-		send(_client_fd, _resp->getText().c_str(), size, 0);
-	}
-	else if (_req->isValid() && _req->getHeader().URL == "/favicon.ico")
-	{
-		_resp->setStatusCode(SUCCESS_OK);
-		_resp->setStatusMsg("OK");
-		_resp->setContentType("image/ico");
-
-		std::vector<char> img_bytes = img_to_chars("www/favicon.ico");		
-		std::string body(img_bytes.begin(), img_bytes.end());
-		
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
-
-		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
-	}
 	else
 	{
-		_resp->setStatusCode(SERVER_ERROR);
-		_resp->setStatusMsg("Internal Server Error");
-		_resp->setContentType("text/html");
-
-		std::string body;
-		std::fstream	file;
-		
-		file.open("www/error_pages/500.html", std::ios::in);
-		for (std::string line; std::getline(file, line);)
-		{
-			body.append(line);
-		}
-		file.close();
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
-
 		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
 	}
-
+	
 	delete _resp;
 	delete _req;
 	// Close the connection

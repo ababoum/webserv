@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 15:26:13 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 16:15:44 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,13 @@ void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items
 		_context = "location";
 		Location *new_route = &(_currentServer->addLocation());
 		new_route->setPrefix(line_items[1]);
+		
+		// make sure that the prefix ends with '/' if it's a named folder
+		if (line_items[1][line_items[1].size() - 1] != '/' && line_items[1].find('*') == std::string::npos)
+		{
+			line_items[1].append("/");
+			new_route->setPrefix(line_items[1]);
+		}
 		_currentLocation = new_route;
 		return ;
 	}

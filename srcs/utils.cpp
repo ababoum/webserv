@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 19:38:17 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 16:58:59 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,4 +83,24 @@ std::vector<char> img_to_chars(const char *img_path)
 	
 	img_file.close();
 	return ret;	
+}
+
+std::string		htmlPath_to_string(const char *html_path)
+{
+	std::string	ret;
+	
+	file.open(html_path, std::ios::in);
+	if (!file)
+	{
+		ret += "<title>Error Page Not Found</title>
+					<H1>Error Page Not Found</H1>"
+		return ret;
+	}
+	for (std::string line; std::getline(file, line);)
+	{
+		ret.append(line);
+	}
+	file.close();
+
+	return ret;
 }

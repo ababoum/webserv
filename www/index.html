@@ -34,6 +34,7 @@
 		<input type="submit" value="Submit">
 	</form>
 	<h2>Delete test</h2>
+	<button id="delete-request">ABC</button>
 	<button onclick="delete_test()">Delete</button>
 	<h2>Download test</h2>
 	<a href="favicon.ico" download>
@@ -52,21 +53,26 @@
 			// // this is the data we get after putting our data,
 			// console.log(data)
 			// );
-			var url = "https://reqbin.com/sample/delete/json";
 
-			var xhr = new XMLHttpRequest();
-			xhr.open("DELETE", url);
+			// var url = "https://reqbin.com/sample/delete/json";
 
-			xhr.setRequestHeader("Accept", "*/*");
-			xhr.setRequestHeader("Authorization", "Bearer mt0dgHmLJMVQhvjpNXDyA83vA_PxH23Y");
+			// var xhr = new XMLHttpRequest();
+			// xhr.open("DELETE", url);
 
-			xhr.onreadystatechange = function () {
-			if (xhr.readyState === 4) {
-				console.log(xhr.status);
-				console.log(xhr.responseText);
-			}};
+			// xhr.setRequestHeader("Accept", "*/*");
+			// xhr.setRequestHeader("Authorization", "Bearer mt0dgHmLJMVQhvjpNXDyA83vA_PxH23Y");
 
-			xhr.send();
+			// xhr.onreadystatechange = function () {
+			// if (xhr.readyState === 4) {
+			// 	console.log(xhr.status);
+			// 	console.log(xhr.responseText);
+			// }};
+			// xhr.send();
+
+			const element = document.querySelector('#delete-request');
+			fetch('http://localhost:9999', { method: 'DELETE' })
+				.then(() => element.innerHTML = 'Delete successful');
+
 		}
 		function random_color()
 		{

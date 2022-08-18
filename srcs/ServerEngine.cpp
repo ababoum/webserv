@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 19:58:40 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 15:12:21 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,10 +177,16 @@ void	ServerEngine::stream_out()
 			body.append(line);
 		}
 		file.close();
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
 
-		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
+		size_t size;
+		if (!_server.getClientBufferSize() || body.size() < _server.getClientBufferSize())
+			size = body.size();
+		else
+			size = _server.getClientBufferSize();
+		_resp->setBody(body);
+		_resp->setContentLength(size);
+
+		send(_client_fd, _resp->getText().c_str(), size, 0);
 	}
 	else if (_req->isValid() && _req->getHeader().URL == "/favicon.ico")
 	{

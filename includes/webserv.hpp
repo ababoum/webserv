@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 16:54:58 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 18:53:57 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ enum HTTP_RESPONSE
 	BAD_REQUEST = 400,
 	FORBIDDEN = 403,
 	NOT_FOUND = 404,
+	METHOD_NOT_ALLOWED = 405,
 	SERVER_ERROR = 500
 };
 
@@ -83,7 +84,7 @@ void	ft_exit(int sig_code);
 // CPP functions
 std::vector<std::string>	split(const std::string &str, char delim);
 std::vector<std::string>	split(const std::string &str, const char *set_delim);
-std::vector<char> 			img_to_chars(const char *img_path);
+std::string 				media_to_string(const char *img_path);
 std::string					htmlPath_to_string(const char *html_path);
 
 #endif

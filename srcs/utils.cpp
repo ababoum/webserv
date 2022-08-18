@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 16:58:59 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 19:30:32 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,39 +61,40 @@ std::vector<std::string> split(const std::string &str, const char *set_delim)
 
 void	ft_exit(int sig_code)
 {
-	std::cout << GREEN_TXT << "\nQuiting webserv... Thanks!\n" << RESET_TXT;
+	std::cout << GREEN_TXT << "\nQuitting webserv... Thanks!\n" << RESET_TXT;
 	exit(sig_code);
 }
 
-std::vector<char> img_to_chars(const char *img_path)
+std::string media_to_string(const char *img_path)
 {
-	std::ifstream 		img_file;
-	std::vector<char> 	ret;
+	std::ifstream 		media_file;
+	std::vector<char> 	tab;
 	char				byte;
 
-	img_file.open(img_path);
-	if (!img_file)
+	media_file.open(img_path);
+	if (!media_file)
 	{
-		// vector is empty if image file cannot be opened
-		return ret;
+		// string is empty if image file cannot be opened
+		return std::string("<title>Media Page Not Found</title><H1>Media Page Not Found</H1>");
 	}
-	while (img_file.get(byte)) {
-        ret.push_back(byte);
+	while (media_file.get(byte)) {
+        tab.push_back(byte);
     }
 	
-	img_file.close();
+	std::string ret(tab.begin(), tab.end());
+	media_file.close();
 	return ret;	
 }
 
 std::string		htmlPath_to_string(const char *html_path)
 {
-	std::string	ret;
-	
+	std::string		ret;
+	std::ifstream	file;
+
 	file.open(html_path, std::ios::in);
 	if (!file)
 	{
-		ret += "<title>Error Page Not Found</title>
-					<H1>Error Page Not Found</H1>"
+		ret += "<title>Error Page Not Found</title><H1>Error Page Not Found</H1>";
 		return ret;
 	}
 	for (std::string line; std::getline(file, line);)

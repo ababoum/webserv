@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 15:52:12 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 18:52:26 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ struct RequestBody
 {
 	std::string		content;
 	std::size_t		length;
+	std::string		type;
+	bool			isMedia;
 };
 
 class Request
@@ -48,6 +50,8 @@ class Request
 
 		void	parseData(std::string requestData);
 		void	findLocation(Server & serv);
+		void	checkAccess();
+		void	identifyType();
 
 		RequestHeader &	getHeader();
 		RequestBody &	getBody();

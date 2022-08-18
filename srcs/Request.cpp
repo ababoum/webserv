@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 16:46:01 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 19:30:03 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void	Request::findLocation(Server & serv)
 		prefix = serv.getRoutes()[i].getPrefix();
 		
 		// check if the location matches
-		if (_header.URL == prefix)
+		if (URL_to_check == prefix)
 		{
 			_targetLocation = &serv.getRoutes()[i];
 			return ;
@@ -116,16 +116,16 @@ void	Request::findLocation(Server & serv)
 		else if (prefix[prefix.size() - 1] == '*')
 		{
 			prefix.erase(prefix.end() - 1);
-			if (prefix.compare(0, prefix.size(), _header.URL))
+			if (prefix.compare(0, prefix.size(), URL_to_check))
 			{
 				_targetLocation = &serv.getRoutes()[i];
 				return ;
 			}
 		}
-		else if (prefix[0] == '*' && _header.URL.size() >= prefix.size())
+		else if (prefix[0] == '*' && URL_to_check.size() >= prefix.size())
 		{
 			prefix.erase(prefix.begin());
-			if (_header.URL.compare(_header.URL.size() - prefix.size(), prefix.size(), prefix))
+			if (URL_to_check.compare(URL_to_check.size() - prefix.size(), prefix.size(), prefix))
 			{
 				_targetLocation = &serv.getRoutes()[i];
 				return ; 
@@ -147,6 +147,101 @@ void	Request::findLocation(Server & serv)
 		goto location_parse_loop;
 	}
 }
+
+void	Request::checkAccess()
+{
+	if (isValid())
+	{
+		std::string absolute_path = _targetLocation->getRoot() + "/" + _header.resource_path;
+		int 		check = 0;
+		struct stat sb;
+
+		if (access(absolute_path.c_str(), F_OK) || (
+			stat(absolute_path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)
+		))
+		{
+			if (_header.method == "GET")
+				check = access(absolute_path.c_str(), R_OK);
+			else if (_header.method == "POST")
+				check = access(absolute_path.c_str(), W_OK);
+			else if (_header.method == "DELETE")
+				check = access(absolute_path.c_str(), W_OK);
+			else
+				check = !0;
+			
+			if (check != 0)
+			{
+				setError(FORBIDDEN);
+				setIsRequestValid(false);
+			}
+		}
+		else
+		{
+			setError(NOT_FOUND);
+			setIsRequestValid(false);
+		}
+		
+	}
+}
+
+void	Request::identifyType()
+{
+	std::string file_to_check = _header.resource_path;
+	std::string extension;
+
+	std::string::reverse_iterator rit = file_to_check.rbegin();
+	for (; rit != file_to_check.rend(); ++rit)
+	{
+		if (*rit == '.')
+			break ;
+		if (*rit == '/')
+		{
+			_body.type = "directory";
+			_body.isMedia = false;
+			return ;
+		}
+		extension.insert(extension.begin(), *rit);
+	}
+	
+	if (extension.empty())
+	{
+		setError(BAD_REQUEST);
+		setIsRequestValid(false);
+		return ;
+	}
+	
+	if (extension == "png" || extension == "ico" || extension == "jpg" || extension == "gif")
+	{
+		_body.isMedia = true;
+		_body.type = "image/" + extension;
+	}
+	else if (extension == "html" || extension == "php")
+	{
+		_body.isMedia = false;
+		_body.type = "text/html";
+	}
+	else if (extension == "mpeg" || extension == "mp3")
+	{
+		_body.isMedia = true;
+		_body.type = "audio/" + extension;
+	}
+	else if (extension == "mp4")
+	{
+		_body.isMedia = true;
+		_body.type = "audio/mp4";
+	}
+	else if (extension == "cgi")
+	{
+		_body.type = "cgi";
+	}
+	else
+	{
+		setError(BAD_REQUEST);
+		setIsRequestValid(false);
+	}
+}
+
+
 
 void			Request::_parseURL()
 {

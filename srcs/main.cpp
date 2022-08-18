@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 16:44:15 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 19:20:08 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,6 @@ int main(int ac, char **av)
 		}
 
 		signal(SIGINT, ft_exit);
-
-		ServerEngine::init_dictionary();
 		
 		std::string inputPath(av[1]);
 		GlobalConfiguration globalConf;

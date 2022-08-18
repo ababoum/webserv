@@ -6,19 +6,21 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 16:59:38 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/18 19:20:04 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ServerEngine.hpp"
 
 
-void ServerEngine::init_dictionary()
+void ServerEngine::_init_dictionary()
 {
-	err_dictionary.insert(make_pair(200, "OK"));
-	err_dictionary.insert(make_pair(400, "Bad Request"));
-	err_dictionary.insert(make_pair(404, "Resource Not Found"));
-	err_dictionary.insert(make_pair(500, "Internal Server Error"));
+	err_dictionary.insert(std::make_pair(200, "OK"));
+	err_dictionary.insert(std::make_pair(400, "Bad Request"));
+	err_dictionary.insert(std::make_pair(403, "Forbidden"));
+	err_dictionary.insert(std::make_pair(404, "Resource Not Found"));
+	err_dictionary.insert(std::make_pair(405, "Method Not Allowed"));
+	err_dictionary.insert(std::make_pair(500, "Internal Server Error"));
 }
 
 
@@ -41,6 +43,8 @@ static int fd_set_blocking(int fd, int blocking) {
 
 ServerEngine::ServerEngine(Server & server):_server(server)
 {
+	// build error dictionary
+	_init_dictionary();
 	
 	// init params
 	_client_fd = -1;
@@ -104,7 +108,13 @@ ServerEngine::~ServerEngine()
 
 void	ServerEngine::_buildResponseOnRequest()
 {
-	if (!_req->getTargetLocation()->getCGI().empty())
+	// check if method is allowed
+	if (!_req->getTargetLocation()->isAllowedMethod(_req->getHeader().method))
+	{
+		_req->setError(METHOD_NOT_ALLOWED);
+		_req->setIsRequestValid(false);
+	}
+	else if (!_req->getTargetLocation()->getCGI().empty() || _req->getBody().type == "cgi")
 	{
 		CGIEngine cgi(_req);
 		_resp->setFromCGI(true);
@@ -113,43 +123,42 @@ void	ServerEngine::_buildResponseOnRequest()
 		if (_req->isValid())
 			return ;
 	}
-	else if (_req->isValid() && _req->getHeader().URL == "/")
+	else if (_req->getBody().type == "directory")
 	{
 		_resp->setStatusCode(SUCCESS_OK);
 		_resp->setStatusMsg("OK");
 		_resp->setContentType("text/html");
 
-		std::string body;
 		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getTargetLocation()->getIndexPage();
-		std::fstream	file;
-		
-		file.open(path.c_str(), std::ios::in);
-		for (std::string line; std::getline(file, line);)
-		{
-			body.append(line);
-		}
-		file.close();
+		std::string body = htmlPath_to_string(path.c_str());
 
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());
-
-		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
 	}
-	else if (_req->isValid() && _req->getHeader().URL == "/favicon.ico")
+	else if (_req->isValid() && _req->getBody().isMedia == false)
 	{
 		_resp->setStatusCode(SUCCESS_OK);
 		_resp->setStatusMsg("OK");
-		_resp->setContentType("image/ico");
+		_resp->setContentType(_req->getBody().type);
 
-		std::vector<char> img_bytes = img_to_chars("www/favicon.ico");		
-		std::string body(img_bytes.begin(), img_bytes.end());
+		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getHeader().resource_path;
+		std::string body = htmlPath_to_string(path.c_str());
+
+		_resp->setBody(body);
+		_resp->setContentLength(body.size());
+	}
+	else if (_req->isValid() && _req->getBody().isMedia)
+	{
+		_resp->setStatusCode(SUCCESS_OK);
+		_resp->setStatusMsg("OK");
+		_resp->setContentType(_req->getBody().type);
+
+		std::string path = _req->getTargetLocation()->getRoot() + "/" + _req->getHeader().resource_path;
+		std::string body = media_to_string(path.c_str());
 		
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());
-
-		send(_client_fd, _resp->getText().c_str(), _resp->size(), 0);
 	}
-
 	
 	// build response if error case
 	if (!_req->isValid())
@@ -171,7 +180,7 @@ void	ServerEngine::_buildResponseOnRequest()
 		else
 			path = _server.getErrorPagePath(_req->getError());
 		
-		body = htmlPath_to_string(path.c_str);
+		body = htmlPath_to_string(path.c_str());
 
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());
@@ -217,6 +226,8 @@ void	ServerEngine::stream_in()
 	_req = new Request;
 	_req->parseData(request_data);
 	_req->findLocation(_server);
+	_req->checkAccess();
+	_req->identifyType();
 	
 }
 

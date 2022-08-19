@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIEngine.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/08/18 19:43:35 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/19 09:42:10 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,14 @@ CGIEngine::CGIEngine(Request *req)
 	_env["PATH_INFO"] = "";
 	_env["PATH_TRANSLATED"] = "";
 	_env["SCRIPT_NAME"] = "";
-	_env["QUERY_STRING"] = "";
+	_env["QUERY_STRING"] = req->getHeader().query_string;
 	_env["REMOTE_HOST"] = "";
 	_env["REMOTE_ADDR"] = "";
 	_env["AUTH_TYPE"] = "";
 	_env["REMOTE_USER"] = "";
 	_env["REMOTE_IDENT"] = "";
-	_env["CONTENT_TYPE"] = "";
-	_env["CONTENT_LENGTH"] = "";
+	_env["CONTENT_TYPE"] = req->getBody().type;
+	_env["CONTENT_LENGTH"] = SSTR( "" << req->getBody().length);
 	_env["HTTP_ACCEPT"] = "";
 	_env["HTTP_ACCEPT_LANGUAGE"] = "";
 	_env["HTTP_USER_AGENT"] = "";
@@ -79,10 +79,17 @@ std::string		CGIEngine::exec()
 	char		buffer[CGI_BUFFER_SIZE + 1] = {0};
 	std::string	cgi_path;
 
-	cgi_path.append(_req->getTargetLocation()->getRoot());
-	cgi_path += (_req->getTargetLocation()->getCGI()[0] == '/' ? "" : "/");
-	cgi_path.append(_req->getTargetLocation()->getCGI());
-
+	if (_req->getBody().type == "cgi")
+	{
+		cgi_path.append(_req->getTargetLocation()->getRoot());
+		cgi_path.append(_req->getHeader().resource_path);
+	}
+	else
+	{
+		cgi_path.append(_req->getTargetLocation()->getRoot());
+		cgi_path += (_req->getTargetLocation()->getCGI()[0] == '/' ? "" : "/");
+		cgi_path.append(_req->getTargetLocation()->getCGI());
+	}
 	env = mapToStr(_env);
 	pipe(cgi_pipe_read);
 	pipe(cgi_pipe_write);

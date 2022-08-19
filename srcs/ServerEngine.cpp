@@ -116,7 +116,7 @@ void	ServerEngine::_buildResponseOnRequest()
 	}
 	else if (!_req->getTargetLocation()->getCGI().empty() || _req->getBody().type == "cgi")
 	{
-		CGIEngine cgi(_req);
+		CGIEngine cgi(_req, &_server);
 		_resp->setFromCGI(true);
 		_resp->setCGIText(cgi.exec());
 		

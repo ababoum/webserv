@@ -20,7 +20,7 @@ class Request;
 class CGIEngine
 {
 	public:
-		CGIEngine(Request *req);
+		CGIEngine(Request *req, Server *serv);
 		~CGIEngine();
 		
 		std::string		exec();

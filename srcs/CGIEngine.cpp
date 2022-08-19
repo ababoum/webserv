@@ -20,20 +20,26 @@ static void	free_env(char **env)
 	delete [] env;
 }
 
-CGIEngine::CGIEngine(Request *req)
+CGIEngine::CGIEngine(Request *req, Server *serv)
 {	
+	std::string path;
+
+	if (_req->getBody().type == "cgi")
+		path = _req->getHeader().resource_path;
+	else
+		path = _req->getTargetLocation()->getCGI();
 	_req = req;
 	_body = req->getBody().content;
 	
 	_env["SERVER_SOFTWARE"] = "";
 	_env["SERVER_NAME"] = "";
-	_env["GATEWAY_INTERFACE"] = "";
+	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-	_env["SERVER_PORT"] = "";
+	_env["SERVER_PORT"] = SSTR( "" << serv->getPort());
 	_env["REQUEST_METHOD"] = req->getHeader().method;
-	_env["PATH_INFO"] = "";
-	_env["PATH_TRANSLATED"] = "";
-	_env["SCRIPT_NAME"] = "";
+	_env["PATH_INFO"] = path;
+	_env["PATH_TRANSLATED"] = path;
+	_env["SCRIPT_NAME"] = path;
 	_env["QUERY_STRING"] = req->getHeader().query_string;
 	_env["REMOTE_HOST"] = "";
 	_env["REMOTE_ADDR"] = "";

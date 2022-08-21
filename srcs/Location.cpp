@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 14:10:48 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/21 20:31:56 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,11 @@ std::string Location::getCGI() const
 std::string Location::getRoot() const
 {
 	return _root;
+}
+
+std::set<std::string> & 	Location::getAllowedMethods()
+{
+	return _allowedMethods;
 }
 
 

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 19:44:01 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/21 20:21:21 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ ServerEngine::ServerEngine(Server & server):_server(server)
 	// Clear socket structure
 	memset(&_sockaddr, 0, sizeof(_sockaddr));
 	
-	// Populate structure
+	// Populate structure (IP)
 	_sockaddr.sin_family = AF_INET;
 	_sockaddr.sin_addr.s_addr = inet_addr(_server.getIP().c_str());
 	_sockaddr.sin_port = htons(_server.getPort());
@@ -84,6 +84,7 @@ ServerEngine::ServerEngine(Server & server):_server(server)
 	}
 
 	_peer_addr_size = sizeof(_sockaddr);
+
 }
 
 
@@ -180,7 +181,7 @@ void	ServerEngine::_buildResponseOnRequest()
 		if (_server.getErrorPagePath(_req->getError()) == "")
 		{
 			path = "www/error_pages/";
-			path += SSTR("" << _req->getError());
+			path += int_to_string(_req->getError());
 			path += ".html";
 		}
 		else

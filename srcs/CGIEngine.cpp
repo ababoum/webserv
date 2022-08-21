@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIEngine.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/08/19 09:42:10 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/21 19:41:24 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	_env["SERVER_NAME"] = "";
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-	_env["SERVER_PORT"] = SSTR( "" << serv->getPort());
+	_env["SERVER_PORT"] = int_to_string(serv->getPort());
 	_env["REQUEST_METHOD"] = req->getHeader().method;
 	_env["PATH_INFO"] = path;
 	_env["PATH_TRANSLATED"] = path;
@@ -47,7 +47,7 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	_env["REMOTE_USER"] = "";
 	_env["REMOTE_IDENT"] = "";
 	_env["CONTENT_TYPE"] = req->getBody().type;
-	_env["CONTENT_LENGTH"] = SSTR( "" << req->getBody().length);
+	_env["CONTENT_LENGTH"] = int_to_string(req->getBody().length);
 	_env["HTTP_ACCEPT"] = "";
 	_env["HTTP_ACCEPT_LANGUAGE"] = "";
 	_env["HTTP_USER_AGENT"] = "";

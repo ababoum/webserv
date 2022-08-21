@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 14:10:19 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/21 20:32:06 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,13 @@ class Location
 
 		// Accessors
 
-		std::string		getPrefix() const;
-		std::string		getIndexPage() const;
-		bool			isAutoindexed() const;
-		std::string		getCGI() const;
-		std::string		getRoot() const;
-	
+		std::string						getPrefix() const;
+		std::string						getIndexPage() const;
+		bool							isAutoindexed() const;
+		std::set<std::string> & 	getAllowedMethods();
+		std::string						getCGI() const;
+		std::string						getRoot() const;
+		
 		// Methods
 		
 		bool			isAllowedMethod(std::string method) const;

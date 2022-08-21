@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/08 18:13:35 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/21 20:35:54 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ class ConfigurationParser
 		void	_parseLocationLine(std::vector<std::string> & line_items, std::size_t line_nb);
 		void	_checkServerDuplicate();
 		void	_checkCurrentServerIntegrity(std::size_t line_nb) const;
+		void	_checkCurrentLocationIntegrity(std::size_t line_nb) const;
+		void	_solveCurrentLocationIntegrity();
 
 	private:
 		std::string				_inputFilePath;

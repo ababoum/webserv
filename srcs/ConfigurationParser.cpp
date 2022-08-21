@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 16:15:44 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/21 20:37:47 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 	if (line_items.size() == 1 && line_items[0] == "}")
 	{
 		_context = "server";
+		_checkCurrentLocationIntegrity(line_nb);
+		_solveCurrentLocationIntegrity();
 		return ;
 	}
 
@@ -318,6 +320,34 @@ void	ConfigurationParser::_checkCurrentServerIntegrity(std::size_t line_nb) cons
 		std::cerr << RED_TXT << "Error: server doesn't have any route: line " <<
 			RESET_TXT << line_nb << '\n';
 		throw std::logic_error("route-less server");
+	}
+}
+
+void	ConfigurationParser::_checkCurrentLocationIntegrity(std::size_t line_nb) const
+{
+	if (_currentLocation->getRoot().empty())
+	{
+		std::cerr << RED_TXT << "Error: location doesn't have a root: line " <<
+			RESET_TXT << line_nb << '\n';
+		throw std::logic_error("root-less location");
+	}
+
+	if (_currentLocation->getIndexPage().empty())
+	{
+		std::cerr << RED_TXT << "Error: location doesn't have an index page: line " <<
+			RESET_TXT << line_nb << '\n';
+		throw std::logic_error("index-less location");
+	}
+}
+
+
+void	ConfigurationParser::_solveCurrentLocationIntegrity()
+{
+	if (_currentLocation->getAllowedMethods().empty())
+	{
+		_currentLocation->addAllowedMethod("GET");
+		_currentLocation->addAllowedMethod("POST");
+		_currentLocation->addAllowedMethod("DELETE");
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 19:30:32 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/21 19:41:10 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,4 +104,9 @@ std::string		htmlPath_to_string(const char *html_path)
 	file.close();
 
 	return ret;
+}
+
+std::string					int_to_string(int n)
+{
+	return SSTR("" << n);
 }

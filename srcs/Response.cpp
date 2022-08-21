@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/15 09:05:03 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/21 19:41:48 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ std::string		ResponseHeader::getText() const
 	// line 1
 	ret.append(protocol_version);
 	ret += ' ';
-	ret += std::string(SSTR("" << status_code));
+	ret += std::string(int_to_string(status_code));
 	ret += ' ';
 	ret.append(status_msg);
 	ret += '\n';
@@ -43,7 +43,7 @@ std::string		ResponseHeader::getText() const
 
 	// line 3
 	ret.append("Content-Length: ");
-	ret.append(SSTR("" << content_length));
+	ret.append(int_to_string(content_length));
 	ret += '\n';
 
 	return ret;	

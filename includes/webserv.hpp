@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/18 19:33:01 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/21 20:21:09 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,10 @@
 
 #define RESET_TXT "\e[0m"
 
-#define DEFAULT_MAX_CONNECTIONS 1024
-#define	REQUEST_BUFFER_SIZE		1024
-#define	CGI_BUFFER_SIZE			1024
+#define DEFAULT_MAX_CONNECTIONS 	1024
+#define	REQUEST_BUFFER_SIZE			1024
+#define	CGI_BUFFER_SIZE				1024
+#define DEFAULT_CLIENT_BODY_SIZE	1000000
 
 enum REQUEST_ERROR
 {
@@ -87,5 +88,6 @@ std::vector<std::string>	split(const std::string &str, char delim);
 std::vector<std::string>	split(const std::string &str, const char *set_delim);
 std::string 				media_to_string(const char *img_path);
 std::string					htmlPath_to_string(const char *html_path);
+std::string					int_to_string(int n);
 
 #endif

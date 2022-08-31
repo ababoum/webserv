@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/21 20:21:21 by mababou          ###   ########.fr       */
+/*   Updated: 2022/08/31 09:05:24 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,6 +195,14 @@ void	ServerEngine::_buildResponseOnRequest()
 
 }
 
+void	ServerEngine::_limit_request_size(std::string & request)
+{
+	while (request.size() > _server.getClientBufferSize())
+	{
+		request.erase(request.end() - 1);
+	}
+}
+
 void	ServerEngine::stream_in()
 {
 	_client_fd = accept(_socket_fd, 
@@ -221,6 +229,8 @@ void	ServerEngine::stream_in()
 		fd_set_blocking(_client_fd, 0);
 		goto readloop;
 	}
+	if (_server.getClientBufferSize() > 0)
+		_limit_request_size(request_data);
 	
 	std::cout << "The request data was: " << \
 		BLUE_TXT << request_data << RESET_TXT;

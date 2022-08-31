@@ -7,6 +7,9 @@
     <title>Test Method</title>
 </head>
 <body>
-    [GET] Welcome <?php echo $_GET["fname"] $_GET["lname"]; ?><br>
+    <p>
+        [GET] Welcome <?php echo $_GET["fname"], $_GET["lname"]; ?><br>
+        [POST] Welcome <?php echo $_POST["login"]; ?><br>
+    </p>
 </body>
 </html>

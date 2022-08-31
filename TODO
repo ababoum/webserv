@@ -3,11 +3,6 @@
 > Understand the 'server_names' and implement their 
 	mechanism (it's already parsed)
 
-
-
-> limit request size (client body size. Default value set if nothing 
-	specified in conf file)
-
 > Build the autoindex mechanism (@Louis)
 
 > Implement the POST mechanism (all the current Responses are treating GET only)

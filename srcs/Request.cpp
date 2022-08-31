@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/31 08:53:05 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/31 10:26:02 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,6 +264,22 @@ void			Request::_parseURL()
 		_validRequest = false;
 		_error = BAD_REQUEST;
 	}
+}
+
+void			Request::getPostData(std::string requestData)
+{
+	std::string::reverse_iterator rit = requestData.rbegin();
+	while (*rit != '\n')
+		rit++;
+	while (rit != requestData.rbegin())
+	{
+		post_string.push_back(*rit);
+		rit--;
+	}
+	if (rit == requestData.rbegin())
+		post_string.push_back(*rit);
+	std::cout << post_string << std::endl;
+		
 }
 
 void			Request::setError(int err)

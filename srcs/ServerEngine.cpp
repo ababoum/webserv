@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/31 09:05:24 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/08/31 09:33:41 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,6 +245,7 @@ void	ServerEngine::stream_in()
 	_req->findLocation(_server);
 	_req->checkAccess();
 	_req->identifyType();
+	_req->getPostData(request_data);
 	
 }
 

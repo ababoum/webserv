@@ -1,7 +1,6 @@
-> redirection http
+> redirection http (already parsed, we just need to 
+	include the mechanism in the response)
 
-> Understand the 'server_names' and implement their 
-	mechanism (it's already parsed)
 
 > Build the autoindex mechanism (@Louis)
 

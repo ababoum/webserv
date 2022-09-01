@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/08 14:51:45 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/01 14:45:46 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,13 @@ GlobalConfiguration::GlobalConfiguration() {}
 ** -------------------------------- DESTRUCTOR --------------------------------
 */
 
-GlobalConfiguration::~GlobalConfiguration() {}
+GlobalConfiguration::~GlobalConfiguration()
+{
+	for (size_t i = 0; _serverEngines.size(); ++i)
+	{
+		delete _serverEngines[i];
+	}
+}
 
 /*
 ** --------------------------------- OVERLOAD ---------------------------------
@@ -57,6 +63,7 @@ void	GlobalConfiguration::startEngines()
 		_serverEngines.push_back(new ServerEngine(getServersList()[i]));
 		_fds_ptr.push_back(_serverEngines.back()->getInFdPtr());
 		_fds_ptr.push_back(_serverEngines.back()->getOutFdPtr());
+		_serverEngines.back()->setGlobalConf(this);
 	}
 }
 

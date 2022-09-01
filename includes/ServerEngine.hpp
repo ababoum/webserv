@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/31 09:05:05 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/01 14:14:58 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,10 @@ class Response;
 class ServerEngine
 {
 	public:
-		typedef struct sockaddr_in			t_sockaddr_in;
-		std::map<int, std::string>	err_dictionary;
+		typedef struct sockaddr_in		t_sockaddr_in;
+
+	public:
+		std::map<int, std::string>		err_dictionary;
 
 	public:
 		// ServerEngine(const ServerEngine & src);
@@ -32,13 +34,15 @@ class ServerEngine
 
 	private:
 
-		int				_socket_fd;
-		t_sockaddr_in	_sockaddr;
-		socklen_t		_peer_addr_size;
-		Server &		_server;
-		int				_client_fd;
-		struct pollfd	_in_fd;
-		struct pollfd	_out_fd;
+		int						_socket_fd;
+		t_sockaddr_in			_sockaddr;
+		socklen_t				_peer_addr_size;
+		Server &				_server;
+		Server 					*_virtual_server;
+		int						_client_fd;
+		struct pollfd			_in_fd;
+		struct pollfd			_out_fd;
+		GlobalConfiguration		*_globalConf;
 
 		// request / response
 		Request			*_req;
@@ -50,6 +54,7 @@ class ServerEngine
 
 	public:
 
+		void			setGlobalConf(GlobalConfiguration *globalConf);
 		void			stream_in();
 		void			stream_out();
 		int				getSocketFd() const;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/01 10:06:38 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/01 15:31:06 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static int fd_set_blocking(int fd, int blocking) {
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ServerEngine::ServerEngine(Server & server):_server(server)
+ServerEngine::ServerEngine(Server & server):_server(server), _virtual_server(0)
 {
 	// build error dictionary
 	_init_dictionary();
@@ -94,7 +94,8 @@ ServerEngine::ServerEngine(Server & server):_server(server)
 
 ServerEngine::~ServerEngine()
 {
-	close(_socket_fd);
+	if (_socket_fd != -1)
+		close(_socket_fd);
 }
 
 
@@ -203,6 +204,12 @@ void	ServerEngine::_limit_request_size(std::string & request)
 	}
 }
 
+void	ServerEngine::setGlobalConf(GlobalConfiguration *globalConf)
+{
+	_globalConf = globalConf;
+}
+
+
 void	ServerEngine::stream_in()
 {
 	_client_fd = accept(_socket_fd, 
@@ -242,7 +249,14 @@ void	ServerEngine::stream_in()
 
 	_req = new Request;
 	_req->parseData(request_data);
-	_req->findLocation(_server);
+	
+	// check if virtual server is used
+	_virtual_server = _req->enableVirtualServer(_globalConf, _server);
+	if (_virtual_server)
+		_req->findLocation(*_virtual_server); 
+	else
+		_req->findLocation(_server);
+
 	_req->checkAccess();
 	_req->identifyType();
 	_req->getPostData(request_data);

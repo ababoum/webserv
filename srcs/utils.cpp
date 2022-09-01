@@ -6,14 +6,14 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/21 19:41:10 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/01 16:35:33 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/webserv.hpp"
 
 // CPP spliter
-std::vector<std::string> split(const std::string &str, char delim)
+std::vector<std::string>	split(const std::string &str, char delim)
 {
 	std::size_t i = 0;
 	std::vector<std::string> list;
@@ -32,7 +32,7 @@ std::vector<std::string> split(const std::string &str, char delim)
 	return list;
 }
 
-std::vector<std::string> split(const std::string &str, const char *set_delim)
+std::vector<std::string>	split(const std::string &str, const char *set_delim)
 {
 	std::size_t i = 0;
 	std::vector<std::string> list;
@@ -59,13 +59,13 @@ std::vector<std::string> split(const std::string &str, const char *set_delim)
 	return list;
 }
 
-void	ft_exit(int sig_code)
+void						ft_exit(int sig_code)
 {
 	std::cout << GREEN_TXT << "\nQuitting webserv... Thanks!\n" << RESET_TXT;
 	exit(sig_code);
 }
 
-std::string media_to_string(const char *img_path)
+std::string 				media_to_string(const char *img_path)
 {
 	std::ifstream 		media_file;
 	std::vector<char> 	tab;
@@ -86,7 +86,7 @@ std::string media_to_string(const char *img_path)
 	return ret;	
 }
 
-std::string		htmlPath_to_string(const char *html_path)
+std::string					htmlPath_to_string(const char *html_path)
 {
 	std::string		ret;
 	std::ifstream	file;
@@ -109,4 +109,13 @@ std::string		htmlPath_to_string(const char *html_path)
 std::string					int_to_string(int n)
 {
 	return SSTR("" << n);
+}
+
+bool						is_digit(std::string str)
+{
+	for (size_t i = 0; i < str.size(); ++i)
+	{
+		if (!std::isdigit(str[i]))
+			return false;
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/31 10:25:44 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/01 13:44:23 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ struct RequestHeader
 	std::string							resource_path;
 	std::string							query_string;
 	std::map<std::string, std::string>	query_variables;
-	std::string							post_string;
 };
 
 struct RequestBody

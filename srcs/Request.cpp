@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/31 11:14:00 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/01 09:20:23 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,6 +222,16 @@ void	Request::identifyType()
 		_body.isMedia = false;
 		_body.type = "text/html";
 	}
+	else if (extension == "css")
+	{
+		_body.isMedia = false;
+		_body.type = "text/css";
+	}
+	else if (extension == "js")
+	{
+		_body.isMedia = false;
+		_body.type = "text/javascript";
+	}
 	else if (extension == "mpeg" || extension == "mp3")
 	{
 		_body.isMedia = true;
@@ -273,11 +283,11 @@ void			Request::getPostData(std::string requestData)
 		rit++;
 	while (rit != requestData.rbegin())
 	{
-		post_string.push_back(*rit);
+		_header.post_string.push_back(*rit);
 		rit--;
 	}
 	if (rit == requestData.rbegin())
-		post_string.push_back(*rit);
+		_header.post_string.push_back(*rit);
 		
 }
 

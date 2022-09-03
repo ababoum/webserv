@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/21 20:21:09 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/01 16:35:44 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,5 +89,6 @@ std::vector<std::string>	split(const std::string &str, const char *set_delim);
 std::string 				media_to_string(const char *img_path);
 std::string					htmlPath_to_string(const char *html_path);
 std::string					int_to_string(int n);
+bool						is_digit(std::string str);
 
 #endif

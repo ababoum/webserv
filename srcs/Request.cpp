@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/01 13:45:52 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/03 10:20:53 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,8 @@ void	Request::parseData(std::string requestData)
 
 	while(std::getline(data, line, '\n'))
 	{
-		std::vector<std::string> line_items = split(line, ' ');
+		std::vector<std::string> line_items = split(line, " \r");
+		// Method line
 		if (line_index == 1)
 		{
 			if ((line_items[0] != "GET" && line_items[0] != "POST" && line_items[0] != "DELETE") ||
@@ -87,6 +88,11 @@ void	Request::parseData(std::string requestData)
 				_header.URL = line_items[1];
 				_parseURL();	
 			}
+		}
+		// Host line
+		if (line_items.size() > 1 && line_items[0] == "Host:")
+		{
+			_header.host = line_items[1];
 		}
 		++line_index;
 	}
@@ -253,7 +259,40 @@ void	Request::identifyType()
 	}
 }
 
+Server	*Request::enableVirtualServer(GlobalConfiguration *globalConf, const Server & server)
+{
+	Server *serv = NULL;
+	
+	if ((server.getIP() == "localhost" || server.getIP() == "127.0.0.1") &&
+		(_header.host.substr(0, 9) == "localhost" || _header.host.substr(0, 9) == "127.0.0.1"))
+	{
+		return serv;
+	}
 
+	for (size_t i = 0; i < globalConf->getServersList().size(); ++i)
+	{
+		serv = &(globalConf->getServersList()[i]);
+		
+		for (size_t n = 0; n < serv->getNames().size(); ++n)
+		{
+			std::cerr << _header.host << '\n';
+			std::cerr << _header.host.size() << '\n';
+			std::cerr << serv->getNames()[n] << '\n';
+			std::cerr << serv->getNames()[n].size() << '\n';
+			
+			if (_header.host == serv->getNames()[n])
+			{
+				return serv;
+			}
+		}
+	}
+
+	// if no virtual server is found
+	setIsRequestValid(false);
+	setError(NOT_FOUND);
+	
+	return NULL;	
+}
 
 void			Request::_parseURL()
 {

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/21 20:37:47 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/01 16:37:25 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ static std::size_t find_comment(const std::vector<std::string> & line_items)
 	}
 	return i;
 }
-
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -86,8 +85,12 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 		throw syntax_error();
 	}
 
+	// erase ';' at the end of the line
+	while(line_items.back().at(line_items.back().size() - 1) == ';')
+		line_items.back().erase(line_items.back().end() - 1);
+
 	// fill root
-	else if (line_items[0] == "root" && line_items.size() == 2)
+	if (line_items[0] == "root" && line_items.size() == 2)
 	{
 		line_items[1].resize(line_items[1].size() - 1);
 		_currentLocation->setRoot(line_items[1]);
@@ -96,7 +99,6 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 	// fill allowed methods
 	else if (line_items[0] == "methods" && line_items.size() >= 2)
 	{
-		line_items.back().resize(line_items.back().size() - 1);
 		for (std::size_t i = 1; i < line_items.size(); ++i)
 			_currentLocation->addAllowedMethod(line_items[i]);
 	}
@@ -104,31 +106,44 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 	// fill autoindex
 	else if (line_items[0] == "autoindex" && line_items.size() == 2)
 	{
-		line_items[1].resize(line_items[1].size() - 1);
 		_currentLocation->setAutoindex(line_items[1]);
 	}
 
 	// fill indexPage
 	else if (line_items[0] == "index" && line_items.size() == 2)
 	{
-		line_items[1].resize(line_items[1].size() - 1);
 		_currentLocation->setIndexPage(line_items[1]);
 	}
 
-	// fill cgi?
+	// fill cgi
 	else if (line_items[0] == "fastcgi_pass" && line_items.size() == 2)
 	{
-		line_items[1].resize(line_items[1].size() - 1);
 		_currentLocation->setCGI(line_items[1]);
 	}
 
+	// fill cgi?
+	else if (line_items[0] == "return" && line_items.size() == 3)
+	{
+		if (!is_digit(line_items[1]))
+		{
+			std::cerr << RED_TXT << "Return code should be an integer at line " 
+				<< line_nb << '\n' << RESET_TXT;
+			throw syntax_error();
+		}
+		_currentLocation->setRedirection(std::atoi(line_items[1]), line_items[2]);
+	}
+
 	// else: parsing error
+	else
+	{
+		std::cerr << RED_TXT << "Parsing error in line " << line_nb << RESET_TXT << '\n';
+			throw parsing_error("invalid line");
+	}
 }
 
 
 void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items, std::size_t line_nb)
 {
-
 	// end of scope
 	if (line_items.size() == 1 && line_items[0] == "}")
 	{
@@ -162,12 +177,13 @@ void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items
 		throw syntax_error();
 	}
 
-	// fill port and host (IP)
-	else if (line_items[0] == "listen" && line_items.size() == 2)
-	{
-		while(line_items.back().at(line_items.back().size() - 1) == ';')
-			line_items.back().resize(line_items.back().size() - 1);
+	// erase ';' at the end of the line
+	while(line_items.back().at(line_items.back().size() - 1) == ';')
+		line_items.back().erase(line_items.back().end() - 1);
 
+	// fill port and host (IP)
+	if (line_items[0] == "listen" && line_items.size() == 2)
+	{
 		_currentServer->setIP(split(line_items.back(), ':')[0]);
 		_currentServer->setPort(split(line_items.back(), ':')[1]);
 	}

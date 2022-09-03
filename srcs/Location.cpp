@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/21 20:31:56 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/01 16:40:07 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ Location &				Location::operator=( Location const & rhs )
 		_indexPage = rhs._indexPage;
 		_autoindex = rhs._autoindex;
 		_cgi = rhs._cgi;
+		_redirection = rhs._redirection;
 	}
 	return *this;
 }
@@ -59,17 +60,17 @@ Location &				Location::operator=( Location const & rhs )
 
 // Setters
 
-void Location::setPrefix(std::string prefix)
+void	Location::setPrefix(std::string prefix)
 {
 	_prefix = prefix;
 }
 
-void Location::setRoot(std::string path)
+void	Location::setRoot(std::string path)
 {
 	_root = path;
 }
 
-void Location::addAllowedMethod(std::string method)
+void	Location::addAllowedMethod(std::string method)
 {
 	if (method.compare("GET") && 
 		method.compare("POST") && 
@@ -79,12 +80,12 @@ void Location::addAllowedMethod(std::string method)
 	_allowedMethods.insert(method);
 }
 
-void Location::setIndexPage(std::string indexPagePath)
+void	Location::setIndexPage(std::string indexPagePath)
 {
 	_indexPage = indexPagePath;	
 }
 
-void Location::setAutoindex(std::string on_off)
+void	Location::setAutoindex(std::string on_off)
 {
 	if (on_off == "on")
 		_autoindex = true;
@@ -94,20 +95,34 @@ void Location::setAutoindex(std::string on_off)
 		throw std::invalid_argument("autoindex option can only received \"on\" or \"off\" argument");
 }
 
-void Location::setCGI(std::string cgiPath)
+void	Location::setCGI(std::string cgiPath)
 {
 	_cgi = cgiPath;
 }
 
+void	Location::setRedirection(int code, std::string url)
+{
+	_redirection.first = code;
+	_redirection.second = url;
+
+	_isRedirected = true;
+}
+
+
 // Methods
 
-bool Location::isAllowedMethod(std::string method) const
+bool	Location::isAllowedMethod(std::string method) const
 {
 	std::set<std::string>::iterator find_result = _allowedMethods.find(method);
 	if (find_result == _allowedMethods.end())
 		return false;
 	else
 		return true;
+}
+
+bool	Location::isRedirected() const
+{
+	return _isRedirected;
 }
 
 /*

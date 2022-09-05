@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/01 15:31:06 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/05 15:54:19 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,16 @@ ServerEngine::ServerEngine(Server & server):_server(server), _virtual_server(0)
 	if (_socket_fd == -1)
 	{
 		std::cerr << RED_TXT << "Error while opening socket\n" << RESET_TXT;
+		throw std::runtime_error("socket");
+	}
+
+	// make the socket re-usable immediately after shutting down the webserv
+	// then relaunching it
+
+	const int enable = 1;
+	if (setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    {
+		std::cerr << RED_TXT << "Error while setting up the socket\n" << RESET_TXT;
 		throw std::runtime_error("socket");
 	}
 	
@@ -162,6 +172,7 @@ void	ServerEngine::_buildResponseOnRequest()
 		std::string path = _req->getTargetLocation()->getRoot();
 		path += (_req->getHeader().resource_path[0] == '/' ? "" : "/");
 		path += _req->getHeader().resource_path;
+
 		std::string body = media_to_string(path.c_str());
 		
 		_resp->setBody(body);

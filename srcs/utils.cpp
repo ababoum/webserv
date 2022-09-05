@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/01 16:35:33 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/05 15:28:02 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,4 +118,5 @@ bool						is_digit(std::string str)
 		if (!std::isdigit(str[i]))
 			return false;
 	}
+	return true;
 }

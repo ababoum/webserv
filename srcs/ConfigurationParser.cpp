@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/01 16:37:25 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/05 15:38:53 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 	// fill root
 	if (line_items[0] == "root" && line_items.size() == 2)
 	{
-		line_items[1].resize(line_items[1].size() - 1);
 		_currentLocation->setRoot(line_items[1]);
 	}
 
@@ -121,7 +120,7 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 		_currentLocation->setCGI(line_items[1]);
 	}
 
-	// fill cgi?
+	// HTTP redirection
 	else if (line_items[0] == "return" && line_items.size() == 3)
 	{
 		if (!is_digit(line_items[1]))
@@ -130,7 +129,7 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 				<< line_nb << '\n' << RESET_TXT;
 			throw syntax_error();
 		}
-		_currentLocation->setRedirection(std::atoi(line_items[1]), line_items[2]);
+		_currentLocation->setRedirection(std::atoi(line_items[1].c_str()), line_items[2]);
 	}
 
 	// else: parsing error

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/01 14:14:58 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/06 16:51:26 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ class ServerEngine
 		void			_buildResponseOnRequest();
 		void			_init_dictionary();
 		void			_limit_request_size(std::string & request);
+		void			_formMethod(std::string postData);
+		void			_deleteMethod();
 
 	public:
 

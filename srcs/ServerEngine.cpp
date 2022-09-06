@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/05 15:54:19 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/06 16:57:53 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,6 +213,37 @@ void	ServerEngine::_limit_request_size(std::string & request)
 	{
 		request.erase(request.end() - 1);
 	}
+}
+
+void	ServerEngine::_formMethod(std::string postData)
+{
+	if (postData.empty())
+		return;
+	std::fstream	file;
+	std::string		path;
+
+	path = _req->getTargetLocation()->getRoot() + "/" +  _req->getHeader().URL;
+	
+	file.open(path.c_str(), std::ios::out);
+	if (!file.is_open())
+	{
+		_resp->setStatusCode(SERVER_ERROR);
+		return;
+	}
+	file << postData;
+	file.close();
+	_resp->setStatusCode(CREATED);
+}
+
+void	ServerEngine::_deleteMethod()
+{
+	std::string		path;
+
+	path = _req->getTargetLocation()->getRoot() + "/" +  _req->getHeader().URL;
+	if (unlink(path.c_str()) == -1)
+		_resp->setStatusCode(SERVER_ERROR);
+	else
+		_resp->setStatusCode(SUCCESS_OK);
 }
 
 void	ServerEngine::setGlobalConf(GlobalConfiguration *globalConf)

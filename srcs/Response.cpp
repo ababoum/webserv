@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 16:56:05 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/06 17:29:19 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,22 @@ std::string		ResponseHeader::getRedirText() const
 	ret.append("Location: ");
 	ret.append(redir_location);
 	ret += '\n';
+
+	return ret;
+}
+
+std::string		ResponseHeader::getDeleteText() const
+{
+	std::string ret;
+
+	// line 1
+	ret.append(protocol_version);
+	ret += ' ';
+	ret += std::string(int_to_string(status_code));
+	ret += ' ';
+	ret.append(status_msg);
+	ret += '\n';
+
 
 	return ret;
 }

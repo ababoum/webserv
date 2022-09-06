@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 17:18:25 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/06 17:27:00 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 void ServerEngine::_init_dictionary()
 {
 	err_dictionary.insert(std::make_pair(200, "OK"));
+	err_dictionary.insert(std::make_pair(201, "Created"));
 	err_dictionary.insert(std::make_pair(301, "Moved Permanently"));
 	err_dictionary.insert(std::make_pair(302, "Found"));
 	err_dictionary.insert(std::make_pair(307, "Temporary Redirect"));
@@ -235,6 +236,14 @@ void	ServerEngine::_buildResponseOnRequest()
 	{
 		_getMethod();
 	}
+	else if (_req->getHeader().method == "POST")
+	{
+		_postMethod(_req->getBody().content);
+	}
+	else if (_req->getHeader().method == "DELETE")
+	{
+		_deleteMethod();
+	}
 		
 	// build response if error case
 	if (!_req->isValid())
@@ -271,7 +280,7 @@ void	ServerEngine::_limit_request_size(std::string & request)
 	}
 }
 
-void	ServerEngine::_formMethod(std::string postData)
+void	ServerEngine::_postMethod(std::string postData)
 {
 	if (postData.empty())
 		return;
@@ -289,6 +298,7 @@ void	ServerEngine::_formMethod(std::string postData)
 	file << postData;
 	file.close();
 	_resp->setStatusCode(CREATED);
+	_resp->setStatusMsg(err_dictionary.find(CREATED)->second);
 }
 
 void	ServerEngine::_deleteMethod()
@@ -297,9 +307,12 @@ void	ServerEngine::_deleteMethod()
 
 	path = _req->getTargetLocation()->getRoot() + "/" +  _req->getHeader().URL;
 	if (unlink(path.c_str()) == -1)
-		_resp->setStatusCode(SERVER_ERROR);
+		_resp->setStatusCode(NOT_FOUND);
 	else
+	{
 		_resp->setStatusCode(SUCCESS_OK);
+		_resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
+	}
 }
 
 void	ServerEngine::setGlobalConf(GlobalConfiguration *globalConf)

@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 17:35:10 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/06 17:37:02 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ struct ResponseHeader
 	
 	std::string		getText() const;
 	std::string		getRedirText() const;
+	std::string		getDeleteText() const;
 
 };
 
@@ -61,7 +62,6 @@ class Response
 		bool			isFromCGI() const;
 		std::string		getCGIText() const;
 		std::string		getRedirText() const;
-		std::string		getDeleteText() const;
 
 		void			setStatusCode(int code);
 		void			setStatusMsg(std::string msg);

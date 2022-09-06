@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 17:27:00 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/06 17:53:53 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,6 +299,8 @@ void	ServerEngine::_postMethod(std::string postData)
 	file.close();
 	_resp->setStatusCode(CREATED);
 	_resp->setStatusMsg(err_dictionary.find(CREATED)->second);
+	_resp->setContentType(_req->getBody().type);
+	_resp->setContentLength(_req->getBody().length);
 }
 
 void	ServerEngine::_deleteMethod()

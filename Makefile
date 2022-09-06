@@ -13,7 +13,8 @@ SRCS		= srcs/main.cpp \
 				srcs/ServerEngine.cpp \
 				srcs/Request.cpp \
 				srcs/Response.cpp \
-				srcs/CGIEngine.cpp
+				srcs/CGIEngine.cpp \
+				srcs/autoindex.cpp
 
 INCL		= includes/webserv.hpp \
 				includes/ConfigurationParser.hpp \

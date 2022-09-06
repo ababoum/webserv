@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/21 19:41:48 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/06 16:56:05 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,27 @@ std::string		ResponseHeader::getText() const
 
 	return ret;	
 }
+
+std::string		ResponseHeader::getRedirText() const
+{
+	std::string ret;
+
+	// line 1
+	ret.append(protocol_version);
+	ret += ' ';
+	ret += std::string(int_to_string(status_code));
+	ret += ' ';
+	ret.append(status_msg);
+	ret += '\n';
+
+	// line 2
+	ret.append("Location: ");
+	ret.append(redir_location);
+	ret += '\n';
+
+	return ret;
+}
+
 
 
 /*
@@ -127,6 +148,11 @@ void	Response::reset()
 	_file_path = "";
 }
 
+void	Response::setRedirectionLocation(std::string url)
+{
+	_header.redir_location = url;
+}
+
 
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
@@ -144,12 +170,19 @@ std::string	Response::getText() const
 	return (ret_txt);
 }
 
+std::string	Response::getRedirText() const
+{
+	return _header.getRedirText();
+}
+
 std::size_t	Response::size() const
 {
-	if (_from_cgi == false)
-		return _header.getText().size() + _body.content.size() + 1;
-	else
+	if (_from_cgi == true)
 		return _cgi_output.size();
+	else if (!_header.redir_location.empty())
+		return _header.getRedirText().size();
+	else
+		return _header.getText().size() + _body.content.size() + 1;
 }
 
 bool		Response::isFromCGI() const

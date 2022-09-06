@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/05 15:54:19 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/06 17:02:22 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,10 @@
 void ServerEngine::_init_dictionary()
 {
 	err_dictionary.insert(std::make_pair(200, "OK"));
+	err_dictionary.insert(std::make_pair(301, "Moved Permanently"));
+	err_dictionary.insert(std::make_pair(302, "Found"));
+	err_dictionary.insert(std::make_pair(307, "Temporary Redirect"));
+	err_dictionary.insert(std::make_pair(308, "Permanent Redirect"));
 	err_dictionary.insert(std::make_pair(400, "Bad Request"));
 	err_dictionary.insert(std::make_pair(403, "Forbidden"));
 	err_dictionary.insert(std::make_pair(404, "Resource Not Found"));
@@ -118,27 +122,13 @@ ServerEngine::~ServerEngine()
 ** --------------------------------- METHODS ----------------------------------
 */
 
-void	ServerEngine::_buildResponseOnRequest()
+void	ServerEngine::_getMethod()
 {
-	// check if method is allowed
-	if (!_req->getTargetLocation()->isAllowedMethod(_req->getHeader().method))
-	{
-		_req->setError(METHOD_NOT_ALLOWED);
-		_req->setIsRequestValid(false);
-	}
-	else if (!_req->getTargetLocation()->getCGI().empty() || _req->getBody().type == "cgi")
-	{
-		CGIEngine cgi(_req, &_server);
-		_resp->setFromCGI(true);
-		_resp->setCGIText(cgi.exec());
-		
-		if (_req->isValid())
-			return ;
-	}
-	else if (_req->getBody().type == "directory")
+	// return index page if a directory is requested as URL
+	if (_req->getBody().type == "directory")
 	{
 		_resp->setStatusCode(SUCCESS_OK);
-		_resp->setStatusMsg("OK");
+		_resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
 		_resp->setContentType("text/html");
 
 		std::string path = _req->getTargetLocation()->getRoot();
@@ -149,10 +139,11 @@ void	ServerEngine::_buildResponseOnRequest()
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());
 	}
+	// return a html page
 	else if (_req->isValid() && _req->getBody().isMedia == false)
 	{
 		_resp->setStatusCode(SUCCESS_OK);
-		_resp->setStatusMsg("OK");
+		_resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
 		_resp->setContentType(_req->getBody().type);
 
 		std::string path = _req->getTargetLocation()->getRoot();
@@ -163,10 +154,11 @@ void	ServerEngine::_buildResponseOnRequest()
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());
 	}
+	// return a media (image, video, etc.)
 	else if (_req->isValid() && _req->getBody().isMedia)
 	{
 		_resp->setStatusCode(SUCCESS_OK);
-		_resp->setStatusMsg("OK");
+		_resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
 		_resp->setContentType(_req->getBody().type);
 
 		std::string path = _req->getTargetLocation()->getRoot();
@@ -178,7 +170,41 @@ void	ServerEngine::_buildResponseOnRequest()
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());
 	}
-	
+	else
+	{
+		_req->setIsRequestValid(false);
+		_req->setError(SERVER_ERROR);
+	}
+}
+
+void	ServerEngine::_buildResponseOnRequest()
+{
+	// check if method is allowed
+	if (!_req->getTargetLocation()->isAllowedMethod(_req->getHeader().method))
+	{
+		_req->setError(METHOD_NOT_ALLOWED);
+		_req->setIsRequestValid(false);
+	}
+	else if (_req->getTargetLocation()->isRedirected())
+	{
+		int resp_code = _req->getTargetLocation()->getRedirection().first;
+		
+		_resp->setStatusCode(resp_code);
+		_resp->setStatusMsg(err_dictionary.find(resp_code)->second);
+		_resp->setRedirectionLocation(_req->getTargetLocation()->getRedirection().second);		
+	}
+	else if (!_req->getTargetLocation()->getCGI().empty() || _req->getBody().type == "cgi")
+	{
+		CGIEngine cgi(_req, &_server);
+		_resp->setFromCGI(true);
+		_resp->setCGIText(cgi.exec());
+
+	}
+	else if (_req->getHeader().method == "GET")
+	{
+		_getMethod();
+	}
+		
 	// build response if error case
 	if (!_req->isValid())
 	{
@@ -204,7 +230,6 @@ void	ServerEngine::_buildResponseOnRequest()
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());
 	}
-
 }
 
 void	ServerEngine::_limit_request_size(std::string & request)
@@ -247,6 +272,8 @@ void	ServerEngine::stream_in()
 		fd_set_blocking(_client_fd, 0);
 		goto readloop;
 	}
+	
+	// this should be corrected and moved to appropriate place (after request is built)
 	if (_server.getClientBufferSize() > 0)
 		_limit_request_size(request_data);
 	
@@ -285,6 +312,10 @@ void	ServerEngine::stream_out()
 	if (_resp->isFromCGI())
 	{
 		send(_client_fd, _resp->getCGIText().c_str(), _resp->size(), 0);
+	}
+	else if (_req->getTargetLocation()->isRedirected())
+	{
+		send(_client_fd, _resp->getRedirText().c_str(), _resp->size(), 0);
 	}
 	else
 	{

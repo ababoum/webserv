@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/01 16:35:44 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/06 16:27:02 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ enum HTTP_RESPONSE
 {
 	SUCCESS_OK = 200, // GET, POST
 	CREATED = 201, // POST
+	MOVED_PERMANENTLY = 301, // HTTP redirection
 	BAD_REQUEST = 400,
 	FORBIDDEN = 403,
 	NOT_FOUND = 404,

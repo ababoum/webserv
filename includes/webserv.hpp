@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 16:27:02 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/06 17:07:50 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include <dirent.h> // For directory listing
 
 #include <cstdlib>
 #include <vector>
@@ -89,7 +90,9 @@ std::vector<std::string>	split(const std::string &str, char delim);
 std::vector<std::string>	split(const std::string &str, const char *set_delim);
 std::string 				media_to_string(const char *img_path);
 std::string					htmlPath_to_string(const char *html_path);
+std::string					autoindexPageHtml(std::string directoryName);
 std::string					int_to_string(int n);
 bool						is_digit(std::string str);
+
 
 #endif

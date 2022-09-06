@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 17:02:22 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/06 17:07:34 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,10 +132,22 @@ void	ServerEngine::_getMethod()
 		_resp->setContentType("text/html");
 
 		std::string path = _req->getTargetLocation()->getRoot();
-		path += (_req->getTargetLocation()->getIndexPage()[0] == '/' ? "" : "/");
-		path += _req->getTargetLocation()->getIndexPage();
-		std::string body = htmlPath_to_string(path.c_str());
-
+		std::string body;
+		if (_req->getTargetLocation()->isAutoindexed())
+		{
+			if (!path.empty() && path[path.size() - 1] == '/')
+				path.append(_req->getHeader().URL.begin() + 1,_req->getHeader().URL.end());
+			else
+				path+=_req->getHeader().URL;
+			std::cerr << path << std::endl;
+			body = autoindexPageHtml(path);
+		}
+		else
+		{
+			path += (_req->getTargetLocation()->getIndexPage()[0] == '/' ? "" : "/");
+			path += _req->getTargetLocation()->getIndexPage();
+			body = htmlPath_to_string(path.c_str());
+		}
 		_resp->setBody(body);
 		_resp->setContentLength(body.size());
 	}

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/01 16:40:07 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/06 16:58:16 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,5 +159,9 @@ std::set<std::string> & 	Location::getAllowedMethods()
 	return _allowedMethods;
 }
 
+std::pair<int, std::string>		Location::getRedirection() const
+{
+	return _redirection;
+}
 
 /* ************************************************************************** */

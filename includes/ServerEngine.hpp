@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 16:51:26 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/06 17:18:19 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ class ServerEngine
 		Response		*_resp;
 
 		void			_buildResponseOnRequest();
+		void			_getMethod();
 		void			_init_dictionary();
 		void			_limit_request_size(std::string & request);
 		void			_formMethod(std::string postData);

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/01 16:39:44 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/06 16:58:39 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ class Location
 		std::string						getCGI() const;
 		std::string						getRoot() const;
 		bool							isRedirected() const;
+		std::pair<int, std::string>		getRedirection() const;
 		
 		// Methods
 		

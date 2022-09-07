@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 10:43:32 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/07 14:15:53 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,6 +218,13 @@ void	Request::identifyType()
 		return ;
 	}
 	
+	// DELETE requests can take any kind of file (or directory?)
+	if (_header.method == "DELETE")
+	{
+		_body.type = extension;
+		return ;
+	}
+
 	if (extension == "png" || extension == "ico" || extension == "jpg" || extension == "gif")
 	{
 		_body.isMedia = true;

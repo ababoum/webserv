@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 16:58:16 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/07 16:23:13 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 
 Location::Location()
 {
+	_autoindex = false;
+	_isRedirected = false;
 }
 
 Location::Location( const Location & src )
@@ -50,6 +52,7 @@ Location &				Location::operator=( Location const & rhs )
 		_autoindex = rhs._autoindex;
 		_cgi = rhs._cgi;
 		_redirection = rhs._redirection;
+		_isRedirected = rhs._isRedirected;
 	}
 	return *this;
 }

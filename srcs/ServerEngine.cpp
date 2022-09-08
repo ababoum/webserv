@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 17:53:53 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/07 16:59:26 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,8 @@ static int fd_set_blocking(int fd, int blocking) {
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ServerEngine::ServerEngine(Server & server):_server(server), _virtual_server(0)
+ServerEngine::ServerEngine(Server & server):
+	_server(server), _virtual_server(0), _req(NULL), _resp(NULL)
 {
 	// build error dictionary
 	_init_dictionary();
@@ -74,7 +75,9 @@ ServerEngine::ServerEngine(Server & server):_server(server), _virtual_server(0)
 	
 	_in_fd.fd = _socket_fd;
 	_in_fd.events = POLLIN;
+	// _in_fd.revents = 0;
 	_out_fd.fd = -1;
+	_out_fd.events = 0;
 
 	// Clear socket structure
 	memset(&_sockaddr, 0, sizeof(_sockaddr));
@@ -111,11 +114,15 @@ ServerEngine::~ServerEngine()
 {
 	if (_socket_fd != -1)
 		close(_socket_fd);
+	if (_req != NULL)
+		delete _req;
+	if (_resp != NULL)
+		delete _resp;
 }
 
 
 /*
-** --------------------------------- OVERLOAD ---------------------------------
+** --------------------------------- STREAM IN / OUT ---------------------------------
 */
 
 
@@ -362,7 +369,10 @@ void	ServerEngine::stream_in()
 
 	// parse the request
 
+	if (_req != NULL)
+		delete _req;
 	_req = new Request;
+	
 	_req->parseData(request_data);
 	
 	// check if virtual server is used
@@ -382,6 +392,8 @@ void	ServerEngine::stream_out()
 {
 	// Send a response to the connection
 
+	if (_resp != NULL)
+		delete _resp;
 	_resp = new Response;
 
 	_buildResponseOnRequest();
@@ -400,7 +412,9 @@ void	ServerEngine::stream_out()
 	}
 	
 	delete _resp;
+	_resp = NULL;
 	delete _req;
+	_req = NULL;
 	// Close the connection
 	close(_client_fd);
 	_client_fd = -1;

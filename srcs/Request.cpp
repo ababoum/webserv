@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/07 11:37:11 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/08 10:36:36 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,6 +224,13 @@ void	Request::identifyType()
 		return ;
 	}
 	
+	// DELETE requests can take any kind of file (or directory?)
+	if (_header.method == "DELETE")
+	{
+		_body.type = extension;
+		return ;
+	}
+
 	if (extension == "png" || extension == "ico" || extension == "jpg" || extension == "gif")
 	{
 		_body.isMedia = true;

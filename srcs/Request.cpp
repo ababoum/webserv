@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 10:43:32 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/07 11:37:11 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,12 @@ void	Request::parseData(std::string requestData)
 		if (line_items.size() > 1 && line_items[0] == "Host:")
 		{
 			_header.host = line_items[1];
+		}
+		//Cookie line
+		if (line_items.size() > 1 && line_items[0] == "Cookie:")
+		{
+			_parseCookieString(line_items);
+			_parseCookieVariables(_header.cookie_string);
 		}
 		++line_index;
 	}
@@ -313,6 +319,20 @@ void			Request::_parseURL()
 		_validRequest = false;
 		_error = BAD_REQUEST;
 	}
+}
+
+void			Request::_parseCookieString(std::vector<std::string> line_items)
+{
+	for (size_t i = 1; i < line_items.size(); i++)
+	{
+		_header.cookie_string += line_items[i];
+	}
+	
+}
+
+void			Request::_parseCookieVariables(std::string cookie_string)
+{
+	std::vector<std::string> cookies = split(cookie_string, ";");
 }
 
 void			Request::getPostData(std::string requestData)

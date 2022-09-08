@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/03 10:20:37 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/07 11:30:03 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ struct RequestHeader
 	std::map<std::string, std::string>	query_variables;
 	std::string							host;
 	std::string							post_string;
+	std::string							cookie_string;
+	std::map<std::string, std::string>	cookie_variables;
 };
 
 struct RequestBody
@@ -46,8 +48,8 @@ class Request
 		RequestBody		_body;
 		bool			_validRequest;
 		int				_error;
-		const Location	*_targetLocation;		
-
+		const Location	*_targetLocation;
+		
 	public:
 
 		void	parseData(std::string requestData);
@@ -68,6 +70,8 @@ class Request
 
 	private:
 		void			_parseURL();
+		void			_parseCookieString(std::vector<std::string> line_items);
+		void			_parseCookieVariables(std::string cookie_string);
 };
 
 

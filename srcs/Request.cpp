@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/07 14:15:53 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/08 17:56:22 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -282,11 +282,7 @@ Server	*Request::enableVirtualServer(GlobalConfiguration *globalConf, const Serv
 		
 		for (size_t n = 0; n < serv->getNames().size(); ++n)
 		{
-			std::cerr << _header.host << '\n';
-			std::cerr << _header.host.size() << '\n';
-			std::cerr << serv->getNames()[n] << '\n';
-			std::cerr << serv->getNames()[n].size() << '\n';
-			
+
 			if (_header.host == serv->getNames()[n])
 			{
 				return serv;

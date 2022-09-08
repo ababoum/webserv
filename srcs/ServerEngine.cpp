@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/07 16:59:26 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/08 17:56:01 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ ServerEngine::ServerEngine(Server & server):
 	// then relaunching it
 
 	const int enable = 1;
-	if (setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+	if (setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int)) < 0)
     {
 		std::cerr << RED_TXT << "Error while setting up the socket\n" << RESET_TXT;
 		throw std::runtime_error("socket");
@@ -226,7 +226,7 @@ void	ServerEngine::_buildResponseOnRequest()
 			path.append(_req->getHeader().URL.begin() + 1,_req->getHeader().URL.end());
 		else
 			path+=_req->getHeader().URL;
-		std::cerr << path << std::endl;
+
 		body = autoindexPageHtml(path);
 		
 		_resp->setBody(body);
@@ -356,6 +356,12 @@ void	ServerEngine::stream_in()
 		fd_set_blocking(_client_fd, 0);
 		goto readloop;
 	}
+	// else if (r == -1)
+	// {
+	// 	// fail to read
+	// }
+	// else if (r == 0)
+	// 	break ;
 	
 	// this should be corrected and moved to appropriate place (after request is built)
 	if (_server.getClientBufferSize() > 0)

@@ -6,14 +6,20 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/07 16:57:57 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/08 14:18:39 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "../includes/webserv.hpp"
 
+static void	ft_exit(int sig_code)
+{
+	throw sig_code;
+}
+
 int main(int ac, char **av)
 {
+	
 	try {
 		if (ac < 2)
 		{
@@ -67,6 +73,11 @@ int main(int ac, char **av)
 
 	catch (const std::exception & e)	{
 		std::cerr << RED_TXT << e.what() << '\n' << RESET_TXT;
+		return EXIT_FAILURE;
+	}
+	catch (int sig_code) {
+		std::cout << GREEN_TXT << "\nQuitting webserv... Thanks!\n" << RESET_TXT;
+		return sig_code;
 	}
 	
 	return (EXIT_SUCCESS);

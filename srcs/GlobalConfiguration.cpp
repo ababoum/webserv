@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/07 17:04:07 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/08 14:16:24 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ GlobalConfiguration::GlobalConfiguration() {}
 
 GlobalConfiguration::~GlobalConfiguration()
 {
-	for (size_t i = 0; _serverEngines.size(); ++i)
+	for (size_t i = 0; i < _serverEngines.size(); ++i)
 	{
 		delete _serverEngines[i];
 	}

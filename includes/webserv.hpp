@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 17:07:50 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/08 14:14:23 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,6 @@ enum HTTP_RESPONSE
 					(std::ostringstream() << std::dec << x)) \
 					.str()
 
-// C functions
-void	ft_exit(int sig_code);
 
 // CPP functions
 std::vector<std::string>	split(const std::string &str, char delim);

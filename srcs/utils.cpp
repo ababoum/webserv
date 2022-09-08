@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/07 16:46:52 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/08 14:14:27 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,6 @@ std::vector<std::string>	split(const std::string &str, const char *set_delim)
 		list.push_back(str.substr(i, str.length()));
 
 	return list;
-}
-
-void						ft_exit(int sig_code)
-{
-	std::cout << GREEN_TXT << "\nQuitting webserv... Thanks!\n" << RESET_TXT;
-	exit(sig_code);
 }
 
 std::string 				media_to_string(const char *img_path)

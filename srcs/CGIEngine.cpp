@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/08 18:02:37 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/08 18:56:55 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,18 +23,24 @@ static void	free_env(char **env)
 CGIEngine::CGIEngine(Request *req, Server *serv)
 {	
 	std::string path;
+	std::string content;
 
 	_req = req;
 	// _body = req->getBody().content;
-	std::string content = _req->getTargetLocation()->getRoot();
-	content += "/";
-	content += _req->getTargetLocation()->getIndexPage();
-	_body = htmlPath_to_string(content.c_str());
 	// std::cout << "PATH : " << content << std::endl;
 	if (_req->getBody().type == "cgi")
+	{
 		path = _req->getHeader().resource_path;
+		_body = htmlPath_to_string(_req->getHeader().resource_path.c_str());
+	}
 	else
+	{
+		content = _req->getTargetLocation()->getRoot();
+		content += "/";
+		content += _req->getTargetLocation()->getIndexPage();
+		_body = htmlPath_to_string(content.c_str());
 		path = _req->getTargetLocation()->getCGI();
+	}
 	
 	_env["SERVER_SOFTWARE"] = "";
 	_env["SERVER_NAME"] = "";

@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/08 18:28:46 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/08 18:29:58 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -416,7 +416,6 @@ void	ServerEngine::stream_out()
 	else
 	{
 		send(_client_fd, _resp->getText().c_str(), _resp->getText().size(), 0);
-		std::cerr << "SEND : " << _resp->getText() << std::endl;
 	}
 	
 	delete _resp;

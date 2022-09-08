@@ -17,7 +17,7 @@
 	<title>Webserv test</title>
 </head>
 <body>
-	<h1>Webserv test</h1>
+	<h1><?php echo "Webserv test"; ?></h1>
 	<h2>Session cookie test</h2>
 	<form action="session_cookie.php" method="POST">
 		<label for="fname">First name:</label>

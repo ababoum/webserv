@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/08 10:36:36 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/08 13:16:57 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,7 +236,7 @@ void	Request::identifyType()
 		_body.isMedia = true;
 		_body.type = "image/" + extension;
 	}
-	else if (extension == "html" || extension == "php")
+	else if (extension == "html")
 	{
 		_body.isMedia = false;
 		_body.type = "text/html";
@@ -261,7 +261,7 @@ void	Request::identifyType()
 		_body.isMedia = true;
 		_body.type = "audio/mp4";
 	}
-	else if (extension == "cgi")
+	else if (extension == "cgi" || extension == "php")
 	{
 		_body.type = "cgi";
 	}

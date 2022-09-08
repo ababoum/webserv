@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIEngine.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/08/21 19:41:24 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/08 18:02:37 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,17 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 {	
 	std::string path;
 
+	_req = req;
+	// _body = req->getBody().content;
+	std::string content = _req->getTargetLocation()->getRoot();
+	content += "/";
+	content += _req->getTargetLocation()->getIndexPage();
+	_body = htmlPath_to_string(content.c_str());
+	// std::cout << "PATH : " << content << std::endl;
 	if (_req->getBody().type == "cgi")
 		path = _req->getHeader().resource_path;
 	else
 		path = _req->getTargetLocation()->getCGI();
-	_req = req;
-	_body = req->getBody().content;
 	
 	_env["SERVER_SOFTWARE"] = "";
 	_env["SERVER_NAME"] = "";
@@ -117,6 +122,7 @@ std::string		CGIEngine::exec()
 
 		// catch output of the CGI script into output pipe
 		dup2(cgi_pipe_write[1], STDOUT_FILENO);
+		close(cgi_pipe_write[1]);
 		char * const *n = NULL;
 		if (execve(cgi_path.c_str(), n, env) == -1)
 		{
@@ -125,10 +131,10 @@ std::string		CGIEngine::exec()
 	}
 	else
 	{
-		waitpid(pid, &status, 0);
 		close(cgi_pipe_read[1]);
 		close(cgi_pipe_read[0]);
 		close(cgi_pipe_write[1]);
+		waitpid(pid, &status, 0);
 		// check if execve failed and set appropriate error page
 		if (WEXITSTATUS(status) == EXIT_FAILURE)
 		{
@@ -142,6 +148,7 @@ std::string		CGIEngine::exec()
 		{
 			ret.append(buffer);
 		}
+		// std::cerr << "RET : " << ret << std::endl;
 		close(cgi_pipe_write[0]);
 	}
 	free_env(env);

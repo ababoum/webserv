@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/09 16:57:45 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/09 18:04:40 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,16 @@
 class Server;
 class Request;
 class Response;
+
+struct Connection
+{
+	Request		*req;
+	Response	*resp;
+
+	Connection(Request *req_input = 0, Response *resp_input = 0):
+		req(req_input), resp(resp_input) {}
+};
+
 
 class ServerEngine
 {
@@ -34,16 +44,14 @@ class ServerEngine
 
 	private:
 
-		int						_socket_fd;
-		struct pollfd			_in_fd;
-		t_sockaddr_in			_sockaddr;
-		socklen_t				_peer_addr_size;
-		Server &				_server;
-		Server 					*_virtual_server;
-		int						_client_fd;
-		struct pollfd			_out_fd;
-		GlobalConfiguration		*_globalConf;
-		// std::map<int, 
+		int							_socket_fd;
+		struct pollfd				_in_fd;
+		t_sockaddr_in				_sockaddr;
+		socklen_t					_peer_addr_size;
+		Server &					_server;
+		Server 						*_virtual_server;
+		GlobalConfiguration			*_globalConf;
+		std::map<int, Connection>	_aliveConnections;
 
 		// request / response
 		Request			*_req;
@@ -60,10 +68,9 @@ class ServerEngine
 
 		void			setGlobalConf(GlobalConfiguration *globalConf);
 		void			stream_in();
-		void			stream_out();
+		int			stream_out(int client_fd);
 		int				getSocketFd() const;
 		struct pollfd	* getInFdPtr();
-		struct pollfd	* getOutFdPtr();
 
 };
 

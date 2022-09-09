@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/07 16:05:46 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/09 17:44:24 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class GlobalConfiguration
 		std::vector<Server>				_serversList;
 		std::vector<ServerEngine *>		_serverEngines;
 		int								_nbAllowedConnections;
-		std::vector<struct pollfd *>	_fds_ptr;
+		t_fds_map						_fds_ptr;
 
 	public:
 
@@ -39,6 +39,8 @@ class GlobalConfiguration
 
 		void	addServer(void);
 		void	addServer(Server & server);
+		void	addClientFd(int fd, int flag_events, ServerEngine *serv_ptr);
+		void	eraseClientFd(int fd);
 		void	setAllowedConnections(int nbConnectionsMax);
 		void	startEngines();
 		void	dispatchStream(std::vector<struct pollfd> fds);
@@ -48,7 +50,7 @@ class GlobalConfiguration
 		int								getAllowedConnections() const;
 		std::vector<Server> & 			getServersList();
 		std::vector<ServerEngine *> &	getEngines();
-		std::vector<struct pollfd *> &	getFdsPtr();
+		t_fds_map						& getFdsPtr();
 
 };
 

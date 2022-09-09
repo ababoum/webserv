@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/08 14:18:39 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/09 18:14:50 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,18 +42,17 @@ int main(int ac, char **av)
 		ConfigurationParser parser(inputPath, globalConf);	
 		globalConf.startEngines();
 
-		nfds_t nfds = globalConf.getFdsPtr().size();
-		std::vector<struct pollfd *> *fds_ptr = &globalConf.getFdsPtr();
+		t_fds_map	*fds_ptr = &globalConf.getFdsPtr();
 
 		int ready;
 		
 		while (42)
 		{
 			std::vector<struct pollfd> fds;
-			for (std::vector<struct pollfd *>::iterator it = fds_ptr->begin(); it != fds_ptr->end() ; ++it)
-				fds.push_back(**it);
+			for (t_fds_map::iterator it = fds_ptr->begin(); it != fds_ptr->end() ; ++it)
+				fds.push_back(it->first);
 
-
+			nfds_t 		nfds = globalConf.getFdsPtr().size();
 			ready = poll(fds.data(), nfds, -1); // timeout = never
 			if (ready == 0)
 			{

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/08 14:14:23 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/09 17:46:44 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,10 @@
 #include <iostream>
 #include <sstream>
 
+class ServerEngine;
+struct Connection;
+typedef	std::map<struct pollfd, ServerEngine *> 	t_fds_map;
+
 #include "ConfigurationParser.hpp"
 #include "GlobalConfiguration.hpp"
 #include "Location.hpp"
@@ -43,6 +47,9 @@
 #include "Response.hpp"
 #include "ServerEngine.hpp"
 #include "CGIEngine.hpp"
+
+bool 	operator==(struct pollfd rhs, struct pollfd lhs);
+bool	operator<(struct pollfd rhs, struct pollfd lhs);
 
 #define RED_TXT "\e[31m"
 #define GREEN_TXT "\e[32m"

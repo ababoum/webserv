@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/08 14:14:27 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/09 17:21:04 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,4 +113,14 @@ bool						is_digit(std::string str)
 			return false;
 	}
 	return true;
+}
+
+bool 	operator==(struct pollfd rhs, struct pollfd lhs)
+{
+	return rhs.fd == lhs.fd;
+}
+
+bool 	operator<(struct pollfd rhs, struct pollfd lhs)
+{
+	return rhs.fd < lhs.fd;
 }

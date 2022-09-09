@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   GlobalConfiguration.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/09 18:10:51 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/10 01:36:21 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
 			return ;
 		}
 	}
+	i = 0;
 }
 
 void	GlobalConfiguration::addClientFd(int fd, int flag_events, ServerEngine *serv_ptr)

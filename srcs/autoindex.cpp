@@ -6,7 +6,7 @@
 /*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/05 09:39:02 by lcalvie           #+#    #+#             */
-/*   Updated: 2022/09/06 16:23:55 by lcalvie          ###   ########.fr       */
+/*   Updated: 2022/09/08 19:41:31 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,7 @@ std::string	autoindexPageHtml(std::string directoryName)
 	
 	DIR *dp = opendir(directoryName.c_str()); // directory fd
 	if (dp == NULL) {
-		std::cerr << "ERROR AUTOINDEX PAS UN DOSSIER ?? error page ou parsing error ?" << std::endl;
-		exit(EXIT_FAILURE);
+		throw std::invalid_argument("autoindex request on file");
 	}
 	struct dirent *dirp;
 	while ((dirp = readdir(dp)) != NULL) {

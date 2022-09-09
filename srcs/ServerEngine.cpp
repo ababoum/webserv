@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/09 16:36:23 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/09 16:59:49 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,7 +147,6 @@ void	ServerEngine::_getMethod()
 				path.append(_req->getHeader().URL.begin() + 1,_req->getHeader().URL.end());
 			else
 				path+=_req->getHeader().URL;
-			std::cerr << path << std::endl;
 			body = autoindexPageHtml(path);
 		}
 		else
@@ -214,25 +213,6 @@ void	ServerEngine::_buildResponseOnRequest()
 		_resp->setStatusCode(resp_code);
 		_resp->setStatusMsg(err_dictionary.find(resp_code)->second);
 		_resp->setRedirectionLocation(_req->getTargetLocation()->getRedirection().second);		
-	}
-	else if (_req->getTargetLocation()->isAutoindexed())
-	{
-		_resp->setStatusCode(SUCCESS_OK);
-		_resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
-		_resp->setContentType("text/html");
-
-		std::string path = _req->getTargetLocation()->getRoot();
-		std::string body;
-		
-		if (!path.empty() && path[path.size() - 1] == '/')
-			path.append(_req->getHeader().URL.begin() + 1,_req->getHeader().URL.end());
-		else
-			path+=_req->getHeader().URL;
-
-		body = autoindexPageHtml(path);
-		
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
 	}
 	else if (!_req->getTargetLocation()->getCGI().empty() || _req->getBody().type == "cgi")
 	{
@@ -360,9 +340,12 @@ void	ServerEngine::stream_in()
 		fd_set_blocking(_client_fd, 0);
 		goto readloop;
 	}
-	// else if (r == -1)
+	// else if (r == -1)                 // securiser le read = rien ne marche mdr
 	// {
-	// 	// fail to read
+	// 	close(_client_fd);
+	// 	_client_fd = -1;
+	// 	_out_fd.fd = -1;
+	// 	return ;
 	// }
 	// else if (r == 0)
 	// 	break ;

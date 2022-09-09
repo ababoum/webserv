@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/03 10:20:37 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/09 15:50:16 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,9 @@ class Request
 		void	parseData(std::string requestData);
 		Server	*enableVirtualServer(GlobalConfiguration *globalConf, const Server & server);
 		void	findLocation(Server & serv);
-		void	checkAccess();
-		void	identifyType();
-		void	getPostData(std::string requestData);
+		int		checkAccess();
+		int		identifyType();
+		int		getPostData(std::string requestData);
 
 		RequestHeader &	getHeader();
 		RequestBody &	getBody();

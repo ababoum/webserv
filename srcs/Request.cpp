@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/08 17:56:22 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/09 16:01:28 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Request::Request(): _validRequest(true), _error(NO_ERROR)
+Request::Request(): _validRequest(true), _error(NO_ERROR),_targetLocation(NULL)
 {
 
 }
@@ -148,51 +148,57 @@ void	Request::findLocation(Server & serv)
 	}
 	else
 	{
-		while(URL_to_check[URL_to_check.size() - 1] != '/')
+		while(URL_to_check.size() >= 1 && URL_to_check[URL_to_check.size() - 1] != '/')
 			URL_to_check.erase(URL_to_check.end() - 1);
+		// this condition covers the case of an URL without '/' at the beginning (bad syntax)
+		if (URL_to_check.empty())
+		{
+			_validRequest = false;
+			_error = BAD_REQUEST;
+		}
 		goto location_parse_loop;
 	}
 }
 
-void	Request::checkAccess()
+int		Request::checkAccess()
 {
-	if (isValid())
+	std::string absolute_path = _targetLocation->getRoot() + 
+		(_header.resource_path[0] == '/' ? "" : "/") + _header.resource_path;
+
+	int 		check = 0;
+	struct stat sb;
+
+	if (!access(absolute_path.c_str(), F_OK) || (
+		stat(absolute_path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)
+	))
 	{
-		std::string absolute_path = _targetLocation->getRoot() + 
-			(_header.resource_path[0] == '/' ? "" : "/") + _header.resource_path;
-
-		int 		check = 0;
-		struct stat sb;
-
-		if (!access(absolute_path.c_str(), F_OK) || (
-			stat(absolute_path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)
-		))
-		{
-			if (_header.method == "GET")
-				check = access(absolute_path.c_str(), R_OK);
-			else if (_header.method == "POST")
-				check = access(absolute_path.c_str(), W_OK);
-			else if (_header.method == "DELETE")
-				check = access(absolute_path.c_str(), W_OK);
-			else
-				check = !0;
-			
-			if (check != 0)
-			{
-				setError(FORBIDDEN);
-				setIsRequestValid(false);
-			}
-		}
+		if (_header.method == "GET")
+			check = access(absolute_path.c_str(), R_OK);
+		else if (_header.method == "POST")
+			check = access(absolute_path.c_str(), W_OK);
+		else if (_header.method == "DELETE")
+			check = access(absolute_path.c_str(), W_OK);
 		else
-		{
-			setError(NOT_FOUND);
-			setIsRequestValid(false);
-		}
+			check = !0;
 		
+		if (check != 0)
+		{
+			setError(FORBIDDEN);
+			setIsRequestValid(false);
+			return 1;
+		}
 	}
+	else
+	{
+		setError(NOT_FOUND);
+		setIsRequestValid(false);
+		return 1;
+	}
+	return 0;
 }
 
-void	Request::identifyType()
+
+int		Request::identifyType()
 {
 	std::string file_to_check = _header.resource_path;
 	std::string extension;
@@ -206,7 +212,7 @@ void	Request::identifyType()
 		{
 			_body.type = "directory";
 			_body.isMedia = false;
-			return ;
+			return 0;
 		}
 		extension.insert(extension.begin(), *rit);
 	}
@@ -215,14 +221,14 @@ void	Request::identifyType()
 	{
 		setError(BAD_REQUEST);
 		setIsRequestValid(false);
-		return ;
+		return 1;
 	}
 	
 	// DELETE requests can take any kind of file (or directory?)
 	if (_header.method == "DELETE")
 	{
 		_body.type = extension;
-		return ;
+		return 0;
 	}
 
 	if (extension == "png" || extension == "ico" || extension == "jpg" || extension == "gif")
@@ -263,7 +269,10 @@ void	Request::identifyType()
 	{
 		setError(BAD_REQUEST);
 		setIsRequestValid(false);
+		return 1;
 	}
+	
+	return 0;
 }
 
 Server	*Request::enableVirtualServer(GlobalConfiguration *globalConf, const Server & server)
@@ -318,7 +327,7 @@ void			Request::_parseURL()
 	}
 }
 
-void			Request::getPostData(std::string requestData)
+int		Request::getPostData(std::string requestData)
 {
 	std::string::reverse_iterator rit = requestData.rbegin();
 	while (*rit != '\n')
@@ -331,7 +340,8 @@ void			Request::getPostData(std::string requestData)
 	if (rit == requestData.rbegin())
 		_body.content.push_back(*rit);
 	_body.length = _body.content.size();
-		
+
+	return 0;	
 }
 
 void			Request::setError(int err)

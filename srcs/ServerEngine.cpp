@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/08 17:56:01 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/09 16:36:23 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,6 +200,8 @@ void	ServerEngine::_getMethod()
 void	ServerEngine::_buildResponseOnRequest()
 {
 	// check if method is allowed
+	if (!_req->isValid())
+		goto error_case;
 	if (!_req->getTargetLocation()->isAllowedMethod(_req->getHeader().method))
 	{
 		_req->setError(METHOD_NOT_ALLOWED);
@@ -251,10 +253,12 @@ void	ServerEngine::_buildResponseOnRequest()
 	{
 		_deleteMethod();
 	}
-		
+	
+	
 	// build response if error case
 	if (!_req->isValid())
 	{
+		error_case:
 		_resp->setStatusCode(_req->getError());
 		_resp->setStatusMsg(err_dictionary.find(_req->getError())->second);
 		_resp->setContentType("text/html");
@@ -380,6 +384,8 @@ void	ServerEngine::stream_in()
 	_req = new Request;
 	
 	_req->parseData(request_data);
+	if (!_req->isValid())
+		return ;
 	
 	// check if virtual server is used
 	_virtual_server = _req->enableVirtualServer(_globalConf, _server);
@@ -388,10 +394,8 @@ void	ServerEngine::stream_in()
 	else
 		_req->findLocation(_server);
 
-	_req->checkAccess();
-	_req->identifyType();
-	_req->getPostData(request_data);
-	
+	if (_req->checkAccess() || _req->identifyType() || _req->getPostData(request_data))
+		return ;	
 }
 
 void	ServerEngine::stream_out()
@@ -402,13 +406,15 @@ void	ServerEngine::stream_out()
 		delete _resp;
 	_resp = new Response;
 
+	// if client already connected
+
 	_buildResponseOnRequest();
 	
 	if (_resp->isFromCGI())
 	{
 		send(_client_fd, _resp->getCGIText().c_str(), _resp->size(), 0);
 	}
-	else if (_req->getTargetLocation()->isRedirected())
+	else if (_req->getTargetLocation() && _req->getTargetLocation()->isRedirected())
 	{
 		send(_client_fd, _resp->getRedirText().c_str(), _resp->size(), 0);
 	}

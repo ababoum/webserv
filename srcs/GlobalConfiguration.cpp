@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/08 14:16:24 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/09 16:53:01 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,11 +71,11 @@ void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
 {
 	for (std::size_t i = 0; i < fds.size(); ++i)
 	{
-		if (i % 2 == 0 && fds[i].revents & POLLIN)
+		if (fds[i].revents & POLLIN)
 		{
 			_serverEngines[i / 2]->stream_in();
 		}
-		else if (i % 2 == 1 && fds[i].revents & POLLOUT)
+		else if (fds[i].revents & POLLOUT)
 		{
 			_serverEngines[i / 2]->stream_out();
 		}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 17:23:14 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/09 16:57:45 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,15 @@ class ServerEngine
 	private:
 
 		int						_socket_fd;
+		struct pollfd			_in_fd;
 		t_sockaddr_in			_sockaddr;
 		socklen_t				_peer_addr_size;
 		Server &				_server;
 		Server 					*_virtual_server;
 		int						_client_fd;
-		struct pollfd			_in_fd;
 		struct pollfd			_out_fd;
 		GlobalConfiguration		*_globalConf;
+		// std::map<int, 
 
 		// request / response
 		Request			*_req;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 17:29:19 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/11 22:17:19 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ ResponseHeader::ResponseHeader()
 	protocol_version = default_protocol;
 }
 
-std::string		ResponseHeader::getText() const
+std::string		ResponseHeader::getText(std::size_t body_size) const
 {
 	std::string ret;
 
@@ -42,9 +42,14 @@ std::string		ResponseHeader::getText() const
 	ret += '\n';
 
 	// line 3
-	ret.append("Content-Length: ");
-	ret.append(int_to_string(content_length));
-	ret += '\n';
+	if (body_size > CHUNKED_RESPONSE_SIZE)
+		ret.append("Transfer-Encoding: chunked\n");
+	else
+	{
+		ret.append("Content-Length: ");
+		ret.append(int_to_string(content_length));
+		ret += '\n';
+	}
 
 	return ret;	
 }
@@ -169,7 +174,6 @@ void	Response::setRedirectionLocation(std::string url)
 	_header.redir_location = url;
 }
 
-
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
@@ -178,7 +182,7 @@ std::string	Response::getText() const
 {
 	std::string ret_txt;
 
-	ret_txt.append(_header.getText());
+	ret_txt.append(_header.getText(_body.content.size()));
 	ret_txt += '\n';
 	
 	ret_txt.append(_body.content);
@@ -198,7 +202,7 @@ std::size_t	Response::size() const
 	else if (!_header.redir_location.empty())
 		return _header.getRedirText().size();
 	else
-		return _header.getText().size() + _body.content.size() + 1;
+		return _header.getText( _body.content.size()).size() + _body.content.size() + 1;
 }
 
 bool		Response::isFromCGI() const
@@ -209,6 +213,16 @@ bool		Response::isFromCGI() const
 std::string		Response::getCGIText() const
 {
 	return _cgi_output;
+}
+
+ResponseHeader	&Response::getHeader()
+{
+	return _header;
+}
+
+ResponseBody	&Response::getBody()
+{
+	return _body;
 }
 
 

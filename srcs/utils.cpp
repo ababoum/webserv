@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/09 17:21:04 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/11 22:22:47 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,12 +115,24 @@ bool						is_digit(std::string str)
 	return true;
 }
 
-bool 	operator==(struct pollfd rhs, struct pollfd lhs)
+bool 						operator==(struct pollfd rhs, struct pollfd lhs)
 {
 	return rhs.fd == lhs.fd;
 }
 
-bool 	operator<(struct pollfd rhs, struct pollfd lhs)
+bool 						operator<(struct pollfd rhs, struct pollfd lhs)
 {
 	return rhs.fd < lhs.fd;
+}
+
+std::string					itohex(std::size_t size)
+{
+	std::string hex;
+	do
+	{
+		hex+= "0123456789ABCDEF"[size%16];
+		size /= 16;
+	} while (size != 0);
+
+	return std::string(hex.rbegin(), hex.rend());
 }

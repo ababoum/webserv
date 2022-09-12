@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/09 17:46:44 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/12 02:17:33 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,9 @@ bool	operator<(struct pollfd rhs, struct pollfd lhs);
 #define DEFAULT_MAX_CONNECTIONS 	1024
 #define	REQUEST_BUFFER_SIZE			1024
 #define	CGI_BUFFER_SIZE				1024
-#define DEFAULT_CLIENT_BODY_SIZE	1000000
+#define DEFAULT_CLIENT_BODY_SIZE	1000
+
+#define CHUNKED_RESPONSE_SIZE		1000
 
 enum REQUEST_ERROR
 {
@@ -97,6 +99,7 @@ std::string 				media_to_string(const char *img_path);
 std::string					htmlPath_to_string(const char *html_path);
 std::string					autoindexPageHtml(std::string directoryName);
 std::string					int_to_string(int n);
+std::string					itohex(std::size_t size);
 bool						is_digit(std::string str);
 
 

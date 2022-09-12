@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/09 18:05:03 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/12 02:13:34 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -356,8 +356,6 @@ void	ServerEngine::stream_in()
 	
 	// parse the request
 
-	if (_req != NULL)
-		delete _req;
 	_req = new Request;
 	
 	_req->parseData(request_data);
@@ -375,21 +373,47 @@ void	ServerEngine::stream_in()
 		return ;
 
 	_aliveConnections[client_fd] = Connection(_req, NULL);
-	_req = NULL;
 }
 
 int	ServerEngine::stream_out(int client_fd)
 {
 	int still_alive = 0;
+
+	_req = _aliveConnections[client_fd].req;
 	
 	// Send a response to the connection
-	_resp = new Response;
+	if (_aliveConnections[client_fd].resp == NULL)
+	{
+		_resp = new Response;
+		_aliveConnections[client_fd].resp = _resp;
+		_buildResponseOnRequest();
+	}
+	else
+	{
+		_resp = _aliveConnections[client_fd].resp;
+		
+		if (_resp->getBody().content.size() <= CHUNKED_RESPONSE_SIZE)
+		{
+			std::string tmp = itohex(_resp->getBody().content.size());
+			tmp+="\r\n";
+			tmp+= _resp->getBody().content;
+			tmp+="\r\n";
+			tmp+="0\r\n\r\n";
+			send(client_fd, tmp.c_str(),tmp.size(), 0);
+			//std::cout << RED_TXT << tmp << "\n" << RESET_TXT;
+			goto clean;
+		}
 
-	// if client already connected
-	_req = _aliveConnections[client_fd].req;
-	_aliveConnections[client_fd].resp = _resp;
+		std::string tmp = itohex(CHUNKED_RESPONSE_SIZE);
+		tmp+="\r\n";
+		tmp.append(_resp->getBody().content.begin(), _resp->getBody().content.begin() + CHUNKED_RESPONSE_SIZE);
+		tmp+="\r\n";
+		send(client_fd, tmp.c_str(),tmp.size(), 0);
+		//std::cout << RED_TXT << tmp << "\n" << RESET_TXT;
+		_resp->getBody().content.erase(0, CHUNKED_RESPONSE_SIZE);
 
-	_buildResponseOnRequest();
+		return !still_alive;
+	}
 
 	if (_resp->isFromCGI())
 	{
@@ -401,15 +425,25 @@ int	ServerEngine::stream_out(int client_fd)
 	}
 	else
 	{
-		send(client_fd, _resp->getText().c_str(), _resp->size(), 0);
+		if (_resp->getBody().content.size() <= CHUNKED_RESPONSE_SIZE)
+		{
+			send(client_fd, _resp->getText().c_str(), _resp->size(), 0);
+		}
+		else
+		{
+			std::string	tmp = _resp->getHeader().getText(_resp->getBody().content.size());
+			tmp+= '\n';
+			send(client_fd, tmp.c_str(),tmp.size(), 0);
+			return !still_alive;
+		}
 	}
 	
+	clean :
 	delete _resp;
 	_resp = NULL;
 	delete _req;
 	_req = NULL;
 
-	
 	// Close the connection
 	_aliveConnections.erase(client_fd);
 	close(client_fd);

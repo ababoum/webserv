@@ -17,6 +17,7 @@
 	<title>Webserv test</title>
 </head>
 <body>
+<?php echo "Your first name is " . $_COOKIE["fname"]; ?>
 	<h1><?php echo "Webserv test"; ?></h1>
 	<h2>Session cookie test</h2>
 	<form action="session_cookie.php" method="POST">

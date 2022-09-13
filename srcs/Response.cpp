@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/08 17:09:23 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/13 08:14:32 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,34 @@ std::string		ResponseHeader::getDeleteText() const
 	return ret;
 }
 
+std::string		ResponseHeader::getCGIText() const
+{
+	std::string ret;
 
+	// line 1
+	ret.append(protocol_version);
+	ret += ' ';
+	ret += std::string(int_to_string(status_code));
+	ret += ' ';
+	ret.append(status_msg);
+	ret += '\n';
+
+	// line 2
+	ret.append("Content-Type: ");
+	ret.append(content_type);
+	ret += '\n';
+
+	// line 3
+	ret.append("Content-Length: ");
+	ret.append(int_to_string(content_length));
+	ret += '\n';
+	
+	//cookies
+	ret.append("Set-Cookie: fname=a; lname=a");
+	ret += '\n';
+
+	return ret;	
+}
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -208,7 +235,14 @@ bool		Response::isFromCGI() const
 
 std::string		Response::getCGIText() const
 {
-	return _cgi_output;
+	std::string ret_txt;
+
+	ret_txt.append(_header.getCGIText());
+	ret_txt += '\n';
+	
+	ret_txt.append(_body.content);
+
+	return (ret_txt);
 }
 
 

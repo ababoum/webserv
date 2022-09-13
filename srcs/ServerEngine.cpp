@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/08 18:29:58 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/13 07:49:51 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -405,15 +405,14 @@ void	ServerEngine::stream_out()
 
 	_buildResponseOnRequest();
 	
-	// if (_resp->isFromCGI())
-	// {
-	// 	send(_client_fd, _resp->getCGIText().c_str(), _resp->size(), 0);
-	// }
-	if (_req->getTargetLocation()->isRedirected())
+	if (_resp->isFromCGI())
+	{
+		send(_client_fd, _resp->getCGIText().c_str(), _resp->getCGIText().size(), 0);
+	}
+	else if (_req->getTargetLocation()->isRedirected())
 	{
 		send(_client_fd, _resp->getRedirText().c_str(), _resp->size(), 0);
 	}
-	else
 	{
 		send(_client_fd, _resp->getText().c_str(), _resp->getText().size(), 0);
 	}

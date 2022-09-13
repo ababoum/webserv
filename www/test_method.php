@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +10,7 @@
     <p>
         [GET] Welcome <?php echo $_GET["fname"], $_GET["lname"]; ?><br>
         [POST] Welcome <?php echo $_POST["login"]; ?><br>
+        <?php echo(min(0, 150, 30, 20, -8, -200));  ?>
     </p>
 </body>
 </html>

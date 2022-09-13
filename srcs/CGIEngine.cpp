@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/08 18:56:55 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/13 07:56:55 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,10 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	// std::cout << "PATH : " << content << std::endl;
 	if (_req->getBody().type == "cgi")
 	{
-		path = _req->getHeader().resource_path;
-		_body = htmlPath_to_string(_req->getHeader().resource_path.c_str());
+		path = _req->getTargetLocation()->getRoot();
+		path += _req->getHeader().resource_path;
+		_body = htmlPath_to_string(path.c_str());
+		// std::cerr << path << std::endl;
 	}
 	else
 	{
@@ -98,8 +100,7 @@ std::string		CGIEngine::exec()
 
 	if (_req->getBody().type == "cgi")
 	{
-		cgi_path.append(_req->getTargetLocation()->getRoot());
-		cgi_path.append(_req->getHeader().resource_path);
+		cgi_path.append("www/cgi/php7.4");
 	}
 	else
 	{

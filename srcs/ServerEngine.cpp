@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/13 07:49:51 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/14 16:07:52 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,6 @@ ServerEngine::ServerEngine(Server & server):
 	// build error dictionary
 	_init_dictionary();
 	
-	// init params
-	_client_fd = -1;
 	
 	// open the socket
 	_socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
@@ -67,7 +65,7 @@ ServerEngine::ServerEngine(Server & server):
 	// then relaunching it
 
 	const int enable = 1;
-	if (setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+	if (setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int)) < 0)
     {
 		std::cerr << RED_TXT << "Error while setting up the socket\n" << RESET_TXT;
 		throw std::runtime_error("socket");
@@ -75,9 +73,6 @@ ServerEngine::ServerEngine(Server & server):
 	
 	_in_fd.fd = _socket_fd;
 	_in_fd.events = POLLIN;
-	// _in_fd.revents = 0;
-	_out_fd.fd = -1;
-	_out_fd.events = 0;
 
 	// Clear socket structure
 	memset(&_sockaddr, 0, sizeof(_sockaddr));
@@ -147,7 +142,6 @@ void	ServerEngine::_getMethod()
 				path.append(_req->getHeader().URL.begin() + 1,_req->getHeader().URL.end());
 			else
 				path+=_req->getHeader().URL;
-			std::cerr << path << std::endl;
 			body = autoindexPageHtml(path);
 		}
 		else
@@ -200,6 +194,8 @@ void	ServerEngine::_getMethod()
 void	ServerEngine::_buildResponseOnRequest()
 {
 	// check if method is allowed
+	if (!_req->isValid())
+		goto error_case;
 	if (!_req->getTargetLocation()->isAllowedMethod(_req->getHeader().method))
 	{
 		_req->setError(METHOD_NOT_ALLOWED);
@@ -212,25 +208,6 @@ void	ServerEngine::_buildResponseOnRequest()
 		_resp->setStatusCode(resp_code);
 		_resp->setStatusMsg(err_dictionary.find(resp_code)->second);
 		_resp->setRedirectionLocation(_req->getTargetLocation()->getRedirection().second);		
-	}
-	else if (_req->getTargetLocation()->isAutoindexed())
-	{
-		_resp->setStatusCode(SUCCESS_OK);
-		_resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
-		_resp->setContentType("text/html");
-
-		std::string path = _req->getTargetLocation()->getRoot();
-		std::string body;
-		
-		if (!path.empty() && path[path.size() - 1] == '/')
-			path.append(_req->getHeader().URL.begin() + 1,_req->getHeader().URL.end());
-		else
-			path+=_req->getHeader().URL;
-		std::cerr << path << std::endl;
-		body = autoindexPageHtml(path);
-		
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
 	}
 	else if (!_req->getTargetLocation()->getCGI().empty() || _req->getBody().type == "cgi")
 	{
@@ -258,10 +235,12 @@ void	ServerEngine::_buildResponseOnRequest()
 	{
 		_deleteMethod();
 	}
-		
+	
+	
 	// build response if error case
 	if (!_req->isValid())
 	{
+		error_case:
 		_resp->setStatusCode(_req->getError());
 		_resp->setStatusMsg(err_dictionary.find(_req->getError())->second);
 		_resp->setContentType("text/html");
@@ -338,16 +317,18 @@ void	ServerEngine::setGlobalConf(GlobalConfiguration *globalConf)
 
 
 void	ServerEngine::stream_in()
-{
-	_client_fd = accept(_socket_fd, 
+{	
+	int client_fd = accept(_socket_fd, 
 		(struct sockaddr*)&_sockaddr,
 		&_peer_addr_size);
 	
-	if (_client_fd == -1)
+	if (client_fd == -1)
 	{
 		std::cerr << RED_TXT << "Error while listening to socket\n" << RESET_TXT;
 		throw std::runtime_error("accept");
 	}
+	
+	_globalConf->addClientFd(client_fd, POLLOUT, this);
 
 	// Read from the connection
 	char 			buffer[REQUEST_BUFFER_SIZE + 1] = {0};
@@ -355,14 +336,23 @@ void	ServerEngine::stream_in()
 	int r;
 	
 	readloop:
-	r = read(_client_fd, buffer, REQUEST_BUFFER_SIZE);
+	r = read(client_fd, buffer, REQUEST_BUFFER_SIZE);
 	if (r > 0)
 	{
 		request_data.append(buffer);
 		memset(buffer, 0, REQUEST_BUFFER_SIZE);
-		fd_set_blocking(_client_fd, 0);
+		fd_set_blocking(client_fd, 0);
 		goto readloop;
 	}
+	// else if (r == -1)                 // securiser le read = rien ne marche mdr
+	// {
+	// 	close(_client_fd);
+	// 	_client_fd = -1;
+	// 	_out_fd.fd = -1;
+	// 	return ;
+	// }
+	// else if (r == 0)
+	// 	break ;
 	
 	// this should be corrected and moved to appropriate place (after request is built)
 	if (_server.getClientBufferSize() > 0)
@@ -371,16 +361,13 @@ void	ServerEngine::stream_in()
 	std::cout << "The request data was: " << \
 		BLUE_TXT << request_data << RESET_TXT;
 	
-	_out_fd.fd = _client_fd;
-	_out_fd.events = POLLOUT;
-
 	// parse the request
 
-	if (_req != NULL)
-		delete _req;
 	_req = new Request;
 	
 	_req->parseData(request_data);
+	if (!_req->isValid())
+		return ;
 	
 	// check if virtual server is used
 	_virtual_server = _req->enableVirtualServer(_globalConf, _server);
@@ -389,42 +376,86 @@ void	ServerEngine::stream_in()
 	else
 		_req->findLocation(_server);
 
-	_req->checkAccess();
-	_req->identifyType();
-	_req->getPostData(request_data);
-	
+	if (_req->checkAccess() || _req->identifyType() || _req->getPostData(request_data))
+		return ;
+
+	_aliveConnections[client_fd] = Connection(_req, NULL);
 }
 
-void	ServerEngine::stream_out()
+int	ServerEngine::stream_out(int client_fd)
 {
-	// Send a response to the connection
+	int still_alive = 0;
 
-	if (_resp != NULL)
-		delete _resp;
-	_resp = new Response;
-
-	_buildResponseOnRequest();
+	_req = _aliveConnections[client_fd].req;
 	
+	// Send a response to the connection
+	if (_aliveConnections[client_fd].resp == NULL)
+	{
+		_resp = new Response;
+		_aliveConnections[client_fd].resp = _resp;
+		_buildResponseOnRequest();
+	}
+	else
+	{
+		_resp = _aliveConnections[client_fd].resp;
+		
+		if (_resp->getBody().content.size() <= CHUNKED_RESPONSE_SIZE)
+		{
+			std::string tmp = itohex(_resp->getBody().content.size());
+			tmp+="\r\n";
+			tmp+= _resp->getBody().content;
+			tmp+="\r\n";
+			tmp+="0\r\n\r\n";
+			send(client_fd, tmp.c_str(),tmp.size(), 0);
+			//std::cout << RED_TXT << tmp << "\n" << RESET_TXT;
+			goto clean;
+		}
+
+		std::string tmp = itohex(CHUNKED_RESPONSE_SIZE);
+		tmp+="\r\n";
+		tmp.append(_resp->getBody().content.begin(), _resp->getBody().content.begin() + CHUNKED_RESPONSE_SIZE);
+		tmp+="\r\n";
+		send(client_fd, tmp.c_str(),tmp.size(), 0);
+		//std::cout << RED_TXT << tmp << "\n" << RESET_TXT;
+		_resp->getBody().content.erase(0, CHUNKED_RESPONSE_SIZE);
+
+		return !still_alive;
+	}
+
 	if (_resp->isFromCGI())
 	{
-		send(_client_fd, _resp->getCGIText().c_str(), _resp->getCGIText().size(), 0);
+		send(client_fd, _resp->getCGIText().c_str(), _resp->getCGIText().size(), 0);
 	}
-	else if (_req->getTargetLocation()->isRedirected())
+	else if (_req->getTargetLocation() && _req->getTargetLocation()->isRedirected())
 	{
-		send(_client_fd, _resp->getRedirText().c_str(), _resp->size(), 0);
+		send(client_fd, _resp->getRedirText().c_str(), _resp->size(), 0);
 	}
 	{
-		send(_client_fd, _resp->getText().c_str(), _resp->getText().size(), 0);
+		if (_resp->getBody().content.size() <= CHUNKED_RESPONSE_SIZE)
+		{
+			send(client_fd, _resp->getText().c_str(), _resp->size(), 0);
+		}
+		else
+		{
+			std::string	tmp = _resp->getHeader().getText(_resp->getBody().content.size());
+			tmp+= '\n';
+			send(client_fd, tmp.c_str(),tmp.size(), 0);
+			return !still_alive;
+		}
 	}
 	
+	clean :
 	delete _resp;
 	_resp = NULL;
 	delete _req;
 	_req = NULL;
+
 	// Close the connection
-	close(_client_fd);
-	_client_fd = -1;
-	_out_fd.fd = -1;
+	_aliveConnections.erase(client_fd);
+	close(client_fd);
+	_globalConf->eraseClientFd(client_fd);
+
+	return still_alive;
 }
 
 /*
@@ -441,10 +472,6 @@ struct pollfd	* ServerEngine::getInFdPtr()
 	return &_in_fd;
 }
 
-struct pollfd	* ServerEngine::getOutFdPtr()
-{
-	return &_out_fd;
-}
 
 /* ************************************************************************** */
 

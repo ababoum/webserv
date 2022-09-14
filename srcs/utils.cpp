@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/07 16:46:52 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/11 22:22:47 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,6 @@ std::vector<std::string>	split(const std::string &str, const char *set_delim)
 		list.push_back(str.substr(i, str.length()));
 
 	return list;
-}
-
-void						ft_exit(int sig_code)
-{
-	std::cout << GREEN_TXT << "\nQuitting webserv... Thanks!\n" << RESET_TXT;
-	exit(sig_code);
 }
 
 std::string 				media_to_string(const char *img_path)
@@ -119,4 +113,26 @@ bool						is_digit(std::string str)
 			return false;
 	}
 	return true;
+}
+
+bool 						operator==(struct pollfd rhs, struct pollfd lhs)
+{
+	return rhs.fd == lhs.fd;
+}
+
+bool 						operator<(struct pollfd rhs, struct pollfd lhs)
+{
+	return rhs.fd < lhs.fd;
+}
+
+std::string					itohex(std::size_t size)
+{
+	std::string hex;
+	do
+	{
+		hex+= "0123456789ABCDEF"[size%16];
+		size /= 16;
+	} while (size != 0);
+
+	return std::string(hex.rbegin(), hex.rend());
 }

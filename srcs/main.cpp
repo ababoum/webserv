@@ -3,17 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/07 16:57:57 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/10 01:36:54 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "../includes/webserv.hpp"
 
+static void	ft_exit(int sig_code)
+{
+	throw sig_code;
+}
+
 int main(int ac, char **av)
 {
+	
 	try {
 		if (ac < 2)
 		{
@@ -36,18 +42,17 @@ int main(int ac, char **av)
 		ConfigurationParser parser(inputPath, globalConf);	
 		globalConf.startEngines();
 
-		nfds_t nfds = globalConf.getFdsPtr().size();
-		std::vector<struct pollfd *> *fds_ptr = &globalConf.getFdsPtr();
+		t_fds_map	*fds_ptr = &globalConf.getFdsPtr();
 
 		int ready;
 		
 		while (42)
 		{
 			std::vector<struct pollfd> fds;
-			for (std::vector<struct pollfd *>::iterator it = fds_ptr->begin(); it != fds_ptr->end() ; ++it)
-				fds.push_back(**it);
+			for (t_fds_map::iterator it = fds_ptr->begin(); it != fds_ptr->end() ; ++it)
+				fds.push_back(it->first);
 
-
+			nfds_t 		nfds = globalConf.getFdsPtr().size();
 			ready = poll(fds.data(), nfds, -1); // timeout = never
 			if (ready == 0)
 			{
@@ -67,6 +72,11 @@ int main(int ac, char **av)
 
 	catch (const std::exception & e)	{
 		std::cerr << RED_TXT << e.what() << '\n' << RESET_TXT;
+		return EXIT_FAILURE;
+	}
+	catch (int sig_code) {
+		std::cout << GREEN_TXT << "\nQuitting webserv... Thanks!\n" << RESET_TXT;
+		return sig_code;
 	}
 	
 	return (EXIT_SUCCESS);

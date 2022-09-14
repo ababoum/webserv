@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/06 17:07:50 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/12 02:17:33 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,10 @@
 #include <iostream>
 #include <sstream>
 
+class ServerEngine;
+struct Connection;
+typedef	std::map<struct pollfd, ServerEngine *> 	t_fds_map;
+
 #include "ConfigurationParser.hpp"
 #include "GlobalConfiguration.hpp"
 #include "Location.hpp"
@@ -43,6 +47,9 @@
 #include "Response.hpp"
 #include "ServerEngine.hpp"
 #include "CGIEngine.hpp"
+
+bool 	operator==(struct pollfd rhs, struct pollfd lhs);
+bool	operator<(struct pollfd rhs, struct pollfd lhs);
 
 #define RED_TXT "\e[31m"
 #define GREEN_TXT "\e[32m"
@@ -58,7 +65,9 @@
 #define DEFAULT_MAX_CONNECTIONS 	1024
 #define	REQUEST_BUFFER_SIZE			1024
 #define	CGI_BUFFER_SIZE				1024
-#define DEFAULT_CLIENT_BODY_SIZE	1000000
+#define DEFAULT_CLIENT_BODY_SIZE	1000
+
+#define CHUNKED_RESPONSE_SIZE		1000
 
 enum REQUEST_ERROR
 {
@@ -82,8 +91,6 @@ enum HTTP_RESPONSE
 					(std::ostringstream() << std::dec << x)) \
 					.str()
 
-// C functions
-void	ft_exit(int sig_code);
 
 // CPP functions
 std::vector<std::string>	split(const std::string &str, char delim);
@@ -92,6 +99,7 @@ std::string 				media_to_string(const char *img_path);
 std::string					htmlPath_to_string(const char *html_path);
 std::string					autoindexPageHtml(std::string directoryName);
 std::string					int_to_string(int n);
+std::string					itohex(std::size_t size);
 bool						is_digit(std::string str);
 
 

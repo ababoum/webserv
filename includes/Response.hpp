@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2022/09/13 07:51:03 by tidurand         ###   ########.fr       */
+=======
+/*   Updated: 2022/09/11 21:57:30 by lcalvie          ###   ########.fr       */
+>>>>>>> 7014ad756603c970fa903229223397f84f3ca5d6
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +31,7 @@ struct ResponseHeader
 	ResponseHeader();
 	static const std::string default_protocol;
 	
-	std::string		getText() const;
+	std::string		getText(std::size_t body_size) const;
 	std::string		getRedirText() const;
 	std::string		getDeleteText() const;
 	std::string		getCGIText() const;
@@ -63,6 +67,8 @@ class Response
 		bool			isFromCGI() const;
 		std::string		getCGIText() const;
 		std::string		getRedirText() const;
+		ResponseHeader	&getHeader();
+		ResponseBody	&getBody();
 
 		void			setStatusCode(int code);
 		void			setStatusMsg(std::string msg);

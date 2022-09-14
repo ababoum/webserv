@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/14 13:46:13 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/14 16:01:07 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 
 	_req = req;
 	_body = req->getBody().content;
-	// std::cout << "PATH : " << content << std::endl;
+	_body.erase(_body.begin());
+	std::cout << YELLOW_TXT<< "body : " << _body << RESET_TXT<<std::endl;
 	if (_req->getBody().type == "cgi")
 	{
 		path = _req->getTargetLocation()->getRoot();
@@ -55,14 +56,16 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	_env["PATH_INFO"] = path;
 	_env["PATH_TRANSLATED"] = path;
 	_env["SCRIPT_NAME"] = path;
+	_env["SCRIPT_FILENAME"] = "www/index2.php";
 	_env["QUERY_STRING"] = req->getHeader().query_string;
 	_env["REMOTE_HOST"] = "";
 	_env["REMOTE_ADDR"] = "";
 	_env["AUTH_TYPE"] = "";
 	_env["REMOTE_USER"] = "";
 	_env["REMOTE_IDENT"] = "";
-	_env["CONTENT_TYPE"] = req->getBody().type;
+	_env["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
 	_env["CONTENT_LENGTH"] = int_to_string(req->getBody().length);
+	_env["REDIRECT_STATUS"] = "200"; // careful to what status code to fill
 	_env["HTTP_ACCEPT"] = "*/*";
 	_env["HTTP_ACCEPT_LANGUAGE"] = "en-US,en";
 	_env["HTTP_USER_AGENT"] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36";
@@ -102,7 +105,7 @@ std::string		CGIEngine::exec()
 
 	if (_req->getBody().type == "cgi")
 	{
-		cgi_path.append("www/cgi/php7.4");
+		cgi_path.append("www/cgi/php-cgi");
 	}
 	else
 	{
@@ -136,6 +139,15 @@ std::string		CGIEngine::exec()
 		arg[0] = const_cast<char*>(cgi_path.c_str());
 		arg[1] = const_cast<char*>(_content.c_str());
 		arg[2] = NULL;
+
+		std::cerr << RED_TXT <<"type: " << _env["CONTENT_TYPE"] << '\n';
+		std::cerr << RED_TXT  <<"length: " << _env["CONTENT_LENGTH"] << '\n';
+		std::cerr << RED_TXT  <<"filename: " << _env["SCRIPT_FILENAME"] << '\n';
+		std::cerr << RED_TXT  <<"method: " << _env["REQUEST_METHOD"] << '\n';
+		std::cerr << RED_TXT  <<"body: " << _body << '\n';
+
+		std::cerr << RESET_TXT ;
+		
 		if (execve(arg[0], arg, env) == -1)
 		{
 			exit(EXIT_FAILURE);

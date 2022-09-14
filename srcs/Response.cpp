@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 16:10:19 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/14 17:15:09 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,9 +103,9 @@ std::string		ResponseHeader::getCGIText() const
 	ret += '\n';
 
 	// line 2
-	ret.append("Content-Type: ");
-	ret.append(content_type);
-	ret += '\n';
+	// ret.append("Content-Type: ");
+	// ret.append(content_type);
+	// ret += '\n';
 
 	// line 3
 	ret.append("Content-Length: ");
@@ -114,7 +114,7 @@ std::string		ResponseHeader::getCGIText() const
 	
 	//cookies
 	ret.append("Set-Cookie: fname=a");
-	ret += '\n';
+	// ret += '\n';
 
 	return ret;	
 }

@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 16:07:52 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/14 17:28:53 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,13 +213,13 @@ void	ServerEngine::_buildResponseOnRequest()
 	{
 		CGIEngine cgi(_req, &_server);
 		_resp->setFromCGI(true);
-		// _resp->setCGIText(cgi.exec());
+		_resp->setCGIText(cgi.exec());
 		_resp->setStatusCode(SUCCESS_OK);
 		_resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
 		_resp->setContentType("text/html");
 		std::string body = cgi.exec();
 		_resp->setBody(body);
-		_resp->setContentLength(body.size());
+		_resp->setContentLength(body.size() - 42);
 
 	}
 	else if (_req->getHeader().method == "GET")

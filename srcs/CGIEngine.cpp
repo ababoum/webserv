@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/14 16:01:07 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/14 17:58:42 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,28 +23,22 @@ static void	free_env(char **env)
 CGIEngine::CGIEngine(Request *req, Server *serv)
 {	
 	std::string path;
-	std::string content;
 
 	_req = req;
 	_body = req->getBody().content;
 	_body.erase(_body.begin());
-	std::cout << YELLOW_TXT<< "body : " << _body << RESET_TXT<<std::endl;
 	if (_req->getBody().type == "cgi")
 	{
 		path = _req->getTargetLocation()->getRoot();
 		path += _req->getHeader().resource_path;
 		_content = path;
-		// _content = htmlPath_to_string(path.c_str());
-		// std::cerr << path << std::endl;
 	}
 	else
 	{
-		content = _req->getTargetLocation()->getRoot();
-		content += "/";
-		content += _req->getTargetLocation()->getIndexPage();
-		_content = content;
-		// _content = htmlPath_to_string(content.c_str());
-		path = _req->getTargetLocation()->getCGI();
+		_content = _req->getTargetLocation()->getRoot();
+		_content += "/";
+		_content += _req->getTargetLocation()->getIndexPage();
+		path = _content;
 	}
 	
 	_env["SERVER_SOFTWARE"] = "Webserv/1.0";
@@ -56,7 +50,7 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	_env["PATH_INFO"] = path;
 	_env["PATH_TRANSLATED"] = path;
 	_env["SCRIPT_NAME"] = path;
-	_env["SCRIPT_FILENAME"] = "www/index2.php";
+	_env["SCRIPT_FILENAME"] = path;
 	_env["QUERY_STRING"] = req->getHeader().query_string;
 	_env["REMOTE_HOST"] = "";
 	_env["REMOTE_ADDR"] = "";
@@ -70,7 +64,7 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	_env["HTTP_ACCEPT_LANGUAGE"] = "en-US,en";
 	_env["HTTP_USER_AGENT"] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36";
 	_env["HTTP_COOKIE"] = "fname=a";
-	_env["HTTP_REFERER"] = "http://localhost:9900/test_method.php?fname=a&lname=a";
+	_env["HTTP_REFERER"] = "";
 }
 
 CGIEngine::~CGIEngine()
@@ -135,18 +129,11 @@ std::string		CGIEngine::exec()
 		// catch output of the CGI script into output pipe
 		dup2(cgi_pipe_write[1], STDOUT_FILENO);
 		close(cgi_pipe_write[1]);
+		
 		char *arg[3];
 		arg[0] = const_cast<char*>(cgi_path.c_str());
 		arg[1] = const_cast<char*>(_content.c_str());
 		arg[2] = NULL;
-
-		std::cerr << RED_TXT <<"type: " << _env["CONTENT_TYPE"] << '\n';
-		std::cerr << RED_TXT  <<"length: " << _env["CONTENT_LENGTH"] << '\n';
-		std::cerr << RED_TXT  <<"filename: " << _env["SCRIPT_FILENAME"] << '\n';
-		std::cerr << RED_TXT  <<"method: " << _env["REQUEST_METHOD"] << '\n';
-		std::cerr << RED_TXT  <<"body: " << _body << '\n';
-
-		std::cerr << RESET_TXT ;
 		
 		if (execve(arg[0], arg, env) == -1)
 		{
@@ -172,10 +159,8 @@ std::string		CGIEngine::exec()
 		{
 			ret.append(buffer);
 		}
-		// std::cerr << "RET : " << ret << std::endl;
 		close(cgi_pipe_write[0]);
 	}
 	free_env(env);
-	std::cout << ret << std::endl;
 	return ret;
 }

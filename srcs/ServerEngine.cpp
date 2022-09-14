@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 16:07:52 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/14 20:10:42 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,15 +249,7 @@ void	ServerEngine::_buildResponseOnRequest()
 		std::fstream	file;
 		std::string		path;
 		
-		if (_server.getErrorPagePath(_req->getError()) == "")
-		{
-			path = "www/error_pages/";
-			path += int_to_string(_req->getError());
-			path += ".html";
-		}
-		else
-			path = _server.getErrorPagePath(_req->getError());
-		
+		path = _server.getErrorPagePath(_req->getError());
 		body = htmlPath_to_string(path.c_str());
 
 		_resp->setBody(body);
@@ -265,11 +257,12 @@ void	ServerEngine::_buildResponseOnRequest()
 	}
 }
 
-void	ServerEngine::_limit_request_size(std::string & request)
+void	ServerEngine::_limit_request_size()
 {
-	while (request.size() > _server.getClientBufferSize())
+	if (_req->getBody().content.size() > _server.getClientBufferSize())
 	{
-		request.erase(request.end() - 1);
+		_req->getBody().content = 
+			_req->getBody().content.substr(0, _server.getClientBufferSize());
 	}
 }
 
@@ -344,19 +337,6 @@ void	ServerEngine::stream_in()
 		fd_set_blocking(client_fd, 0);
 		goto readloop;
 	}
-	// else if (r == -1)                 // securiser le read = rien ne marche mdr
-	// {
-	// 	close(_client_fd);
-	// 	_client_fd = -1;
-	// 	_out_fd.fd = -1;
-	// 	return ;
-	// }
-	// else if (r == 0)
-	// 	break ;
-	
-	// this should be corrected and moved to appropriate place (after request is built)
-	if (_server.getClientBufferSize() > 0)
-		_limit_request_size(request_data);
 	
 	std::cout << "The request data was: " << \
 		BLUE_TXT << request_data << RESET_TXT;
@@ -364,10 +344,13 @@ void	ServerEngine::stream_in()
 	// parse the request
 
 	_req = new Request;
+	_aliveConnections[client_fd] = Connection(_req, NULL);
 	
 	_req->parseData(request_data);
 	if (!_req->isValid())
+	{
 		return ;
+	}
 	
 	// check if virtual server is used
 	_virtual_server = _req->enableVirtualServer(_globalConf, _server);
@@ -377,9 +360,14 @@ void	ServerEngine::stream_in()
 		_req->findLocation(_server);
 
 	if (_req->checkAccess() || _req->identifyType() || _req->getPostData(request_data))
+	{
 		return ;
-
-	_aliveConnections[client_fd] = Connection(_req, NULL);
+	}
+	
+	// shorten POST request body if it's overflowed
+	if (_server.getClientBufferSize() >= 0)
+		_limit_request_size();
+	
 }
 
 int	ServerEngine::stream_out(int client_fd)
@@ -430,6 +418,7 @@ int	ServerEngine::stream_out(int client_fd)
 	{
 		send(client_fd, _resp->getRedirText().c_str(), _resp->size(), 0);
 	}
+	else
 	{
 		if (_resp->getBody().content.size() <= CHUNKED_RESPONSE_SIZE)
 		{

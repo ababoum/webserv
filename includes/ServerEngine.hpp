@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/09 18:04:40 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/14 18:36:40 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ class ServerEngine
 		void			_buildResponseOnRequest();
 		void			_getMethod();
 		void			_init_dictionary();
-		void			_limit_request_size(std::string & request);
+		void			_limit_request_size();
 		void			_postMethod(std::string postData);
 		void			_deleteMethod();
 
@@ -68,7 +68,7 @@ class ServerEngine
 
 		void			setGlobalConf(GlobalConfiguration *globalConf);
 		void			stream_in();
-		int			stream_out(int client_fd);
+		int				stream_out(int client_fd);
 		int				getSocketFd() const;
 		struct pollfd	* getInFdPtr();
 

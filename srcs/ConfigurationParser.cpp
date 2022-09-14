@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/05 15:38:53 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/14 20:06:47 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,7 @@ void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items
 	{
 		_context = "main";
 		_checkCurrentServerIntegrity(line_nb);
+		_currentServer->completeErrorPages();
 		return ;
 	}
 
@@ -305,7 +306,7 @@ void	ConfigurationParser::_parseFile()
 		throw parsing_error("invalid file");
 	}
 
-	_checkServerDuplicate();	
+	_checkServerDuplicate();
 	inputStream.close();
 }
 

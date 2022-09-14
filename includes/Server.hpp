@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:14:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/01 14:33:49 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/14 20:07:48 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ class Server
 		void			addErrorPage(int error_code, std::string filePath);
 		void			setClientBufferSize(std::size_t buffer_max);
 		Location &		addLocation();
+		void			completeErrorPages();
 
 		// Accessors
 		
@@ -57,10 +58,10 @@ class Server
 		std::size_t					getClientBufferSize() const;
 		std::vector<Location> 	&	getRoutes();
 
+		
 	private:
 
 		// helper functions
-		
 		bool _isIPValid(std::string IP) const;
 		
 };

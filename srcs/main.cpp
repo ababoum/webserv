@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/10 01:36:54 by lcalvie          ###   ########.fr       */
+/*   Updated: 2022/09/14 20:04:15 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ int main(int ac, char **av)
 {
 	
 	try {
+		signal(SIGINT, ft_exit);
+		
 		if (ac < 2)
 		{
 			std::cerr << RED_TXT << "Error: webserv needs a configuration file to be launched\n"
@@ -35,7 +37,29 @@ int main(int ac, char **av)
 				<< RESET_TXT << "usage: ./webserv [file.conf]" << std::endl;
 		}
 
-		signal(SIGINT, ft_exit);
+		// check if all cgi binaries are available
+		if (access(PHP_CGI_PATH, X_OK) || 
+			access(PYTHON_CGI_PATH, X_OK) || 
+			access(PERL_CGI_PATH, X_OK))
+		{
+			std::cerr << RED_TXT << "Error: webserv cannot work properly without executable CGI binaries in cgi/\n"
+			<< RESET_TXT << "solution: provide php-cgi, python, and perl in cgi/ with execution privileges" << std::endl;
+
+			return (EXIT_FAILURE);
+		}
+
+		// check if all default error pages exist
+		if (access(BAD_REQUEST_DEFAULT, R_OK) || 
+			access(FORBIDDEN_DEFAULT, R_OK) || 
+			access(NOT_FOUND_DEFAULT, R_OK) ||
+			access(METHOD_NOT_ALLOWED_DEFAULT, R_OK) ||
+			access(SERVER_ERROR_DEFAULT, R_OK))
+		{
+			std::cerr << RED_TXT << "Error: webserv cannot work properly without default error pages\n"
+			<< RESET_TXT << "solution: provide default error pages in default_error_pages/" << std::endl;
+
+			return (EXIT_FAILURE);
+		}
 		
 		std::string inputPath(av[1]);
 		GlobalConfiguration globalConf;

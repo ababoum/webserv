@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIEngine.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/14 16:01:07 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/14 18:59:37 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 
 	_req = req;
 	_body = req->getBody().content;
-	_body.erase(_body.begin());
 	std::cout << YELLOW_TXT<< "body : " << _body << RESET_TXT<<std::endl;
 	if (_req->getBody().type == "cgi")
 	{

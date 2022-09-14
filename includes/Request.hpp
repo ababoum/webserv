@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 16:09:06 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/14 18:00:21 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ struct RequestHeader
 {
 	std::string							method;
 	std::string							URL;
+	std::string							user_agent;
 	std::string							resource_path;
 	std::string							query_string;
 	std::map<std::string, std::string>	query_variables;

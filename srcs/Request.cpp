@@ -6,11 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2022/09/08 13:16:57 by tidurand         ###   ########.fr       */
-=======
-/*   Updated: 2022/09/09 16:01:28 by mababou          ###   ########.fr       */
->>>>>>> 7014ad756603c970fa903229223397f84f3ca5d6
+/*   Updated: 2022/09/14 16:10:05 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -337,7 +333,6 @@ void			Request::_parseURL()
 	}
 }
 
-<<<<<<< HEAD
 void			Request::_parseCookieString(std::vector<std::string> line_items)
 {
 	for (size_t i = 1; i < line_items.size(); i++)
@@ -352,10 +347,7 @@ void			Request::_parseCookieVariables(std::string cookie_string)
 	std::vector<std::string> cookies = split(cookie_string, ";");
 }
 
-void			Request::getPostData(std::string requestData)
-=======
 int		Request::getPostData(std::string requestData)
->>>>>>> 7014ad756603c970fa903229223397f84f3ca5d6
 {
 	std::string::reverse_iterator rit = requestData.rbegin();
 	while (*rit != '\n')

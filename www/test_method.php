@@ -8,7 +8,9 @@
 </head>
 <body>
     <p>
-        [GET] Welcome <?php echo $_GET["fname"], $_GET["lname"]; ?><br>
+        [GET] Welcome <?php
+        parse_str(getenv("QUERY_STRING", $PP));
+        echo $PP["fname"], $PP["lname"]; ?><br>
         [POST] Welcome <?php echo $_POST["login"]; ?><br>
         <?php echo(min(0, 150, 30, 20, -8, -200));  ?>
     </p>

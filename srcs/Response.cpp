@@ -24,7 +24,7 @@ ResponseHeader::ResponseHeader()
 	protocol_version = default_protocol;
 }
 
-std::string		ResponseHeader::getText(std::size_t body_size) const
+std::string		ResponseHeader::getText(bool body_is_ifstream) const
 {
 	std::string ret;
 
@@ -41,15 +41,8 @@ std::string		ResponseHeader::getText(std::size_t body_size) const
 	ret.append(content_type);
 	ret += '\n';
 
-	// line 3
-	if (body_size > CHUNKED_RESPONSE_SIZE)
+	if (body_is_ifstream)
 		ret.append("Transfer-Encoding: chunked\n");
-	else
-	{
-		ret.append("Content-Length: ");
-		ret.append(int_to_string(content_length));
-		ret += '\n';
-	}
 
 	return ret;	
 }
@@ -123,9 +116,8 @@ std::string		ResponseHeader::getCGIText() const
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Response::Response()
+Response::Response() : _from_cgi(false)
 {
-	_from_cgi = false;
 }
 
 /*
@@ -134,6 +126,8 @@ Response::Response()
 
 Response::~Response()
 {
+	if (_ifstream_body.is_open())
+		_ifstream_body.close();
 }
 
 
@@ -201,27 +195,40 @@ void	Response::setRedirectionLocation(std::string url)
 	_header.redir_location = url;
 }
 
+void	Response::setIfstreamBodyHTML(const char *path)
+{
+	_ifstream_body.open(path);
+	if (!_ifstream_body.is_open())
+	{
+		_body.content = "<title>Error Page Not Found</title><H1>Error Page Not Found</H1>";
+		_body.length = 65;
+	}
+}
+
+void	Response::setIfstreamBodyMedia(const char *path)
+{
+	_ifstream_body.open(path);
+	if (!_ifstream_body.is_open())
+	{
+		_body.content = "<title>Media Page Not Found</title><H1>Media Page Not Found</H1>";
+		_body.length = 65;
+	}
+}
+
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
 
-std::string	Response::getText() const
+std::string	Response::getHeaderText() const
 {
-	std::string ret_txt;
-
-	ret_txt.append(_header.getText(_body.content.size()));
-	ret_txt += '\n';
-	
-	ret_txt.append(_body.content);
-
-	return (ret_txt);
+	return (_header.getText(_ifstream_body.is_open()));
 }
 
 std::string	Response::getRedirText() const
 {
 	return _header.getRedirText();
 }
-
+/*
 std::size_t	Response::size() const
 {
 	if (_from_cgi == true)
@@ -231,7 +238,7 @@ std::size_t	Response::size() const
 	else
 		return _header.getText( _body.content.size()).size() + _body.content.size() + 1;
 }
-
+*/
 bool		Response::isFromCGI() const
 {
 	return _from_cgi;
@@ -259,5 +266,9 @@ ResponseBody	&Response::getBody()
 	return _body;
 }
 
+std::ifstream	&Response::getIfstreamBody()
+{
+	return _ifstream_body;
+}
 
 /* ************************************************************************** */

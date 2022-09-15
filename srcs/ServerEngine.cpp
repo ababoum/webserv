@@ -143,15 +143,15 @@ void	ServerEngine::_getMethod()
 			else
 				path+=_req->getHeader().URL;
 			body = autoindexPageHtml(path);
+			_resp->setBody(body);
+			_resp->setContentLength(body.size());
 		}
 		else
 		{
 			path += (_req->getTargetLocation()->getIndexPage()[0] == '/' ? "" : "/");
 			path += _req->getTargetLocation()->getIndexPage();
-			body = htmlPath_to_string(path.c_str());
+			_resp->setIfstreamBodyHTML(path.c_str());
 		}
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
 	}
 	// return a html page
 	else if (_req->isValid() && _req->getBody().isMedia == false)
@@ -163,10 +163,7 @@ void	ServerEngine::_getMethod()
 		std::string path = _req->getTargetLocation()->getRoot();
 		path += (_req->getHeader().resource_path[0] == '/' ? "" : "/");
 		path += _req->getHeader().resource_path;
-		std::string body = htmlPath_to_string(path.c_str());
-
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
+		_resp->setIfstreamBodyHTML(path.c_str());
 	}
 	// return a media (image, video, etc.)
 	else if (_req->isValid() && _req->getBody().isMedia)
@@ -179,10 +176,7 @@ void	ServerEngine::_getMethod()
 		path += (_req->getHeader().resource_path[0] == '/' ? "" : "/");
 		path += _req->getHeader().resource_path;
 
-		std::string body = media_to_string(path.c_str());
-		
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
+		_resp->setIfstreamBodyMedia(path.c_str());
 	}
 	else
 	{
@@ -250,10 +244,7 @@ void	ServerEngine::_buildResponseOnRequest()
 		std::string		path;
 		
 		path = _server.getErrorPagePath(_req->getError());
-		body = htmlPath_to_string(path.c_str());
-
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
+		_resp->setIfstreamBodyHTML(path.c_str());
 	}
 }
 
@@ -373,73 +364,71 @@ void	ServerEngine::stream_in()
 int	ServerEngine::stream_out(int client_fd)
 {
 	int still_alive = 0;
+	std::string to_send;
 
 	_req = _aliveConnections[client_fd].req;
 	
-	// Send a response to the connection
-	if (_aliveConnections[client_fd].resp == NULL)
+	if (_aliveConnections[client_fd].resp == NULL)	// new connection 
 	{
 		_resp = new Response;
 		_aliveConnections[client_fd].resp = _resp;
 		_buildResponseOnRequest();
 	}
-	else
+	else											// old connection
 	{
 		_resp = _aliveConnections[client_fd].resp;
-		
-		if (_resp->getBody().content.size() <= CHUNKED_RESPONSE_SIZE)
+
+		std::string str;
+		char c;
+
+		while (str.length() < CHUNKED_RESPONSE_SIZE && _resp->getIfstreamBody().get(c))
+			str+=c;
+
+		to_send = itohex(str.length());
+		to_send+="\r\n";
+		to_send+=str;
+		to_send+="\r\n";
+		if (str.length() < CHUNKED_RESPONSE_SIZE)
 		{
-			std::string tmp = itohex(_resp->getBody().content.size());
-			tmp+="\r\n";
-			tmp+= _resp->getBody().content;
-			tmp+="\r\n";
-			tmp+="0\r\n\r\n";
-			send(client_fd, tmp.c_str(),tmp.size(), 0);
-			//std::cout << RED_TXT << tmp << "\n" << RESET_TXT;
-			goto clean;
+			to_send+="0\r\n\r\n";
+			_resp->getIfstreamBody().close();
 		}
-
-		std::string tmp = itohex(CHUNKED_RESPONSE_SIZE);
-		tmp+="\r\n";
-		tmp.append(_resp->getBody().content.begin(), _resp->getBody().content.begin() + CHUNKED_RESPONSE_SIZE);
-		tmp+="\r\n";
-		send(client_fd, tmp.c_str(),tmp.size(), 0);
-		//std::cout << RED_TXT << tmp << "\n" << RESET_TXT;
-		_resp->getBody().content.erase(0, CHUNKED_RESPONSE_SIZE);
-
-		return !still_alive;
+		else
+			still_alive = 1;
+		goto send;
 	}
 
 	if (_resp->isFromCGI())
 	{
-		send(client_fd, _resp->getCGIText().c_str(), _resp->getCGIText().size(), 0);
+		to_send = _resp->getCGIText();
 	}
 	else if (_req->getTargetLocation() && _req->getTargetLocation()->isRedirected())
 	{
-		send(client_fd, _resp->getRedirText().c_str(), _resp->size(), 0);
+		to_send = _resp->getRedirText();
 	}
 	else
 	{
-		if (_resp->getBody().content.size() <= CHUNKED_RESPONSE_SIZE)
-		{
-			send(client_fd, _resp->getText().c_str(), _resp->size(), 0);
-		}
-		else
-		{
-			std::string	tmp = _resp->getHeader().getText(_resp->getBody().content.size());
-			tmp+= '\n';
-			send(client_fd, tmp.c_str(),tmp.size(), 0);
-			return !still_alive;
-		}
+		to_send = _resp->getHeaderText();
+		to_send+= '\n';
+		if (_resp->getIfstreamBody().is_open())	//body = fd
+			still_alive = 1;
+		else									//body = string
+			to_send += _resp->getBody().content;
 	}
-	
-	clean :
+
+	send :
+
+	if (send(client_fd, to_send.c_str(), to_send.size(), 0) == -1)
+		still_alive = 0; // clean 
+
+	if (still_alive)
+		return still_alive;
+
+	// Close the connection
 	delete _resp;
 	_resp = NULL;
 	delete _req;
 	_req = NULL;
-
-	// Close the connection
 	_aliveConnections.erase(client_fd);
 	close(client_fd);
 	_globalConf->eraseClientFd(client_fd);

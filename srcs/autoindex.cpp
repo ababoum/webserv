@@ -28,10 +28,9 @@ std::string	autoindexPageHtml(std::string directoryName)
 
 	body+="<pre>\n";
 	
-	DIR *dp = opendir(directoryName.c_str()); // directory fd
-	if (dp == NULL) {
-		throw std::invalid_argument("autoindex request on file");
-	}
+	DIR *dp = opendir(directoryName.c_str());
+	if (dp == NULL)
+		return ("<title>Directory Not Found</title><H1>Directory " + directoryName + " Not Found</H1>");
 	struct dirent *dirp;
 	while ((dirp = readdir(dp)) != NULL) {
 		body+="<a href=\"";

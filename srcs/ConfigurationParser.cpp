@@ -348,7 +348,7 @@ void	ConfigurationParser::_checkCurrentLocationIntegrity(std::size_t line_nb) co
 		throw std::logic_error("root-less location");
 	}
 
-	if (_currentLocation->getIndexPage().empty())
+	if (_currentLocation->getIndexPage().empty() && !_currentLocation->isAutoindexed())
 	{
 		std::cerr << RED_TXT << "Error: location doesn't have an index page: line " <<
 			RESET_TXT << line_nb << '\n';

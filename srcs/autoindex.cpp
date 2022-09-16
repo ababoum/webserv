@@ -12,20 +12,15 @@
 
 # include "../includes/webserv.hpp"
 
-std::string	autoindexPageHtml(std::string directoryName)
+std::string	autoindexPageHtml(std::string directoryName, std::string headerURL)
 {
 	std::string body;
+	
+	if (headerURL.empty() || headerURL[headerURL.length() -1] != '/')
+		headerURL+='/';
 
-	//config header here 
-
-	//body
-	body+="<body>\n";
-	body+="<h1>Index of ";
-	body+=directoryName;
-	body+="</h1>\n";
-
+	body+="<body>\n<h1>Index of "+directoryName+"</h1>\n";
 	body+="<pre><a>Name</a></pre><hr />";
-
 	body+="<pre>\n";
 	
 	DIR *dp = opendir(directoryName.c_str());
@@ -33,16 +28,11 @@ std::string	autoindexPageHtml(std::string directoryName)
 		return ("<title>Directory Not Found</title><H1>Directory " + directoryName + " Not Found</H1>");
 	struct dirent *dirp;
 	while ((dirp = readdir(dp)) != NULL) {
-		body+="<a href=\"";
-		body+=dirp->d_name;
-		body+="\">";
-		body+=dirp->d_name;
-		body+="</a>\n";
+		body+= "<a href=\"" + headerURL + dirp->d_name +"\">" + dirp->d_name + "</a>\n";
 	}
 	closedir(dp);
 
-	body+="</pre>\n";
-	body+="</body>\n";
+	body+="</pre>\n</body>\n";
 
 	return (body);
 }

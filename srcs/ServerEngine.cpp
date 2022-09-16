@@ -142,7 +142,7 @@ void	ServerEngine::_getMethod()
 				path.append(_req->getHeader().URL.begin() + 1,_req->getHeader().URL.end());
 			else
 				path+=_req->getHeader().URL;
-			body = autoindexPageHtml(path);
+			body = autoindexPageHtml(path, _req->getHeader().URL);
 			_resp->setBody(body);
 			_resp->setContentLength(body.size());
 		}
@@ -373,8 +373,20 @@ int	ServerEngine::stream_out(int client_fd)
 		_resp = new Response;
 		_aliveConnections[client_fd].resp = _resp;
 		_buildResponseOnRequest();
+		if (_resp->isFromCGI())
+			to_send = _resp->getCGIText();
+		else if (_req->getTargetLocation() && _req->getTargetLocation()->isRedirected())
+			to_send = _resp->getRedirText();
+		else
+		{
+			to_send = _resp->getHeaderText() + '\n';
+			if (_resp->getIfstreamBody().is_open())	//body = fd
+				still_alive = 1;
+			else									//body = string
+				to_send += _resp->getBody().content;
+		}
 	}
-	else											// old connection
+	else											// old connection (fd)
 	{
 		_resp = _aliveConnections[client_fd].resp;
 
@@ -384,10 +396,7 @@ int	ServerEngine::stream_out(int client_fd)
 		while (str.length() < CHUNKED_RESPONSE_SIZE && _resp->getIfstreamBody().get(c))
 			str+=c;
 
-		to_send = itohex(str.length());
-		to_send+="\r\n";
-		to_send+=str;
-		to_send+="\r\n";
+		to_send = itohex(str.length()) + "\r\n" + str + "\r\n";
 		if (str.length() < CHUNKED_RESPONSE_SIZE)
 		{
 			to_send+="0\r\n\r\n";
@@ -395,28 +404,7 @@ int	ServerEngine::stream_out(int client_fd)
 		}
 		else
 			still_alive = 1;
-		goto send;
 	}
-
-	if (_resp->isFromCGI())
-	{
-		to_send = _resp->getCGIText();
-	}
-	else if (_req->getTargetLocation() && _req->getTargetLocation()->isRedirected())
-	{
-		to_send = _resp->getRedirText();
-	}
-	else
-	{
-		to_send = _resp->getHeaderText();
-		to_send+= '\n';
-		if (_resp->getIfstreamBody().is_open())	//body = fd
-			still_alive = 1;
-		else									//body = string
-			to_send += _resp->getBody().content;
-	}
-
-	send :
 
 	if (send(client_fd, to_send.c_str(), to_send.size(), 0) == -1)
 		still_alive = 0; // clean 

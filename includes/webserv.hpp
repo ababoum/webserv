@@ -110,7 +110,7 @@ std::vector<std::string>	split(const std::string &str, char delim);
 std::vector<std::string>	split(const std::string &str, const char *set_delim);
 std::string 				media_to_string(const char *img_path);
 std::string					htmlPath_to_string(const char *html_path);
-std::string					autoindexPageHtml(std::string directoryName);
+std::string					autoindexPageHtml(std::string directoryName, std::string headerURL);
 std::string					int_to_string(int n);
 std::string					itohex(std::size_t size);
 bool						is_digit(std::string str);

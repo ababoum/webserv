@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 16:10:05 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/14 19:25:10 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,16 +69,27 @@ void	Request::parseData(std::string requestData)
 	std::string			line;
 	size_t				line_index = 1;
 
+	if (requestData.empty())
+	{
+		_error = BAD_REQUEST;
+		_validRequest = false;
+		return ;
+	}
 	while(std::getline(data, line, '\n'))
 	{
 		std::vector<std::string> line_items = split(line, " \r");
 		// Method line
 		if (line_index == 1)
 		{
-			if ((line_items[0] != "GET" && line_items[0] != "POST" && line_items[0] != "DELETE") ||
-				line_items.size() != 3)
+			if (line_items.size() != 3)
 			{
 				_error = BAD_REQUEST;
+				_validRequest = false;
+				return ;
+			}
+			else if (line_items[0] != "GET" && line_items[0] != "POST" && line_items[0] != "DELETE")
+			{
+				_error = METHOD_NOT_ALLOWED;
 				_validRequest = false;
 				return ;
 			}
@@ -90,12 +101,17 @@ void	Request::parseData(std::string requestData)
 			}
 		}
 		// Host line
-		if (line_items.size() > 1 && line_items[0] == "Host:")
+		else if (line_items.size() > 1 && line_items[0] == "Host:")
 		{
 			_header.host = line_items[1];
 		}
-		//Cookie line
-		if (line_items.size() > 1 && line_items[0] == "Cookie:")
+		// User-Agent line
+		else if (line_items.size() > 1 && line_items[0] == "User-Agent:")
+		{
+			_header.user_agent = line.substr(12, line.length() - 13);
+		}
+		// Cookie line
+		else if (line_items.size() > 1 && line_items[0] == "Cookie:")
 		{
 			_parseCookieString(line_items);
 			_parseCookieVariables(_header.cookie_string);
@@ -349,6 +365,9 @@ void			Request::_parseCookieVariables(std::string cookie_string)
 
 int		Request::getPostData(std::string requestData)
 {
+	if (_header.method != "POST")
+		return 0;
+
 	std::string::reverse_iterator rit = requestData.rbegin();
 	while (*rit != '\n')
 		rit++;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   GlobalConfiguration.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/11 23:11:27 by lcalvie          ###   ########.fr       */
+/*   Updated: 2022/09/14 18:06:32 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 */
 
 GlobalConfiguration::GlobalConfiguration() {}
-
 
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------

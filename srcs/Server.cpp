@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:14:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/08/13 20:42:07 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/14 20:05:18 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static bool isNumber(const std::string &str)
 */
 
 Server::Server()
-	:_port(-1) {}
+	:_port(-1), _clientBufferSize(-1) {}
 
 Server::Server(const Server &src)
 {
@@ -134,6 +134,30 @@ bool Server::_isIPValid(std::string IP) const
 		}
 	}
 	return true;
+}
+
+void			Server::completeErrorPages()
+{
+	if (_errorPages.find(BAD_REQUEST) == _errorPages.end())
+	{
+		_errorPages[BAD_REQUEST] = BAD_REQUEST_DEFAULT;
+	}
+	if (_errorPages.find(FORBIDDEN) == _errorPages.end())
+	{
+		_errorPages[FORBIDDEN] = FORBIDDEN_DEFAULT;
+	}
+	if (_errorPages.find(NOT_FOUND) == _errorPages.end())
+	{
+		_errorPages[NOT_FOUND] = NOT_FOUND_DEFAULT;
+	}
+	if (_errorPages.find(METHOD_NOT_ALLOWED) == _errorPages.end())
+	{
+		_errorPages[METHOD_NOT_ALLOWED] = METHOD_NOT_ALLOWED_DEFAULT;
+	}
+	if (_errorPages.find(SERVER_ERROR) == _errorPages.end())
+	{
+		_errorPages[SERVER_ERROR] = SERVER_ERROR_DEFAULT;
+	}
 }
 
 /*

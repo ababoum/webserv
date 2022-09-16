@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 17:28:53 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/16 10:03:00 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,16 +142,16 @@ void	ServerEngine::_getMethod()
 				path.append(_req->getHeader().URL.begin() + 1,_req->getHeader().URL.end());
 			else
 				path+=_req->getHeader().URL;
-			body = autoindexPageHtml(path);
+			body = autoindexPageHtml(path, _req->getHeader().URL);
+			_resp->setBody(body);
+			_resp->setContentLength(body.size());
 		}
 		else
 		{
 			path += (_req->getTargetLocation()->getIndexPage()[0] == '/' ? "" : "/");
 			path += _req->getTargetLocation()->getIndexPage();
-			body = htmlPath_to_string(path.c_str());
+			_resp->setIfstreamBodyHTML(path.c_str());
 		}
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
 	}
 	// return a html page
 	else if (_req->isValid() && _req->getBody().isMedia == false)
@@ -163,10 +163,7 @@ void	ServerEngine::_getMethod()
 		std::string path = _req->getTargetLocation()->getRoot();
 		path += (_req->getHeader().resource_path[0] == '/' ? "" : "/");
 		path += _req->getHeader().resource_path;
-		std::string body = htmlPath_to_string(path.c_str());
-
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
+		_resp->setIfstreamBodyHTML(path.c_str());
 	}
 	// return a media (image, video, etc.)
 	else if (_req->isValid() && _req->getBody().isMedia)
@@ -179,10 +176,7 @@ void	ServerEngine::_getMethod()
 		path += (_req->getHeader().resource_path[0] == '/' ? "" : "/");
 		path += _req->getHeader().resource_path;
 
-		std::string body = media_to_string(path.c_str());
-		
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
+		_resp->setIfstreamBodyMedia(path.c_str());
 	}
 	else
 	{
@@ -249,27 +243,17 @@ void	ServerEngine::_buildResponseOnRequest()
 		std::fstream	file;
 		std::string		path;
 		
-		if (_server.getErrorPagePath(_req->getError()) == "")
-		{
-			path = "www/error_pages/";
-			path += int_to_string(_req->getError());
-			path += ".html";
-		}
-		else
-			path = _server.getErrorPagePath(_req->getError());
-		
-		body = htmlPath_to_string(path.c_str());
-
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
+		path = _server.getErrorPagePath(_req->getError());
+		_resp->setIfstreamBodyHTML(path.c_str());
 	}
 }
 
-void	ServerEngine::_limit_request_size(std::string & request)
+void	ServerEngine::_limit_request_size()
 {
-	while (request.size() > _server.getClientBufferSize())
+	if (_req->getBody().content.size() > _server.getClientBufferSize())
 	{
-		request.erase(request.end() - 1);
+		_req->getBody().content = 
+			_req->getBody().content.substr(0, _server.getClientBufferSize());
 	}
 }
 
@@ -344,19 +328,6 @@ void	ServerEngine::stream_in()
 		fd_set_blocking(client_fd, 0);
 		goto readloop;
 	}
-	// else if (r == -1)                 // securiser le read = rien ne marche mdr
-	// {
-	// 	close(_client_fd);
-	// 	_client_fd = -1;
-	// 	_out_fd.fd = -1;
-	// 	return ;
-	// }
-	// else if (r == 0)
-	// 	break ;
-	
-	// this should be corrected and moved to appropriate place (after request is built)
-	if (_server.getClientBufferSize() > 0)
-		_limit_request_size(request_data);
 	
 	std::cout << "The request data was: " << \
 		BLUE_TXT << request_data << RESET_TXT;
@@ -364,10 +335,13 @@ void	ServerEngine::stream_in()
 	// parse the request
 
 	_req = new Request;
+	_aliveConnections[client_fd] = Connection(_req, NULL);
 	
 	_req->parseData(request_data);
 	if (!_req->isValid())
+	{
 		return ;
+	}
 	
 	// check if virtual server is used
 	_virtual_server = _req->enableVirtualServer(_globalConf, _server);
@@ -377,80 +351,72 @@ void	ServerEngine::stream_in()
 		_req->findLocation(_server);
 
 	if (_req->checkAccess() || _req->identifyType() || _req->getPostData(request_data))
+	{
 		return ;
-
-	_aliveConnections[client_fd] = Connection(_req, NULL);
+	}
+	
+	// shorten POST request body if it's overflowed
+	if (_server.getClientBufferSize() >= 0)
+		_limit_request_size();
+	
 }
 
 int	ServerEngine::stream_out(int client_fd)
 {
 	int still_alive = 0;
+	std::string to_send;
 
 	_req = _aliveConnections[client_fd].req;
 	
-	// Send a response to the connection
-	if (_aliveConnections[client_fd].resp == NULL)
+	if (_aliveConnections[client_fd].resp == NULL)	// new connection 
 	{
 		_resp = new Response;
 		_aliveConnections[client_fd].resp = _resp;
 		_buildResponseOnRequest();
-	}
-	else
-	{
-		_resp = _aliveConnections[client_fd].resp;
-		
-		if (_resp->getBody().content.size() <= CHUNKED_RESPONSE_SIZE)
-		{
-			std::string tmp = itohex(_resp->getBody().content.size());
-			tmp+="\r\n";
-			tmp+= _resp->getBody().content;
-			tmp+="\r\n";
-			tmp+="0\r\n\r\n";
-			send(client_fd, tmp.c_str(),tmp.size(), 0);
-			//std::cout << RED_TXT << tmp << "\n" << RESET_TXT;
-			goto clean;
-		}
-
-		std::string tmp = itohex(CHUNKED_RESPONSE_SIZE);
-		tmp+="\r\n";
-		tmp.append(_resp->getBody().content.begin(), _resp->getBody().content.begin() + CHUNKED_RESPONSE_SIZE);
-		tmp+="\r\n";
-		send(client_fd, tmp.c_str(),tmp.size(), 0);
-		//std::cout << RED_TXT << tmp << "\n" << RESET_TXT;
-		_resp->getBody().content.erase(0, CHUNKED_RESPONSE_SIZE);
-
-		return !still_alive;
-	}
-
-	if (_resp->isFromCGI())
-	{
-		send(client_fd, _resp->getCGIText().c_str(), _resp->getCGIText().size(), 0);
-	}
-	else if (_req->getTargetLocation() && _req->getTargetLocation()->isRedirected())
-	{
-		send(client_fd, _resp->getRedirText().c_str(), _resp->size(), 0);
-	}
-	{
-		if (_resp->getBody().content.size() <= CHUNKED_RESPONSE_SIZE)
-		{
-			send(client_fd, _resp->getText().c_str(), _resp->size(), 0);
-		}
+		if (_resp->isFromCGI())
+			to_send = _resp->getCGIText();
+		else if (_req->getTargetLocation() && _req->getTargetLocation()->isRedirected())
+			to_send = _resp->getRedirText();
 		else
 		{
-			std::string	tmp = _resp->getHeader().getText(_resp->getBody().content.size());
-			tmp+= '\n';
-			send(client_fd, tmp.c_str(),tmp.size(), 0);
-			return !still_alive;
+			to_send = _resp->getHeaderText() + '\n';
+			if (_resp->getIfstreamBody().is_open())	//body = fd
+				still_alive = 1;
+			else									//body = string
+				to_send += _resp->getBody().content;
 		}
 	}
-	
-	clean :
+	else											// old connection (fd)
+	{
+		_resp = _aliveConnections[client_fd].resp;
+
+		std::string str;
+		char c;
+
+		while (str.length() < CHUNKED_RESPONSE_SIZE && _resp->getIfstreamBody().get(c))
+			str+=c;
+
+		to_send = itohex(str.length()) + "\r\n" + str + "\r\n";
+		if (str.length() < CHUNKED_RESPONSE_SIZE)
+		{
+			to_send+="0\r\n\r\n";
+			_resp->getIfstreamBody().close();
+		}
+		else
+			still_alive = 1;
+	}
+
+	if (send(client_fd, to_send.c_str(), to_send.size(), 0) == -1)
+		still_alive = 0; // clean 
+
+	if (still_alive)
+		return still_alive;
+
+	// Close the connection
 	delete _resp;
 	_resp = NULL;
 	delete _req;
 	_req = NULL;
-
-	// Close the connection
 	_aliveConnections.erase(client_fd);
 	close(client_fd);
 	_globalConf->eraseClientFd(client_fd);

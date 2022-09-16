@@ -27,7 +27,7 @@ struct ResponseHeader
 	ResponseHeader();
 	static const std::string default_protocol;
 	
-	std::string		getText(std::size_t body_size) const;
+	std::string		getText(bool body_is_ifstream) const;
 	std::string		getRedirText() const;
 	std::string		getDeleteText() const;
 	std::string		getCGIText() const;
@@ -50,6 +50,7 @@ class Response
 
 	private:
 
+		std::ifstream	_ifstream_body;
 		ResponseBody	_body;
 		ResponseHeader	_header;
 		std::string		_file_path;
@@ -58,13 +59,14 @@ class Response
 	
 	public:
 
-		std::string		getText() const;
-		std::size_t		size() const;
+		std::string		getHeaderText() const;
+		//std::size_t		size() const;
 		bool			isFromCGI() const;
 		std::string		getCGIText() const;
 		std::string		getRedirText() const;
 		ResponseHeader	&getHeader();
 		ResponseBody	&getBody();
+		std::ifstream	&getIfstreamBody();
 
 		void			setStatusCode(int code);
 		void			setStatusMsg(std::string msg);
@@ -73,6 +75,9 @@ class Response
 		void			setBody(std::string body);
 		void			setFromCGI(bool val);
 		void			setRedirectionLocation(std::string url);
+		void			setIfstreamBodyHTML(const char *path);
+		void			setIfstreamBodyMedia(const char *path);
+
 		// for CGI response only
 		void			setCGIText(std::string CGI_text);
 		void			reset();

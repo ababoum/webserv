@@ -59,7 +59,7 @@ std::vector<std::string>	split(const std::string &str, const char *set_delim)
 	return list;
 }
 
-std::string 				media_to_string(const char *img_path)
+std::string 				media_to_string(const char *img_path) // a supprimer
 {
 	std::ifstream 		media_file;
 	std::vector<char> 	tab;
@@ -80,7 +80,7 @@ std::string 				media_to_string(const char *img_path)
 	return ret;	
 }
 
-std::string					htmlPath_to_string(const char *html_path)
+std::string					htmlPath_to_string(const char *html_path) // a supprimer
 {
 	std::string		ret;
 	std::ifstream	file;

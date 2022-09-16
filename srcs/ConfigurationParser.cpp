@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigurationParser.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 20:06:47 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/16 14:16:08 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,12 +112,6 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 	else if (line_items[0] == "index" && line_items.size() == 2)
 	{
 		_currentLocation->setIndexPage(line_items[1]);
-	}
-
-	// fill cgi
-	else if (line_items[0] == "fastcgi_pass" && line_items.size() == 2)
-	{
-		_currentLocation->setCGI(line_items[1]);
 	}
 
 	// HTTP redirection
@@ -341,12 +335,21 @@ void	ConfigurationParser::_checkCurrentServerIntegrity(std::size_t line_nb) cons
 
 void	ConfigurationParser::_checkCurrentLocationIntegrity(std::size_t line_nb) const
 {
+	struct stat sb;
+	
 	if (_currentLocation->getRoot().empty())
 	{
 		std::cerr << RED_TXT << "Error: location doesn't have a root: line " <<
 			RESET_TXT << line_nb << '\n';
 		throw std::logic_error("root-less location");
 	}
+	else if (!(stat(_currentLocation->getRoot().c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)))
+	{
+		std::cerr << RED_TXT << "Error: Root not valid: line " <<
+			RESET_TXT << line_nb << '\n';
+		throw std::logic_error("root not valid");
+	}
+	
 
 	if (_currentLocation->getIndexPage().empty() && !_currentLocation->isAutoindexed())
 	{

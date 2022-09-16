@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/16 10:03:44 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/16 14:26:30 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,9 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 
 	_req = req;
 	_body = req->getBody().content;
-	_body.erase(_body.begin());
-	if (_req->getBody().type == "cgi")
+	if (!_body.empty())
+		_body.erase(_body.begin());
+	if (_req->getHeader().resource_path != "/")
 	{
 		path = _req->getTargetLocation()->getRoot();
 		path += _req->getHeader().resource_path;
@@ -52,8 +53,8 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	_env["SCRIPT_NAME"] = path;
 	_env["SCRIPT_FILENAME"] = path;
 	_env["QUERY_STRING"] = req->getHeader().query_string;
-	_env["REMOTE_HOST"] = "";
-	_env["REMOTE_ADDR"] = "";
+	_env["REMOTE_HOST"] = req->getHeader().host;
+	_env["REMOTE_ADDR"] = serv->getIP();
 	_env["AUTH_TYPE"] = "";
 	_env["REMOTE_USER"] = "";
 	_env["REMOTE_IDENT"] = "";
@@ -62,8 +63,8 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	_env["REDIRECT_STATUS"] = "200"; // careful to what status code to fill
 	_env["HTTP_ACCEPT"] = "*/*";
 	_env["HTTP_ACCEPT_LANGUAGE"] = "en-US,en";
-	_env["HTTP_USER_AGENT"] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36";
-	_env["HTTP_COOKIE"] = "fname=a";
+	_env["HTTP_USER_AGENT"] = req->getHeader().user_agent;
+	_env["HTTP_COOKIE"] = req->getHeader().cookie_string;
 	_env["HTTP_REFERER"] = "";
 }
 
@@ -96,17 +97,25 @@ std::string		CGIEngine::exec()
 	int			status;
 	char		buffer[CGI_BUFFER_SIZE + 1] = {0};
 	std::string	cgi_path;
+	char *arg[4] = {0};
 
-	if (_req->getBody().type == "cgi")
+	if (_req->getBody().type == "php") 
 	{
-		cgi_path.append("www/cgi/php-cgi");
+		cgi_path.append(PHP_CGI_PATH);
+		arg[1] = const_cast<char*>("-q");
+		arg[2] = const_cast<char*>(_content.c_str());
 	}
-	else
+	else if (_req->getBody().type == "py") 
 	{
-		cgi_path.append(_req->getTargetLocation()->getRoot());
-		cgi_path += (_req->getTargetLocation()->getCGI()[0] == '/' ? "" : "/");
-		cgi_path.append(_req->getTargetLocation()->getCGI());
+		cgi_path.append(PYTHON_CGI_PATH);
+		arg[1] = const_cast<char*>(_content.c_str());
 	}
+	else if (_req->getBody().type == "pl") 
+	{
+		cgi_path.append(PERL_CGI_PATH);
+		arg[1] = const_cast<char*>(_content.c_str());
+	}
+	arg[0] = const_cast<char*>(cgi_path.c_str());
 	env = mapToStr(_env);
 	pipe(cgi_pipe_read);
 	pipe(cgi_pipe_write);
@@ -129,11 +138,6 @@ std::string		CGIEngine::exec()
 		// catch output of the CGI script into output pipe
 		dup2(cgi_pipe_write[1], STDOUT_FILENO);
 		close(cgi_pipe_write[1]);
-		
-		char *arg[3];
-		arg[0] = const_cast<char*>(cgi_path.c_str());
-		arg[1] = const_cast<char*>(_content.c_str());
-		arg[2] = NULL;
 		
 		if (execve(arg[0], arg, env) == -1)
 		{

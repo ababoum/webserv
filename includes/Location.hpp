@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/07 15:00:45 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/16 14:16:52 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ class Location
 		std::set<std::string>			_allowedMethods;
 		std::string						_indexPage;
 		bool							_autoindex;
-		std::string						_cgi;
 		std::pair<int, std::string>		_redirection;
 		bool							_isRedirected;
 
@@ -46,7 +45,6 @@ class Location
 		void			addAllowedMethod(std::string method);
 		void			setIndexPage(std::string indexPagePath);
 		void			setAutoindex(std::string on_off);
-		void			setCGI(std::string cgiPath);
 		void			setRedirection(int code, std::string url);
 
 		// Accessors
@@ -55,7 +53,6 @@ class Location
 		std::string						getIndexPage() const;
 		bool							isAutoindexed() const;
 		std::set<std::string> & 		getAllowedMethods();
-		std::string						getCGI() const;
 		std::string						getRoot() const;
 		bool							isRedirected() const;
 		std::pair<int, std::string>		getRedirection() const;

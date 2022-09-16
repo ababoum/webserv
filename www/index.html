@@ -8,13 +8,31 @@
 <body>
 	<h1>Webserv test</h1>
 	<h2>Get test</h2>
-		<a href="test_get.php">Get test</a>
-	<h2>Post test CGI</h2>
-		<a href="test_post.php">Post test</a>
-	<h2>Post test no CGI</h2>
-		<p>TODO</p>
-	<h2>Delete test</h2>
-		<p>TODO with curl</p>
+	<form action="test_method.php" method="GET">
+		<label for="fname">First name:</label>
+		<input type="text" id="fname" name="fname"><br><br>
+		<label for="lname">Last name:</label>
+		<input type="text" id="lname" name="lname"><br><br>
+		<input type="submit" value="Submit">
+	</form>
+	<br>
+	<form action="cgi/test.cgi" method="GET">
+		<input type="radio" id="c" name="fav_language" value="c" checked="checked">
+		<label for="c">C</label><br>
+		<input type="radio" id="cpp" name="fav_language" value="cpp">
+		<label for="cpp">C++</label><br>
+		<input type="radio" id="another" name="fav_language" value="another">
+		<label for="another">Another</label><br><br>
+		<input type="submit" value="Submit">
+	</form>
+	<h2>Post test</h2>
+	<form action="test_method.php" method="POST">
+		<label for="login">Login</label>
+		<input type="text" name="login"><br><br>
+		<label for="password">Password</label>
+		<input type="password" name="password"><br><br>
+		<input type="submit" value="Submit">
+	</form>
 	<h2>Download test</h2>
 		<a href="favicon.ico" download>
 			<img src="favicon.ico" alt="img">

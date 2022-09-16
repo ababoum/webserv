@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 19:25:10 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/16 14:49:53 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,6 +234,15 @@ int		Request::identifyType()
 		{
 			_body.type = "directory";
 			_body.isMedia = false;
+			if (!_targetLocation->isAutoindexed())
+			{
+				file_to_check = _targetLocation->getIndexPage();
+				extension.clear();
+				rit = file_to_check.rbegin();
+				rit--;
+				_header.resource_path.append(file_to_check);
+				continue ;
+			}
 			return 0;
 		}
 		extension.insert(extension.begin(), *rit);
@@ -283,9 +292,9 @@ int		Request::identifyType()
 		_body.isMedia = true;
 		_body.type = "audio/mp4";
 	}
-	else if (extension == "cgi" || extension == "php")
+	else if (extension == "py" || extension == "php" || extension == "pl")
 	{
-		_body.type = "cgi";
+		_body.type = extension;
 	}
 	else
 	{

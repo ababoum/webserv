@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/16 10:03:00 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/16 14:43:13 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,17 +203,16 @@ void	ServerEngine::_buildResponseOnRequest()
 		_resp->setStatusMsg(err_dictionary.find(resp_code)->second);
 		_resp->setRedirectionLocation(_req->getTargetLocation()->getRedirection().second);		
 	}
-	else if (!_req->getTargetLocation()->getCGI().empty() || _req->getBody().type == "cgi")
+	else if (_req->getBody().type == "php" || _req->getBody().type == "py" || _req->getBody().type == "pl")
 	{
 		CGIEngine cgi(_req, &_server);
 		_resp->setFromCGI(true);
-		_resp->setCGIText(cgi.exec());
 		_resp->setStatusCode(SUCCESS_OK);
 		_resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
 		_resp->setContentType("text/html");
 		std::string body = cgi.exec();
 		_resp->setBody(body);
-		_resp->setContentLength(body.size() - 42);
+		_resp->setContentLength(body.size());
 
 	}
 	else if (_req->getHeader().method == "GET")
@@ -350,7 +349,7 @@ void	ServerEngine::stream_in()
 	else
 		_req->findLocation(_server);
 
-	if (_req->checkAccess() || _req->identifyType() || _req->getPostData(request_data))
+	if (!_req->isValid() || _req->checkAccess() || _req->identifyType() || _req->getPostData(request_data))
 	{
 		return ;
 	}
@@ -408,7 +407,7 @@ int	ServerEngine::stream_out(int client_fd)
 
 	if (send(client_fd, to_send.c_str(), to_send.size(), 0) == -1)
 		still_alive = 0; // clean 
-
+	std::cerr << to_send << std::endl;
 	if (still_alive)
 		return still_alive;
 

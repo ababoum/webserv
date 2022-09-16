@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/07 16:23:13 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/16 14:17:06 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ Location &				Location::operator=( Location const & rhs )
 		_allowedMethods = rhs._allowedMethods;
 		_indexPage = rhs._indexPage;
 		_autoindex = rhs._autoindex;
-		_cgi = rhs._cgi;
 		_redirection = rhs._redirection;
 		_isRedirected = rhs._isRedirected;
 	}
@@ -98,10 +97,6 @@ void	Location::setAutoindex(std::string on_off)
 		throw std::invalid_argument("autoindex option can only received \"on\" or \"off\" argument");
 }
 
-void	Location::setCGI(std::string cgiPath)
-{
-	_cgi = cgiPath;
-}
 
 void	Location::setRedirection(int code, std::string url)
 {
@@ -147,10 +142,6 @@ bool Location::isAutoindexed() const
 	return _autoindex;
 }
 
-std::string Location::getCGI() const
-{
-	return _cgi;
-}
 
 std::string Location::getRoot() const
 {

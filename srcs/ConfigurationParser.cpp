@@ -154,8 +154,9 @@ void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items
 		new_route->setPrefix(line_items[1]);
 		
 		// make sure that the prefix ends with '/' if it's a named folder
-		if (line_items[1][line_items[1].size() - 1] != '/' && line_items[1].find('*') == std::string::npos)
+		if (line_items[1][line_items[1].size() - 1] != '/' && line_items[1].find('*') == std::string::npos && line_items[1].find('.') == std::string::npos)
 		{
+
 			line_items[1].append("/");
 			new_route->setPrefix(line_items[1]);
 		}

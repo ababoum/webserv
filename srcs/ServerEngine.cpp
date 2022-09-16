@@ -405,7 +405,8 @@ int	ServerEngine::stream_out(int client_fd)
 			still_alive = 1;
 	}
 
-	if (send(client_fd, to_send.c_str(), to_send.size(), 0) == -1)
+	//std::cerr << "client_fd = " << client_fd << " to_send = " << to_send << std::endl;
+	if (send(client_fd, to_send.c_str(), to_send.size(), MSG_NOSIGNAL) == -1)
 		still_alive = 0; // clean 
 	std::cerr << to_send << std::endl;
 	if (still_alive)

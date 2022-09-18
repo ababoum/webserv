@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/16 11:29:10 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/18 13:25:39 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,10 +103,6 @@ std::string		ResponseHeader::getCGIText() const
 	// line 3
 	ret.append("Content-Length: ");
 	ret.append(int_to_string(content_length));
-	ret += '\n';
-	
-	//cookies
-	ret.append("Set-Cookie: fname=a");
 	// ret += '\n';
 
 	return ret;	

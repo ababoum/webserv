@@ -1,14 +1,3 @@
-<?php session_start(); 
-	$_SESSION["fname"] = "";
-	if(isset($_COOKIE["fname"]))
-		echo "Your first name is " . $_COOKIE["fname"];
-?>
-
-<?php function deleteCookie() {
-	if(isset($_COOKIE["fname"]))
-		setcookie("fname", $_COOKIE["fname"], time() - 3600);
-	}?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +6,6 @@
 	<title>Webserv test</title>
 </head>
 <body>
-<?php echo "Your first name is " . $_COOKIE["fname"]; ?>
 	<h1><?php echo "Webserv test"; ?></h1>
 	<h2>Session cookie test</h2>
 	<form action="session_cookie.php" method="POST">
@@ -36,7 +24,5 @@
 		<input type="text" id="lname" name="lname"><br><br>
 		<input type="submit" value="Submit">
 	</form>
-	<h2>Delete persistent cookie</h2>
-	<button onclick="deleteCookie()">Delete</button>
 </body>
 </html>

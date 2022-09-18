@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/16 14:43:13 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/18 14:50:33 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,11 +219,10 @@ void	ServerEngine::_buildResponseOnRequest()
 	{
 		_getMethod();
 	}
-	// else if (_req->getHeader().method == "POST")
-	// {
-	// 	// exec cgi
-	// 	_postMethod(_req->getBody().content);
-	// }
+	else if (_req->getHeader().method == "POST")
+	{
+		_postMethod(_req->getBody().content);
+	}
 	else if (_req->getHeader().method == "DELETE")
 	{
 		_deleteMethod();
@@ -349,7 +348,7 @@ void	ServerEngine::stream_in()
 	else
 		_req->findLocation(_server);
 
-	if (!_req->isValid() || _req->checkAccess() || _req->identifyType() || _req->getPostData(request_data))
+	if (!_req->isValid() || _req->identifyType() || _req->checkAccess() || _req->getPostData(request_data))
 	{
 		return ;
 	}
@@ -408,7 +407,7 @@ int	ServerEngine::stream_out(int client_fd)
 	//std::cerr << "client_fd = " << client_fd << " to_send = " << to_send << std::endl;
 	if (send(client_fd, to_send.c_str(), to_send.size(), MSG_NOSIGNAL) == -1)
 		still_alive = 0; // clean 
-	std::cerr << to_send << std::endl;
+	// std::cerr << to_send << std::endl;
 	if (still_alive)
 		return still_alive;
 

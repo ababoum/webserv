@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/16 14:26:30 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/18 13:27:39 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,8 +102,8 @@ std::string		CGIEngine::exec()
 	if (_req->getBody().type == "php") 
 	{
 		cgi_path.append(PHP_CGI_PATH);
-		arg[1] = const_cast<char*>("-q");
-		arg[2] = const_cast<char*>(_content.c_str());
+		// arg[1] = const_cast<char*>("-q");
+		arg[1] = const_cast<char*>(_content.c_str());
 	}
 	else if (_req->getBody().type == "py") 
 	{

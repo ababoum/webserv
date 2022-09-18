@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/16 14:49:53 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/18 15:56:19 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,6 +190,8 @@ int		Request::checkAccess()
 	int 		check = 0;
 	struct stat sb;
 
+	if (_body.type == "directory" && _header.method == "POST")
+		return 0;
 	if (!access(absolute_path.c_str(), F_OK) || (
 		stat(absolute_path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)
 	))
@@ -234,7 +236,7 @@ int		Request::identifyType()
 		{
 			_body.type = "directory";
 			_body.isMedia = false;
-			if (!_targetLocation->isAutoindexed())
+			if (!_targetLocation->isAutoindexed() && _header.method == "GET")
 			{
 				file_to_check = _targetLocation->getIndexPage();
 				extension.clear();

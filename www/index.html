@@ -16,16 +16,7 @@
 		<input type="submit" value="Submit">
 	</form>
 	<br>
-	<form action="cgi/test.cgi" method="GET">
-		<input type="radio" id="c" name="fav_language" value="c" checked="checked">
-		<label for="c">C</label><br>
-		<input type="radio" id="cpp" name="fav_language" value="cpp">
-		<label for="cpp">C++</label><br>
-		<input type="radio" id="another" name="fav_language" value="another">
-		<label for="another">Another</label><br><br>
-		<input type="submit" value="Submit">
-	</form>
-	<h2>Post test</h2>
+	<h2>Post test with cgi</h2>
 	<form action="test_method.php" method="POST">
 		<label for="login">Login</label>
 		<input type="text" name="login"><br><br>
@@ -33,6 +24,16 @@
 		<input type="password" name="password"><br><br>
 		<input type="submit" value="Submit">
 	</form>
+	<h2>Post test without cgi</h2>
+	<form action="test" method="POST">
+		<label for="login">Login</label>
+		<input type="text" name="login"><br><br>
+		<label for="password">Password</label>
+		<input type="password" name="password"><br><br>
+		<input type="submit" value="Submit">
+	</form>
+	<h2>Delete test</h2>
+	<p>In terminal : curl -X DELETE /www/test</p>
 	<h2>Download test</h2>
 		<a href="favicon.ico" download>
 			<img src="favicon.ico" alt="img">

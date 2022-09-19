@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/16 14:49:53 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/19 12:11:11 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,6 +190,8 @@ int		Request::checkAccess()
 	int 		check = 0;
 	struct stat sb;
 
+	// for GET and DELETE and file-overwriting POST
+
 	if (!access(absolute_path.c_str(), F_OK) || (
 		stat(absolute_path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)
 	))
@@ -212,6 +214,8 @@ int		Request::checkAccess()
 	}
 	else
 	{
+		if (_header.method == "POST") // we need to check if location folder is W & R & X
+			return 0;
 		setError(NOT_FOUND);
 		setIsRequestValid(false);
 		return 1;
@@ -344,12 +348,21 @@ void			Request::_parseURL()
 	if (path_and_query.size() == 2)
 	{
 		_header.resource_path = path_and_query[0];
+		// uniformize resource_path format if it's a folder ('/' at the end)
+		if (_header.resource_path.find('.') == std::string::npos &&
+			str_back(_header.resource_path) != '/')
+			_header.resource_path.append("/"); 
+		
 		_header.query_string = path_and_query[1];
 		// parsing query string into the map
 	}
 	else if (path_and_query.size() == 1)
 	{
 		_header.resource_path = path_and_query[0];
+		// uniformize resource_path format if it's a folder ('/' at the end)
+		if (_header.resource_path.find('.') == std::string::npos &&
+			str_back(_header.resource_path) != '/')
+			_header.resource_path.append("/"); 
 	}
 	else
 	{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/16 14:43:13 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/19 11:47:22 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -367,7 +367,7 @@ int	ServerEngine::stream_out(int client_fd)
 
 	_req = _aliveConnections[client_fd].req;
 	
-	if (_aliveConnections[client_fd].resp == NULL)	// new connection 
+	if (_aliveConnections[client_fd	].resp == NULL)	// new connection 
 	{
 		_resp = new Response;
 		_aliveConnections[client_fd].resp = _resp;

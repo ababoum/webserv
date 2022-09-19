@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/19 13:31:45 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/19 14:16:53 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,8 +190,6 @@ int		Request::checkAccess()
 	int 		check = 0;
 	struct stat sb;
 
-	if (_body.type == "directory" && _header.method == "POST")
-		return 0;
 	// for GET and DELETE and file-overwriting POST
 
 	if (!access(absolute_path.c_str(), F_OK) || (
@@ -299,6 +297,10 @@ int		Request::identifyType()
 		_body.type = "audio/mp4";
 	}
 	else if (extension == "py" || extension == "php" || extension == "pl")
+	{
+		_body.type = extension;
+	}
+	else if (_header.method == "POST")
 	{
 		_body.type = extension;
 	}

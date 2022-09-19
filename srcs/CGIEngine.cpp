@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIEngine.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/18 13:27:39 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/19 18:00:36 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,14 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	{
 		path = _req->getTargetLocation()->getRoot();
 		path += _req->getHeader().resource_path;
-		_content = path;
+		_inputFile = path;
 	}
 	else
 	{
-		_content = _req->getTargetLocation()->getRoot();
-		_content += "/";
-		_content += _req->getTargetLocation()->getIndexPage();
-		path = _content;
+		_inputFile = _req->getTargetLocation()->getRoot();
+		_inputFile += "/";
+		_inputFile += _req->getTargetLocation()->getIndexPage();
+		path = _inputFile;
 	}
 	
 	_env["SERVER_SOFTWARE"] = "Webserv/1.0";
@@ -97,35 +97,37 @@ std::string		CGIEngine::exec()
 	int			status;
 	char		buffer[CGI_BUFFER_SIZE + 1] = {0};
 	std::string	cgi_path;
-	char *arg[4] = {0};
+	char 		*arg[4] = {0};
+	// std::string php_flag("-q");
 
 	if (_req->getBody().type == "php") 
 	{
-		cgi_path.append(PHP_CGI_PATH);
-		// arg[1] = const_cast<char*>("-q");
-		arg[1] = const_cast<char*>(_content.c_str());
+		cgi_path = PHP_CGI_PATH;
+		// arg[1] = const_cast<char*>(php_flag.c_str());
+		arg[1] = const_cast<char*>(_inputFile.c_str());
 	}
 	else if (_req->getBody().type == "py") 
 	{
-		cgi_path.append(PYTHON_CGI_PATH);
-		arg[1] = const_cast<char*>(_content.c_str());
+		cgi_path = PYTHON_CGI_PATH;
+		arg[1] = const_cast<char*>(_inputFile.c_str());
 	}
 	else if (_req->getBody().type == "pl") 
 	{
-		cgi_path.append(PERL_CGI_PATH);
-		arg[1] = const_cast<char*>(_content.c_str());
+		cgi_path = PERL_CGI_PATH;
+		arg[1] = const_cast<char*>(_inputFile.c_str());
 	}
 	arg[0] = const_cast<char*>(cgi_path.c_str());
 	env = mapToStr(_env);
 	pipe(cgi_pipe_read);
 	pipe(cgi_pipe_write);
+
 	
 	pid = fork();
 	if (pid == -1)
 	{
 		std::cerr << RED_TXT << "Fork failed\n" << RESET_TXT;
 		free_env(env);
-		throw std::runtime_error("accept");
+		throw std::runtime_error("fork");
 	}
 	if (pid == 0)
 	{
@@ -138,11 +140,18 @@ std::string		CGIEngine::exec()
 		// catch output of the CGI script into output pipe
 		dup2(cgi_pipe_write[1], STDOUT_FILENO);
 		close(cgi_pipe_write[1]);
-		
-		if (execve(arg[0], arg, env) == -1)
+
+		// std::cerr << arg[0] << '\n';
+		// std::cerr << arg[1] << '\n';
+		// std::cerr << arg[2] << '\n';
+		// std::cerr << (arg[3] == 0) << '\n';
+
+		if (execve("cgi/php-cgi7.4", arg, env) == -1)
 		{
 			exit(EXIT_FAILURE);
 		}
+		// system("cgi/php-cgi7.4 -q www/test_get.php");
+		exit (EXIT_SUCCESS);
 	}
 	else
 	{
@@ -155,15 +164,26 @@ std::string		CGIEngine::exec()
 		{
 			_req->setError(SERVER_ERROR);
 			_req->setIsRequestValid(false);
+			close(cgi_pipe_write[0]);
 
 			return ret;
 		}
 		
-		while (read(cgi_pipe_write[0], buffer, CGI_BUFFER_SIZE) > 0)
+		int tot = 0;
+		int r = 0;
+
+
+		pipe_read:
+		r = read(cgi_pipe_write[0], buffer, CGI_BUFFER_SIZE);
+		if (r > 0)
 		{
-			ret.append(buffer);
+			ret += (buffer);
+			tot += r;
+			memset(buffer, 0, CGI_BUFFER_SIZE);
+			goto pipe_read;
 		}
 		close(cgi_pipe_write[0]);
+		
 	}
 	free_env(env);
 	return ret;

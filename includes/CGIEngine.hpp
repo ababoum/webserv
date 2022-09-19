@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIEngine.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:15:19 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/14 13:35:26 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/19 14:40:27 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ class CGIEngine
 	private:
 		std::map<std::string, std::string>	_env;
 		std::string 						_body;
-		std::string 						_content;
+		std::string 						_inputFile;
 		Request								*_req;
 };
 

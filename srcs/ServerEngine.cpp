@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/19 13:31:00 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/19 18:55:02 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,12 +207,15 @@ void	ServerEngine::_buildResponseOnRequest()
 	{
 		CGIEngine cgi(_req, &_server);
 		_resp->setFromCGI(true);
-		_resp->setStatusCode(SUCCESS_OK);
-		_resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
-		_resp->setContentType("text/html");
-		std::string body = cgi.exec();
-		_resp->setBody(body);
-		_resp->setContentLength(body.size());
+		// _resp->setStatusCode(SUCCESS_OK);
+		// _resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
+		// _resp->setContentType("text/html"); // to remove
+		std::string cgi_output = cgi.exec();
+
+		_parse_CGI_output(cgi_output);
+		// std::cerr << YELLOW_TXT << body << '\n';
+		// std::cerr << body.size() << RESET_TXT << '\n';
+
 
 	}
 	else if (_req->getHeader().method == "GET")
@@ -297,9 +300,51 @@ void	ServerEngine::setGlobalConf(GlobalConfiguration *globalConf)
 	_globalConf = globalConf;
 }
 
+void	ServerEngine::_parse_CGI_output(std::string cgi_output)
+{
+	std::string					line;
+	std::vector<std::string>	line_items;
+	bool						status_set = false;
+	std::istringstream 			data(cgi_output);
+
+	while (std::getline(data, line, '\n'))
+	{
+		if (line == "" || line == "\r")
+			break ;
+		line_items = split(line, " \r");
+		if (line_items.size() > 0 && line_items[0] == "Content-type:")
+		{
+			_resp->setContentType(line.c_str() + 14);
+		}
+		else if (line_items.size() > 2 && line_items[0] == "Status:")
+		{
+			_resp->setStatusCode(atoi(line_items[1].c_str()));
+			_resp->setStatusMsg(err_dictionary.find(atoi(line_items[1].c_str()))->second);
+			status_set = true;
+		}
+		// add cookies parsing
+	}
+
+	std::string cgi_output_body;
+	while (std::getline(data, line, '\n'))
+	{
+		cgi_output_body += line;
+		cgi_output_body += "\n";
+	}
+
+	_resp->setBody(cgi_output_body);
+	_resp->setContentLength(cgi_output_body.size());
+	if (!status_set)
+	{
+		_resp->setStatusCode(SUCCESS_OK);
+		_resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
+	}	
+}
 
 void	ServerEngine::stream_in()
-{	
+{
+
+
 	int client_fd = accept(_socket_fd, 
 		(struct sockaddr*)&_sockaddr,
 		&_peer_addr_size);
@@ -327,13 +372,16 @@ void	ServerEngine::stream_in()
 		goto readloop;
 	}
 	
+	
 	std::cout << "The request data was: " << \
-		BLUE_TXT << request_data << RESET_TXT;
+		BLUE_TXT << request_data << RESET_TXT << std::endl;
 	
 	// parse the request
 
 	_req = new Request;
 	_aliveConnections[client_fd] = Connection(_req, NULL);
+
+	// unchunk
 	
 	_req->parseData(request_data);
 	if (!_req->isValid())
@@ -404,7 +452,7 @@ int	ServerEngine::stream_out(int client_fd)
 			still_alive = 1;
 	}
 
-	//std::cerr << "client_fd = " << client_fd << " to_send = " << to_send << std::endl;
+	// std::cerr << "client_fd = " << client_fd << '\n' << " to_send = " << to_send << std::endl;
 	if (send(client_fd, to_send.c_str(), to_send.size(), MSG_NOSIGNAL) == -1)
 		still_alive = 0; // clean 
 	// std::cerr << to_send << std::endl;

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 18:36:40 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/19 18:27:24 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ class ServerEngine
 		void			_getMethod();
 		void			_init_dictionary();
 		void			_limit_request_size();
+		void			_parse_CGI_output(std::string cgi_output);
 		void			_postMethod(std::string postData);
 		void			_deleteMethod();
 

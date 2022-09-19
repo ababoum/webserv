@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 20:03:10 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/19 11:40:36 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,7 @@ std::string					autoindexPageHtml(std::string directoryName, std::string headerU
 std::string					int_to_string(int n);
 std::string					itohex(std::size_t size);
 bool						is_digit(std::string str);
+char						str_back(std::string str);
 
 
 #endif

@@ -1,13 +1,8 @@
-> redirection http (already parsed, we just need to 
-	include the mechanism in the response)
-
-
-> Build the autoindex mechanism (@Louis)
-
-> Implement the POST mechanism (all the current Responses are treating GET only)
-	Files should be stored in www/uploads
-
-> Implement the DELETE mechanism (all the current Responses are treating GET only)
+> test YoupiBanane
+> test cookies with PHP, Python, and Perl
+> do the scale
+> do the read of input in multiple reads?
+> test to upload a file
 
 execve fail if hhtml non execve before
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/11 22:22:47 by lcalvie          ###   ########.fr       */
+/*   Updated: 2022/09/19 11:40:06 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,3 +136,13 @@ std::string					itohex(std::size_t size)
 
 	return std::string(hex.rbegin(), hex.rend());
 }
+
+char str_back(std::string str)
+{
+	if (str.length() > 0)
+	{
+		return str[str.size() - 1];
+	}
+	return 0;
+}
+

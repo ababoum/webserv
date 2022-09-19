@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/19 13:30:57 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/19 13:31:45 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,13 +190,10 @@ int		Request::checkAccess()
 	int 		check = 0;
 	struct stat sb;
 
-<<<<<<< HEAD
 	if (_body.type == "directory" && _header.method == "POST")
 		return 0;
-=======
 	// for GET and DELETE and file-overwriting POST
 
->>>>>>> 678a33529403c03415278a13fa54c55e4dff5185
 	if (!access(absolute_path.c_str(), F_OK) || (
 		stat(absolute_path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)
 	))

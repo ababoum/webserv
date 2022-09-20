@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/20 15:11:50 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/20 16:08:13 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,6 +280,11 @@ int		Request::identifyType()
 	{
 		_body.isMedia = false;
 		_body.type = "text/css";
+	}
+	else if (extension == "txt")
+	{
+		_body.isMedia = false;
+		_body.type = "text/plain";
 	}
 	else if (extension == "js")
 	{

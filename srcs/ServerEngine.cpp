@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/19 18:55:02 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/20 15:38:47 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -373,7 +373,7 @@ void	ServerEngine::stream_in()
 	}
 	
 	
-	std::cout << "The request data was: " << \
+	std::cout << "Request received:\n" << \
 		BLUE_TXT << request_data << RESET_TXT << std::endl;
 	
 	// parse the request

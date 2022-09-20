@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/19 14:16:53 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/20 15:11:50 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -394,17 +394,29 @@ int		Request::getPostData(std::string requestData)
 	if (_header.method != "POST")
 		return 0;
 
-	std::string::reverse_iterator rit = requestData.rbegin();
-	while (*rit != '\n')
-		rit++;
-	while (rit != requestData.rbegin())
+	// std::string::reverse_iterator rit = requestData.rbegin();
+	// while (*rit != '\n')
+	// 	rit++;
+	// while (rit != requestData.rbegin())
+	// {
+	// 	_body.content.push_back(*rit);
+	// 	rit--;
+	// }
+	// if (rit == requestData.rbegin())
+	// 	_body.content.push_back(*rit);
+	// _body.length = _body.content.size();
+
+	size_t 		body_sep = requestData.find("\r\n\r\n");
+
+	if (body_sep == std::string::npos)
 	{
-		_body.content.push_back(*rit);
-		rit--;
+		_body.content = "";
+		return 0;
 	}
-	if (rit == requestData.rbegin())
-		_body.content.push_back(*rit);
-	_body.length = _body.content.size();
+	else
+	{
+		_body.content = requestData.substr(body_sep + 4);
+	}
 
 	return 0;	
 }

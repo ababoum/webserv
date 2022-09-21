@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/20 16:08:13 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 12:21:30 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,11 @@ void	Request::parseData(std::string requestData)
 		{
 			_parseCookieString(line_items);
 			_parseCookieVariables(_header.cookie_string);
+		}
+		// Content-Type line
+		else if (line_items.size() > 1 && line_items[0] == "Content-Type:")
+		{
+			_header.content_type = line.substr(14, line.length() - 15);
 		}
 		++line_index;
 	}
@@ -426,6 +431,11 @@ int		Request::getPostData(std::string requestData)
 	return 0;	
 }
 
+void			Request::setRawData(std::string req_data)
+{
+	_raw_data = req_data;
+}
+
 void			Request::setError(int err)
 {
 	_error = err;
@@ -450,6 +460,12 @@ RequestHeader &	Request::getHeader()
 {
 	return _header;
 }
+
+std::string		Request::getRawData()
+{
+	return _raw_data;
+}
+
 
 bool			Request::isValid() const
 {

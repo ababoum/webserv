@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/19 18:00:28 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 15:46:24 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,14 @@ bool	operator<(struct pollfd rhs, struct pollfd lhs);
 # define MAG_TXT "\e[35m"
 
 # define BOLD_TXT "\e[1m"
+# define ITALIC_TXT "\e[2m"
 # define UL_TXT "\e[4m"
 
 # define RESET_TXT "\e[0m"
+
+# define DEBUG(x)	std::cerr << YELLOW_TXT << x << RESET_TXT;
+# define FATAL_ERR(x)	std::cerr << RED_TXT << x << RESET_TXT;
+# define INFO(x)	std::cerr << ITALIC_TXT << x << RESET_TXT;
 
 # define DEFAULT_MAX_CONNECTIONS 	1024
 # define REQUEST_BUFFER_SIZE		1024
@@ -90,7 +95,7 @@ enum HTTP_RESPONSE
 	SERVER_ERROR = 500
 };
 
-# define PHP_CGI_PATH		"cgi/php-cgi"
+# define PHP_CGI_PATH		"cgi/php-cgi7.4"
 # define PYTHON_CGI_PATH	"cgi/python"
 # define PERL_CGI_PATH		"cgi/perl"
 

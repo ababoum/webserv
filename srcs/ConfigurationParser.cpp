@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigurationParser.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/16 14:16:08 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/21 15:49:49 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,8 +80,7 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 	// check if ';' closes the line
 	else if (line_items.back().at(line_items.back().size() - 1) != ';')
 	{
-		std::cerr << RED_TXT << "Missing ';' at the end of line " 
-			<< line_nb << '\n' << RESET_TXT;
+		FATAL_ERR("Missing ';' at the end of line " << line_nb << '\n');
 		throw syntax_error();
 	}
 
@@ -119,8 +118,7 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 	{
 		if (!is_digit(line_items[1]))
 		{
-			std::cerr << RED_TXT << "Return code should be an integer at line " 
-				<< line_nb << '\n' << RESET_TXT;
+			FATAL_ERR("Return code should be an integer at line " << line_nb << '\n');
 			throw syntax_error();
 		}
 		_currentLocation->setRedirection(std::atoi(line_items[1].c_str()), line_items[2]);
@@ -129,8 +127,8 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 	// else: parsing error
 	else
 	{
-		std::cerr << RED_TXT << "Parsing error in line " << line_nb << RESET_TXT << '\n';
-			throw parsing_error("invalid line");
+		FATAL_ERR("Parsing error in line " << line_nb << '\n');
+		throw parsing_error("invalid line");
 	}
 }
 
@@ -167,8 +165,7 @@ void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items
 	// check if ';' closes the line
 	else if (line_items.back().at(line_items.back().size() - 1) != ';')
 	{
-		std::cerr << RED_TXT << "Missing ';' at the end of line " 
-			<< line_nb << '\n' << RESET_TXT;
+		FATAL_ERR("Missing ';' at the end of line " << line_nb << '\n');
 		throw syntax_error();
 	}
 
@@ -208,8 +205,8 @@ void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items
 	// else: parsing error
 	else
 	{
-		std::cerr << RED_TXT << "Parsing error in line " << line_nb << RESET_TXT << '\n';
-			throw parsing_error("invalid line");
+		FATAL_ERR("Parsing error in line " << line_nb << '\n');
+		throw parsing_error("invalid line");
 	}
 	
 }
@@ -235,13 +232,12 @@ void	ConfigurationParser::_parseLine(std::vector<std::string> & line_items, std:
 		}
 		else if (line_items.size() == 1 && line_items[0] == "}")
 		{
-			std::cerr << RED_TXT << "Syntax error: extra '}' in the configuration file\n"
-				<< RESET_TXT;
+			FATAL_ERR("Syntax error: extra '}' in the configuration file\n");
 			throw syntax_error("misplaced symbol");
 		}
 		else
 		{
-			std::cerr << RED_TXT << "Parsing error in line " << line_nb << RESET_TXT << '\n';
+			FATAL_ERR("Parsing error in line " << line_nb << '\n');
 			throw parsing_error("invalid line");
 		}
 	}
@@ -290,14 +286,13 @@ void	ConfigurationParser::_parseFile()
 
 	if (_context != "main")
 	{
-		std::cerr << RED_TXT << "Syntax error: missing '}' in the configuration file\n"
-			<< RESET_TXT;
+		FATAL_ERR("Syntax error: missing '}' in the configuration file\n");
 		throw syntax_error();
 	}
 
 	if (_globalConf.getServersList().empty())
 	{
-		std::cerr << RED_TXT << "No server detected in configuration file" << RESET_TXT << '\n';
+		FATAL_ERR("No server detected in configuration file" << '\n');
 		throw parsing_error("invalid file");
 	}
 
@@ -322,14 +317,12 @@ void	ConfigurationParser::_checkCurrentServerIntegrity(std::size_t line_nb) cons
 {
 	if (_currentServer->getPort() == -1)
 	{
-		std::cerr << RED_TXT << "Error: server doesn't have a designated port: line " <<
-			RESET_TXT << line_nb << '\n';
+		FATAL_ERR("Error: server doesn't have a designated port: line " << line_nb << '\n');
 		throw std::logic_error("port-less server");
 	}
 	if (_currentServer->getRoutes().empty())
 	{
-		std::cerr << RED_TXT << "Error: server doesn't have any route: line " <<
-			RESET_TXT << line_nb << '\n';
+		FATAL_ERR("Error: server doesn't have any route: line " << line_nb << '\n');
 		throw std::logic_error("route-less server");
 	}
 }
@@ -340,22 +333,19 @@ void	ConfigurationParser::_checkCurrentLocationIntegrity(std::size_t line_nb) co
 	
 	if (_currentLocation->getRoot().empty())
 	{
-		std::cerr << RED_TXT << "Error: location doesn't have a root: line " <<
-			RESET_TXT << line_nb << '\n';
+		FATAL_ERR("Error: location doesn't have a root: line " << line_nb << '\n');
 		throw std::logic_error("root-less location");
 	}
 	else if (!(stat(_currentLocation->getRoot().c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)))
 	{
-		std::cerr << RED_TXT << "Error: Root not valid: line " <<
-			RESET_TXT << line_nb << '\n';
+		FATAL_ERR("Error: Root not valid: line " << line_nb << '\n');
 		throw std::logic_error("root not valid");
 	}
 	
 
 	if (_currentLocation->getIndexPage().empty() && !_currentLocation->isAutoindexed())
 	{
-		std::cerr << RED_TXT << "Error: location doesn't have an index page: line " <<
-			RESET_TXT << line_nb << '\n';
+		FATAL_ERR("Error: location doesn't have an index page: line " << line_nb << '\n');
 		throw std::logic_error("index-less location");
 	}
 }

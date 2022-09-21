@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/19 18:00:36 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 15:49:10 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,10 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	_env["AUTH_TYPE"] = "";
 	_env["REMOTE_USER"] = "";
 	_env["REMOTE_IDENT"] = "";
-	_env["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
+	if (_req->getHeader().content_type.empty())
+		_env["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
+	else
+		_env["CONTENT_TYPE"] = _req->getHeader().content_type;
 	_env["CONTENT_LENGTH"] = int_to_string(req->getBody().length);
 	_env["REDIRECT_STATUS"] = "200"; // careful to what status code to fill
 	_env["HTTP_ACCEPT"] = "*/*";
@@ -68,9 +71,9 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	_env["HTTP_REFERER"] = "";
 }
 
-CGIEngine::~CGIEngine()
-{
-}
+
+CGIEngine::~CGIEngine() {}
+
 
 char	**CGIEngine::mapToStr(std::map<std::string, std::string> env)
 {
@@ -97,13 +100,11 @@ std::string		CGIEngine::exec()
 	int			status;
 	char		buffer[CGI_BUFFER_SIZE + 1] = {0};
 	std::string	cgi_path;
-	char 		*arg[4] = {0};
-	// std::string php_flag("-q");
+	char 		*arg[3] = {0};
 
 	if (_req->getBody().type == "php") 
 	{
 		cgi_path = PHP_CGI_PATH;
-		// arg[1] = const_cast<char*>(php_flag.c_str());
 		arg[1] = const_cast<char*>(_inputFile.c_str());
 	}
 	else if (_req->getBody().type == "py") 
@@ -125,7 +126,7 @@ std::string		CGIEngine::exec()
 	pid = fork();
 	if (pid == -1)
 	{
-		std::cerr << RED_TXT << "Fork failed\n" << RESET_TXT;
+		FATAL_ERR("Fork failed\n");
 		free_env(env);
 		throw std::runtime_error("fork");
 	}
@@ -141,16 +142,10 @@ std::string		CGIEngine::exec()
 		dup2(cgi_pipe_write[1], STDOUT_FILENO);
 		close(cgi_pipe_write[1]);
 
-		// std::cerr << arg[0] << '\n';
-		// std::cerr << arg[1] << '\n';
-		// std::cerr << arg[2] << '\n';
-		// std::cerr << (arg[3] == 0) << '\n';
-
 		if (execve("cgi/php-cgi7.4", arg, env) == -1)
 		{
 			exit(EXIT_FAILURE);
 		}
-		// system("cgi/php-cgi7.4 -q www/test_get.php");
 		exit (EXIT_SUCCESS);
 	}
 	else
@@ -169,18 +164,10 @@ std::string		CGIEngine::exec()
 			return ret;
 		}
 		
-		int tot = 0;
-		int r = 0;
-
-
-		pipe_read:
-		r = read(cgi_pipe_write[0], buffer, CGI_BUFFER_SIZE);
-		if (r > 0)
+		while (read(cgi_pipe_write[0], buffer, CGI_BUFFER_SIZE) > 0)
 		{
 			ret += (buffer);
-			tot += r;
 			memset(buffer, 0, CGI_BUFFER_SIZE);
-			goto pipe_read;
 		}
 		close(cgi_pipe_write[0]);
 		

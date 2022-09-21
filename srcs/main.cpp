@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 20:04:15 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 15:48:23 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,16 @@ int main(int ac, char **av)
 		
 		if (ac < 2)
 		{
-			std::cerr << RED_TXT << "Error: webserv needs a configuration file to be launched\n"
-				<< RESET_TXT << "usage: ./webserv [file.conf]" << std::endl;
+			FATAL_ERR("Error: webserv needs a configuration file to be launched\n");
+			INFO("usage: ./webserv [file.conf]\n");
 			
 			return (EXIT_FAILURE);
 		}
 
 		if (ac > 2)
 		{
-			std::cerr << RED_TXT << "Warning: any argument after the first one will be ignored\n"
-				<< RESET_TXT << "usage: ./webserv [file.conf]" << std::endl;
+			FATAL_ERR("Warning: any argument after the first one will be ignored\n");
+			INFO("usage: ./webserv [file.conf]\n");
 		}
 
 		// check if all cgi binaries are available
@@ -42,8 +42,8 @@ int main(int ac, char **av)
 			access(PYTHON_CGI_PATH, X_OK) || 
 			access(PERL_CGI_PATH, X_OK))
 		{
-			std::cerr << RED_TXT << "Error: webserv cannot work properly without executable CGI binaries in cgi/\n"
-			<< RESET_TXT << "solution: provide php-cgi, python, and perl in cgi/ with execution privileges" << std::endl;
+			FATAL_ERR("Error: webserv cannot work properly without executable CGI binaries in cgi/\n");
+			INFO("solution: provide php-cgi, python, and perl in cgi/ with execution privileges\n");
 
 			return (EXIT_FAILURE);
 		}
@@ -55,8 +55,8 @@ int main(int ac, char **av)
 			access(METHOD_NOT_ALLOWED_DEFAULT, R_OK) ||
 			access(SERVER_ERROR_DEFAULT, R_OK))
 		{
-			std::cerr << RED_TXT << "Error: webserv cannot work properly without default error pages\n"
-			<< RESET_TXT << "solution: provide default error pages in default_error_pages/" << std::endl;
+			FATAL_ERR("Error: webserv cannot work properly without default error pages\n");
+			INFO("solution: provide default error pages in default_error_pages/\n");
 
 			return (EXIT_FAILURE);
 		}
@@ -80,13 +80,12 @@ int main(int ac, char **av)
 			ready = poll(fds.data(), nfds, -1); // timeout = never
 			if (ready == 0)
 			{
-				std::cerr << RED_TXT
-				<< "webserv timed out" << RESET_TXT << '\n';
+				FATAL_ERR("webserv timed out\n");
 				return (EXIT_SUCCESS);
 			}
 			else if (ready == -1)
 			{
-				std::cerr << RED_TXT << "poll failed to execute" << RESET_TXT << '\n';
+				FATAL_ERR("poll failed to execute\n";
 				return (EXIT_SUCCESS);
 			}
 
@@ -95,12 +94,12 @@ int main(int ac, char **av)
 	}
 
 	catch (const std::exception & e)	{
-		std::cerr << RED_TXT << e.what() << '\n' << RESET_TXT;
-		return EXIT_FAILURE;
+		FATAL_ERR(e.what() << '\n');
+		return (EXIT_FAILURE);
 	}
 	catch (int sig_code) {
 		std::cout << GREEN_TXT << "\nQuitting webserv... Thanks!\n" << RESET_TXT;
-		return sig_code;
+		return (sig_code);
 	}
 	
 	return (EXIT_SUCCESS);

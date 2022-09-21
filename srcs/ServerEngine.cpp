@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/20 15:38:47 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 15:53:09 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ ServerEngine::ServerEngine(Server & server):
 	_socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if (_socket_fd == -1)
 	{
-		std::cerr << RED_TXT << "Error while opening socket\n" << RESET_TXT;
+		FATAL_ERR("Error while opening socket\n");
 		throw std::runtime_error("socket");
 	}
 
@@ -67,7 +67,7 @@ ServerEngine::ServerEngine(Server & server):
 	const int enable = 1;
 	if (setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int)) < 0)
     {
-		std::cerr << RED_TXT << "Error while setting up the socket\n" << RESET_TXT;
+		FATAL_ERR("Error while setting up the socket\n");
 		throw std::runtime_error("socket");
 	}
 	
@@ -86,13 +86,13 @@ ServerEngine::ServerEngine(Server & server):
 	// bind socket to given host:port
 	if (bind(_socket_fd, (struct sockaddr*)(&_sockaddr), sizeof(sockaddr)) == -1)
 	{
-		std::cerr << RED_TXT << "Error while binding socket\n" << RESET_TXT;
+		FATAL_ERR("Error while binding socket\n");
 		throw std::runtime_error("bind");
 	}
 
 	if (listen(_socket_fd, DEFAULT_MAX_CONNECTIONS) == -1)
 	{
-		std::cerr << RED_TXT << "Error while listening to socket\n" << RESET_TXT;
+		FATAL_ERR("Error while listening to socket\n");
 		throw std::runtime_error("listen");
 	}
 
@@ -205,18 +205,13 @@ void	ServerEngine::_buildResponseOnRequest()
 	}
 	else if (_req->getBody().type == "php" || _req->getBody().type == "py" || _req->getBody().type == "pl")
 	{
+		std::string cgi_output;
+		
 		CGIEngine cgi(_req, &_server);
 		_resp->setFromCGI(true);
-		// _resp->setStatusCode(SUCCESS_OK);
-		// _resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
-		// _resp->setContentType("text/html"); // to remove
-		std::string cgi_output = cgi.exec();
+		cgi_output = cgi.exec();
 
 		_parse_CGI_output(cgi_output);
-		// std::cerr << YELLOW_TXT << body << '\n';
-		// std::cerr << body.size() << RESET_TXT << '\n';
-
-
 	}
 	else if (_req->getHeader().method == "GET")
 	{
@@ -343,24 +338,28 @@ void	ServerEngine::_parse_CGI_output(std::string cgi_output)
 
 void	ServerEngine::stream_in()
 {
-
-
-	int client_fd = accept(_socket_fd, 
+	int					client_fd;
+	char 				buffer[REQUEST_BUFFER_SIZE + 1] = {0};
+	static std::string	request_data;
+	int 				r;
+	
+	
+	client_fd = accept(_socket_fd, 
 		(struct sockaddr*)&_sockaddr,
 		&_peer_addr_size);
 	
 	if (client_fd == -1)
 	{
-		std::cerr << RED_TXT << "Error while listening to socket\n" << RESET_TXT;
+		FATAL_ERR("Error while listening to socket\n");
 		throw std::runtime_error("accept");
 	}
-	
+
 	_globalConf->addClientFd(client_fd, POLLOUT, this);
 
+
 	// Read from the connection
-	char 			buffer[REQUEST_BUFFER_SIZE + 1] = {0};
-	std::string		request_data;
-	int r;
+
+
 	
 	readloop:
 	r = read(client_fd, buffer, REQUEST_BUFFER_SIZE);
@@ -371,9 +370,9 @@ void	ServerEngine::stream_in()
 		fd_set_blocking(client_fd, 0);
 		goto readloop;
 	}
-	
-	
-	std::cout << "Request received:\n" << \
+
+	// for information only
+	std::cerr << "Request received:\n" << \
 		BLUE_TXT << request_data << RESET_TXT << std::endl;
 	
 	// parse the request
@@ -381,9 +380,14 @@ void	ServerEngine::stream_in()
 	_req = new Request;
 	_aliveConnections[client_fd] = Connection(_req, NULL);
 
-	// unchunk
+	// unchunk ?
 	
+
+	// store and parse the received request
+	_req->setRawData(request_data);
 	_req->parseData(request_data);
+	request_data.clear();
+		
 	if (!_req->isValid())
 	{
 		return ;
@@ -452,10 +456,11 @@ int	ServerEngine::stream_out(int client_fd)
 			still_alive = 1;
 	}
 
-	// std::cerr << "client_fd = " << client_fd << '\n' << " to_send = " << to_send << std::endl;
+	DEBUG("client_fd =\n" << client_fd << '\n'
+		<< "to_send =\n" << to_send << '\n');
+
 	if (send(client_fd, to_send.c_str(), to_send.size(), MSG_NOSIGNAL) == -1)
 		still_alive = 0; // clean 
-	// std::cerr << to_send << std::endl;
 	if (still_alive)
 		return still_alive;
 

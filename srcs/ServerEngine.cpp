@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 11:35:10 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/21 11:53:13 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -330,7 +330,8 @@ void	ServerEngine::_parse_CGI_output(std::string cgi_output)
 		}
 	}
 
-	_resp->setCookieLine(cookies);
+	if (!cookies.empty())
+		_resp->setCookieLine(cookies);
 
 	std::string cgi_output_body;
 	while (std::getline(data, line, '\n'))

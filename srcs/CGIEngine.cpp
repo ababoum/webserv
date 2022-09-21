@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/21 15:49:10 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 15:56:28 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ std::string		CGIEngine::exec()
 		dup2(cgi_pipe_write[1], STDOUT_FILENO);
 		close(cgi_pipe_write[1]);
 
-		if (execve("cgi/php-cgi7.4", arg, env) == -1)
+		if (execve(arg[0], arg, env) == -1)
 		{
 			exit(EXIT_FAILURE);
 		}

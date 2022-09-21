@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/20 15:37:16 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/21 11:35:10 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -307,6 +307,7 @@ void	ServerEngine::_parse_CGI_output(std::string cgi_output)
 	std::vector<std::string>	line_items;
 	bool						status_set = false;
 	std::istringstream 			data(cgi_output);
+	std::vector<std::string>	cookies;
 
 	while (std::getline(data, line, '\n'))
 	{
@@ -325,9 +326,11 @@ void	ServerEngine::_parse_CGI_output(std::string cgi_output)
 		}
 		else if (line_items.size() > 0 && line_items[0] == "Set-Cookie:")
 		{
-			_resp->setCookieLine(line);
+			cookies.push_back(line);
 		}
 	}
+
+	_resp->setCookieLine(cookies);
 
 	std::string cgi_output_body;
 	while (std::getline(data, line, '\n'))

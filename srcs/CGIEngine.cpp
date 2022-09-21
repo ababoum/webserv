@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIEngine.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/19 18:00:36 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 14:41:02 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ std::string		CGIEngine::exec()
 		// std::cerr << arg[2] << '\n';
 		// std::cerr << (arg[3] == 0) << '\n';
 
-		if (execve("cgi/php-cgi7.4", arg, env) == -1)
+		if (execve(arg[0], arg, env) == -1)
 		{
 			exit(EXIT_FAILURE);
 		}

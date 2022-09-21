@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerEngine.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/20 15:38:47 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 14:46:46 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,6 +211,7 @@ void	ServerEngine::_buildResponseOnRequest()
 		// _resp->setStatusMsg(err_dictionary.find(SUCCESS_OK)->second);
 		// _resp->setContentType("text/html"); // to remove
 		std::string cgi_output = cgi.exec();
+		std::cout << cgi_output << std::endl;
 
 		_parse_CGI_output(cgi_output);
 		// std::cerr << YELLOW_TXT << body << '\n';
@@ -306,6 +307,7 @@ void	ServerEngine::_parse_CGI_output(std::string cgi_output)
 	std::vector<std::string>	line_items;
 	bool						status_set = false;
 	std::istringstream 			data(cgi_output);
+	std::vector<std::string>	cookies;
 
 	while (std::getline(data, line, '\n'))
 	{
@@ -322,8 +324,14 @@ void	ServerEngine::_parse_CGI_output(std::string cgi_output)
 			_resp->setStatusMsg(err_dictionary.find(atoi(line_items[1].c_str()))->second);
 			status_set = true;
 		}
-		// add cookies parsing
+		else if (line_items.size() > 0 && line_items[0] == "Set-Cookie:")
+		{
+			cookies.push_back(line);
+		}
 	}
+
+	if (!cookies.empty())
+		_resp->setCookieLine(cookies);
 
 	std::string cgi_output_body;
 	while (std::getline(data, line, '\n'))

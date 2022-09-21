@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/19 15:51:53 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 11:51:09 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,13 @@ std::string		ResponseHeader::getCGIText() const
 	ret.append(int_to_string(content_length));
 	ret += '\n';
 
+	// line cookie
+	for (std::vector<std::string>::const_iterator it (cookie_line.begin()); it != cookie_line.end(); it++)
+	{
+		ret.append(*it);
+		ret += '\n';
+	}
+
 	return ret;	
 }
 
@@ -156,6 +163,11 @@ void	Response::setContentLength(std::size_t length)
 {
 	_header.content_length = length;
 	_body.length = length;
+}
+
+void	Response::setCookieLine(std::vector<std::string> cookie)
+{
+	_header.cookie_line = cookie;
 }
 
 void	Response::setBody(std::string body)

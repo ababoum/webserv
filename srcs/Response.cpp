@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 11:51:09 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/21 20:48:44 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,23 +93,23 @@ std::string		ResponseHeader::getCGIText() const
 	ret += std::string(int_to_string(status_code));
 	ret += ' ';
 	ret.append(status_msg);
-	ret += '\n';
+	ret += "\r\n";
 
 	// line 2
 	ret.append("Content-Type: ");
 	ret.append(content_type);
-	ret += '\n';
+	ret += "\r\n";
 
 	// line 3
 	ret.append("Content-Length: ");
 	ret.append(int_to_string(content_length));
-	ret += '\n';
+	ret += "\r\n";
 
 	// line cookie
 	for (std::vector<std::string>::const_iterator it (cookie_line.begin()); it != cookie_line.end(); it++)
 	{
 		ret.append(*it);
-		ret += '\n';
+		ret += "\r\n";
 	}
 
 	return ret;	
@@ -257,9 +257,9 @@ std::string		Response::getCGIText() const
 	std::string ret_txt;
 
 	ret_txt.append(_header.getCGIText());
-	ret_txt += '\n';
+	ret_txt += "\r\n";
 	
-	ret_txt.append(_body.content);
+	ret_txt.insert(ret_txt.size(), _body.content);
 
 	return (ret_txt);
 }

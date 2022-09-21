@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 15:46:24 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 20:42:30 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ enum HTTP_RESPONSE
 };
 
 # define PHP_CGI_PATH		"cgi/php-cgi7.4"
-# define PYTHON_CGI_PATH	"cgi/python"
+# define PYTHON_CGI_PATH	"cgi/python3.10"
 # define PERL_CGI_PATH		"cgi/perl"
 
 # define BAD_REQUEST_DEFAULT		"default_error_pages/400.html"

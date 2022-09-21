@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 15:48:23 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 16:59:05 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ int main(int ac, char **av)
 			}
 			else if (ready == -1)
 			{
-				FATAL_ERR("poll failed to execute\n";
+				FATAL_ERR("poll failed to execute\n");
 				return (EXIT_SUCCESS);
 			}
 

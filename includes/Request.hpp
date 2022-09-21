@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 12:21:12 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 17:09:19 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,32 +46,32 @@ class Request
 		~Request();
 
 	private:
-		RequestHeader	_header;
-		RequestBody		_body;
-		bool			_validRequest;
-		int				_error;
-		const Location	*_targetLocation;
-		std::string		_raw_data;
+		RequestHeader		_header;
+		RequestBody			_body;
+		bool				_validRequest;
+		int					_error;
+		const Location		*_targetLocation;
+		std::vector<char>	_raw_data;
 		
 	public:
 
-		void		parseData(std::string requestData);
+		void		parseData(std::vector<char> requestData);
 		Server		*enableVirtualServer(GlobalConfiguration *globalConf, const Server & server);
 		void		findLocation(Server & serv);
 		int			checkAccess();
 		int			identifyType();
-		int			getPostData(std::string requestData);
+		int			extractBody(std::vector<char> requestData);
 
-		std::string		getRawData();
-		RequestHeader &	getHeader();
-		RequestBody &	getBody();
-		const Location	*getTargetLocation();
-		bool			isValid() const;
-		int				getError() const;
+		std::vector<char>	getRawData();
+		RequestHeader &		getHeader();
+		RequestBody &		getBody();
+		const Location		*getTargetLocation();
+		bool				isValid() const;
+		int					getError() const;
 
 		void			setError(int err);
 		void			setIsRequestValid(bool val);
-		void			setRawData(std::string req_data);
+		void			setRawData(std::vector<char> req_data);
 
 	private:
 		void			_parseURL();

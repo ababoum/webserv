@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 12:21:30 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 17:08:30 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,19 @@ Request::~Request()
 ** --------------------------------- METHODS ----------------------------------
 */
 
-void	Request::parseData(std::string requestData)
+void	Request::parseData(std::vector<char> requestData)
 {
-	std::istringstream 	data(requestData);
+	std::string req_string(requestData.begin(), requestData.end());
+
+	// extract header only
+	size_t 		header_sep = req_string.find("\r\n\r\n");
+
+	if (header_sep != std::string::npos)
+	{
+		req_string.resize(header_sep);
+	}
+
+	std::istringstream 	data(req_string);
 	std::string			line;
 	size_t				line_index = 1;
 
@@ -399,7 +409,7 @@ void			Request::_parseCookieVariables(std::string cookie_string)
 	std::vector<std::string> cookies = split(cookie_string, ";");
 }
 
-int		Request::getPostData(std::string requestData)
+int		Request::extractBody(std::vector<char> requestRawData)
 {
 	if (_header.method != "POST")
 		return 0;
@@ -416,6 +426,8 @@ int		Request::getPostData(std::string requestData)
 	// 	_body.content.push_back(*rit);
 	// _body.length = _body.content.size();
 
+	
+	std::string requestData(requestRawData.begin(), requestRawData.end());
 	size_t 		body_sep = requestData.find("\r\n\r\n");
 
 	if (body_sep == std::string::npos)
@@ -431,7 +443,7 @@ int		Request::getPostData(std::string requestData)
 	return 0;	
 }
 
-void			Request::setRawData(std::string req_data)
+void			Request::setRawData(std::vector<char> req_data)
 {
 	_raw_data = req_data;
 }
@@ -461,7 +473,7 @@ RequestHeader &	Request::getHeader()
 	return _header;
 }
 
-std::string		Request::getRawData()
+std::vector<char>		Request::getRawData()
 {
 	return _raw_data;
 }

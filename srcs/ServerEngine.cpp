@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 15:55:30 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/21 17:07:38 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -347,7 +347,7 @@ void	ServerEngine::stream_in()
 {
 	int					client_fd;
 	char 				buffer[REQUEST_BUFFER_SIZE + 1] = {0};
-	static std::string	request_data;
+	std::vector<char>	request_data;
 	int 				r;
 	
 	
@@ -372,15 +372,18 @@ void	ServerEngine::stream_in()
 	r = read(client_fd, buffer, REQUEST_BUFFER_SIZE);
 	if (r > 0)
 	{
-		request_data.append(buffer);
+		request_data.insert(request_data.end(), buffer, buffer + r);
+		// request_data.append(buffer);
 		memset(buffer, 0, REQUEST_BUFFER_SIZE);
 		fd_set_blocking(client_fd, 0);
 		goto readloop;
 	}
 
 	// for information only
+
+	std::string req_str(request_data.begin(), request_data.end());
 	std::cerr << "Request received:\n" << \
-		BLUE_TXT << request_data << RESET_TXT << std::endl;
+		BLUE_TXT << req_str << RESET_TXT << std::endl;
 	
 	// parse the request
 
@@ -407,7 +410,7 @@ void	ServerEngine::stream_in()
 	else
 		_req->findLocation(_server);
 
-	if (!_req->isValid() || _req->identifyType() || _req->checkAccess() || _req->getPostData(request_data))
+	if (!_req->isValid() || _req->identifyType() || _req->checkAccess() || _req->extractBody(request_data))
 	{
 		return ;
 	}

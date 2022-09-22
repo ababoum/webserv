@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 14:21:06 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 17:49:53 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ class ServerEngine
 		int				stream_out(int client_fd);
 		int				getSocketFd() const;
 		struct pollfd	* getInFdPtr();
+		void			kill_client(int client_fd);
 
 };
 

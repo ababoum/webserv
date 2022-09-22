@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 15:49:35 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 17:49:26 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,12 @@ void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
 			if (_targetServ->stream_out(fds[i].fd))
 				++i;
 			i = (i >= fds.size()) ? 0 : i;
+			return ;
+		}
+		else if (fds[i].revents & POLLERR || fds[i].revents & POLLNVAL)
+		{
+			ServerEngine *_targetServ = _fds_ptr[fds[i]];
+			_targetServ->kill_client(fds[i].fd);
 			return ;
 		}
 	}

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 15:58:42 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 17:49:57 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -439,7 +439,7 @@ void	ServerEngine::stream_in(int poll_client_fd)
 		client_fd = accept(_socket_fd, 
 			(struct sockaddr*)&_sockaddr,
 			&_peer_addr_size);
-		
+
 		if (client_fd == -1)
 		{
 			FATAL_ERR("Error while listening to socket\n");
@@ -465,7 +465,7 @@ void	ServerEngine::stream_in(int poll_client_fd)
 	r = recv(client_fd, buffer, REQUEST_BUFFER_SIZE, 0);
 	DEBUG("READ QTY: " << r << "\n\n");
 	_globalConf->updateClientFd(client_fd, POLLIN | POLLOUT, this);
-	if (r >= 0)
+	if (r > 0)
 	{
 		_req->getRawData().insert(_req->getRawData().end(), buffer, buffer + r);
 		return ; // we can read more
@@ -550,6 +550,13 @@ int	ServerEngine::stream_out(int client_fd)
 	_globalConf->eraseClientFd(client_fd);
 
 	return still_alive;
+}
+
+void	ServerEngine::kill_client(int client_fd)
+{
+	_aliveConnections.erase(client_fd);
+	close(client_fd);
+	_globalConf->eraseClientFd(client_fd);
 }
 
 /*

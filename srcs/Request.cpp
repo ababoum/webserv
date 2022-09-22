@@ -129,7 +129,13 @@ void	Request::parseData(std::vector<char> requestData)
 		// Content-Type line
 		else if (line_items.size() > 1 && line_items[0] == "Content-Type:")
 		{
-			_header.content_type = line.substr(14, line.length() - 15);
+			_header.content_type = (line_items[1]).substr(0, (line_items[1]).size() - 1);
+			std::cout << "content_type = " << _header.content_type << "\n";
+			if (line_items.size() > 2 && !(line_items[2]).compare(0, 9, "boundary="))
+			{
+				_header.boundary = "--" + line_items[2].substr(9);
+				std::cout << "boundary = " << _header.boundary << "\n";
+			}
 		}
 		++line_index;
 	}

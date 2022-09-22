@@ -21,6 +21,7 @@ struct RequestHeader
 	std::string							URL;
 	std::string							user_agent;
 	std::string							content_type;
+	std::string							boundary;
 	std::string							resource_path;
 	std::string							query_string;
 	std::map<std::string, std::string>	query_variables;

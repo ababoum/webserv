@@ -62,7 +62,7 @@ class ServerEngine
 		void			_init_dictionary();
 		void			_limit_request_size();
 		void			_parse_CGI_output(std::string cgi_output);
-		void			_postMethod(std::string postData);
+		void			_postMethod();
 		void			_deleteMethod();
 
 	public:

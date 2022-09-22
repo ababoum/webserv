@@ -219,7 +219,7 @@ void	ServerEngine::_buildResponseOnRequest()
 	}
 	else if (_req->getHeader().method == "POST")
 	{
-		_postMethod(_req->getBody().content);
+		_postMethod();
 	}
 	else if (_req->getHeader().method == "DELETE")
 	{
@@ -253,23 +253,70 @@ void	ServerEngine::_limit_request_size()
 	}
 }
 
-void	ServerEngine::_postMethod(std::string postData)
+void	ServerEngine::_postMethod()
 {
-	if (postData.empty())
-		return;
 	std::fstream	file;
 	std::string		path;
+	std::string		upload_directory = "www/uploads/"; //where add files ? ( find the directory, finishing with a '/')
 
-	path = _req->getTargetLocation()->getRoot() + "/" +  _req->getHeader().URL;
+	//upload_directory = _req->getTargetLocation()->getRoot() + _req->getHeader().URL;
+	std::cerr << YELLOW_TXT << "upload_directory = " << upload_directory << std::endl << RESET_TXT;
 	
-	file.open(path.c_str(), std::ios::out);
-	if (!file.is_open())
+	if (_req->getHeader().content_type == "multipart/form-data")
 	{
-		_resp->setStatusCode(SERVER_ERROR);
-		return;
+		std::string file_name;
+		std::string line;
+		std::string reqData = _req->getBody().content.substr(_req->getBody().content.find('\n') + 1);
+		std::cerr << reqData << "\n";
+		//std::vector<std::string>::iterator it = reqData.begin();
+		line = reqData.substr(0,reqData.find('\n'));
+		reqData = reqData.substr(reqData.find('\n') + 1);
+		while (line != _req->getHeader().boundary + "--\r")
+		{
+			if (line.substr(0,20) == "Content-Disposition:")
+			{
+				std::vector<std::string> line_items = split(line, " \r");
+				file_name = line_items[2].substr(6);
+				//std::cerr << file_name.rfind('\"') << std::endl;
+				file_name = file_name.substr(0, file_name.rfind('\"'));
+				std::cout << YELLOW_TXT << "name = " << file_name << std::endl << RESET_TXT;
+			}
+			else if (line == "\r")
+			{
+				//create file	
+				path = upload_directory + file_name;
+				file.open(path.c_str(), std::ios::out);
+				if (!file.is_open())
+				{
+					_resp->setStatusCode(SERVER_ERROR);
+					return;
+				}
+				//fill file
+				line = reqData.substr(0,reqData.find('\n'));
+				reqData = reqData.substr(reqData.find('\n') + 1);
+				while (1)
+				{
+					std::string tmp = line;
+					line = reqData.substr(0,reqData.find('\n'));
+					reqData = reqData.substr(reqData.find('\n') + 1);
+					if (line == _req->getHeader().boundary +"\r" || line == _req->getHeader().boundary + "--\r")
+					{
+						if (tmp.length() >= 1) // removing last '\r' caractere
+							tmp.erase(tmp.end() - 1);
+						file << tmp;
+						break;
+					}
+					file << tmp;
+					file << '\n';
+				}
+				file.close();
+			}
+			line = reqData.substr(0,reqData.find('\n'));
+			reqData = reqData.substr(reqData.find('\n') + 1);
+		}
+		
 	}
-	file << postData;
-	file.close();
+
 	_resp->setStatusCode(CREATED);
 	_resp->setStatusMsg(err_dictionary.find(CREATED)->second);
 	_resp->setContentType(_req->getBody().type);
@@ -369,8 +416,8 @@ void	ServerEngine::stream_in()
 
 	
 	readloop:
-	r = read(client_fd, buffer, REQUEST_BUFFER_SIZE);
-	if (r > 0)
+	r = recv(client_fd, buffer, REQUEST_BUFFER_SIZE, 0);
+	if (r >= 0)
 	{
 		request_data.insert(request_data.end(), buffer, buffer + r);
 		// request_data.append(buffer);
@@ -396,7 +443,6 @@ void	ServerEngine::stream_in()
 	// store and parse the received request
 	_req->setRawData(request_data);
 	_req->parseData(request_data);
-	request_data.clear();
 		
 	if (!_req->isValid())
 	{

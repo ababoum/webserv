@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 17:49:26 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 17:55:58 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,11 +72,11 @@ void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
 	
 	for (; i < fds.size(); ++i)
 	{
-		DEBUG("i: " << i << '\n');
+		// DEBUG("i: " << i << '\n');
 		if (fds[i].revents == POLLIN || fds[i].revents == (POLLIN | POLLOUT))
 		{
-			DEBUG("FD_IN: " << fds[i].fd << '\n');
-			DEBUG("REVENTS: " << fds[i].revents << "\n\n");
+			// DEBUG("FD_IN: " << fds[i].fd << '\n');
+			// DEBUG("REVENTS: " << fds[i].revents << "\n\n");
 			ServerEngine *_targetServ = _fds_ptr[fds[i]];
 			if (i < threshold)
 			{
@@ -91,8 +91,8 @@ void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
 		}
 		else if (fds[i].revents == POLLOUT)
 		{
-			DEBUG("FD_OUT: " << fds[i].fd << '\n');
-			DEBUG("REVENTS: " << fds[i].revents << "\n\n");
+			// DEBUG("FD_OUT: " << fds[i].fd << '\n');
+			// DEBUG("REVENTS: " << fds[i].revents << "\n\n");
 			ServerEngine *_targetServ = _fds_ptr[fds[i]];
 			if (_targetServ->stream_out(fds[i].fd))
 				++i;

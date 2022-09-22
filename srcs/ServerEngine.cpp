@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 17:49:57 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 17:56:37 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -463,7 +463,7 @@ void	ServerEngine::stream_in(int poll_client_fd)
 	// Read from the connection
 
 	r = recv(client_fd, buffer, REQUEST_BUFFER_SIZE, 0);
-	DEBUG("READ QTY: " << r << "\n\n");
+	// DEBUG("READ QTY: " << r << "\n\n");
 	_globalConf->updateClientFd(client_fd, POLLIN | POLLOUT, this);
 	if (r > 0)
 	{
@@ -532,8 +532,7 @@ int	ServerEngine::stream_out(int client_fd)
 			still_alive = 1;
 	}
 
-	DEBUG("client_fd =\n" << client_fd << '\n'
-		<< "to_send =\n" << to_send << '\n');
+	// DEBUG("client_fd =\n" << client_fd << '\n' << "to_send =\n" << to_send << '\n');
 
 	if (send(client_fd, to_send.c_str(), to_send.size(), MSG_NOSIGNAL) == -1)
 		still_alive = 0; // clean 

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 15:32:49 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 14:32:40 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,21 +68,31 @@ void	GlobalConfiguration::startEngines()
 void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
 {
 	static size_t			i = 0;
+	size_t			threshold = _serversList.size();
 	
 	for (; i < fds.size(); ++i)
 	{
 		if (fds[i].revents & POLLIN)
 		{
+			DEBUG("FD_IN: " << fds[i].fd << '\n');
+			DEBUG("REVENTS: " << fds[i].revents << "\n\n");
 			ServerEngine *_targetServ = _fds_ptr[fds[i]];
-			_targetServ->stream_in();
-				i++;
+			if (i < threshold)
+			{
+				_targetServ->stream_in(-1);
+			}
+			else
+			{
+				_targetServ->stream_in(fds[i].fd);
+			}
+			++i;
 			return ;
 		}
 		else if (fds[i].revents & POLLOUT)
 		{
 			ServerEngine *_targetServ = _fds_ptr[fds[i]];
 			if (_targetServ->stream_out(fds[i].fd))
-				i++;
+				++i;
 			i = (i >= fds.size()) ? 0 : i;
 			return ;
 		}

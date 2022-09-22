@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 17:09:19 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 14:00:22 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,14 +56,14 @@ class Request
 		
 	public:
 
-		void		parseData(std::vector<char> requestData);
+		void		parseData();
 		Server		*enableVirtualServer(GlobalConfiguration *globalConf, const Server & server);
 		void		findLocation(Server & serv);
 		int			checkAccess();
 		int			identifyType();
-		int			extractBody(std::vector<char> requestData);
+		int			extractBody();
 
-		std::vector<char>	getRawData();
+		std::vector<char>	& getRawData();
 		RequestHeader &		getHeader();
 		RequestBody &		getBody();
 		const Location		*getTargetLocation();
@@ -72,7 +72,6 @@ class Request
 
 		void			setError(int err);
 		void			setIsRequestValid(bool val);
-		void			setRawData(std::vector<char> req_data);
 
 	private:
 		void			_parseURL();

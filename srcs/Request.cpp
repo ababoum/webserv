@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 17:08:30 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 14:00:15 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,9 @@ Request::~Request()
 ** --------------------------------- METHODS ----------------------------------
 */
 
-void	Request::parseData(std::vector<char> requestData)
+void	Request::parseData()
 {
-	std::string req_string(requestData.begin(), requestData.end());
+	std::string req_string(_raw_data.begin(), _raw_data.end());
 
 	// extract header only
 	size_t 		header_sep = req_string.find("\r\n\r\n");
@@ -79,7 +79,7 @@ void	Request::parseData(std::vector<char> requestData)
 	std::string			line;
 	size_t				line_index = 1;
 
-	if (requestData.empty())
+	if (_raw_data.empty())
 	{
 		_error = BAD_REQUEST;
 		_validRequest = false;
@@ -415,7 +415,7 @@ void			Request::_parseCookieVariables(std::string cookie_string)
 	std::vector<std::string> cookies = split(cookie_string, ";");
 }
 
-int		Request::extractBody(std::vector<char> requestRawData)
+int		Request::extractBody()
 {
 	if (_header.method != "POST")
 		return 0;
@@ -433,7 +433,7 @@ int		Request::extractBody(std::vector<char> requestRawData)
 	// _body.length = _body.content.size();
 
 	
-	std::string requestData(requestRawData.begin(), requestRawData.end());
+	std::string requestData(_raw_data.begin(), _raw_data.end());
 	size_t 		body_sep = requestData.find("\r\n\r\n");
 
 	if (body_sep == std::string::npos)
@@ -447,11 +447,6 @@ int		Request::extractBody(std::vector<char> requestRawData)
 	}
 
 	return 0;	
-}
-
-void			Request::setRawData(std::vector<char> req_data)
-{
-	_raw_data = req_data;
 }
 
 void			Request::setError(int err)
@@ -479,7 +474,7 @@ RequestHeader &	Request::getHeader()
 	return _header;
 }
 
-std::vector<char>		Request::getRawData()
+std::vector<char>	&	Request::getRawData()
 {
 	return _raw_data;
 }

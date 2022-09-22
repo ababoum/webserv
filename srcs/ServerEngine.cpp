@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 17:07:38 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 14:44:28 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,7 +260,7 @@ void	ServerEngine::_postMethod()
 	std::string		upload_directory = "www/uploads/"; //where add files ? ( find the directory, finishing with a '/')
 
 	//upload_directory = _req->getTargetLocation()->getRoot() + _req->getHeader().URL;
-	std::cerr << YELLOW_TXT << "upload_directory = " << upload_directory << std::endl << RESET_TXT;
+	DEBUG("upload_directory = " << upload_directory << '\n');
 	
 	if (_req->getHeader().content_type == "multipart/form-data")
 	{
@@ -390,59 +390,19 @@ void	ServerEngine::_parse_CGI_output(std::string cgi_output)
 	}	
 }
 
-void	ServerEngine::stream_in()
+void	ServerEngine::_buildRequest()
 {
-	int					client_fd;
-	char 				buffer[REQUEST_BUFFER_SIZE + 1] = {0};
-	std::vector<char>	request_data;
-	int 				r;
-	
-	
-	client_fd = accept(_socket_fd, 
-		(struct sockaddr*)&_sockaddr,
-		&_peer_addr_size);
-	
-	if (client_fd == -1)
-	{
-		FATAL_ERR("Error while listening to socket\n");
-		throw std::runtime_error("accept");
-	}
-
-	_globalConf->addClientFd(client_fd, POLLOUT, this);
-
-
-	// Read from the connection
-
-
-	
-	readloop:
-	r = recv(client_fd, buffer, REQUEST_BUFFER_SIZE, 0);
-	if (r >= 0)
-	{
-		request_data.insert(request_data.end(), buffer, buffer + r);
-		// request_data.append(buffer);
-		memset(buffer, 0, REQUEST_BUFFER_SIZE);
-		fd_set_blocking(client_fd, 0);
-		goto readloop;
-	}
-
 	// for information only
 
-	std::string req_str(request_data.begin(), request_data.end());
+	std::string req_str(_req->getRawData().begin(), _req->getRawData().end());
 	std::cerr << "Request received:\n" << \
 		BLUE_TXT << req_str << RESET_TXT << std::endl;
-	
-	// parse the request
-
-	_req = new Request;
-	_aliveConnections[client_fd] = Connection(_req, NULL);
 
 	// unchunk ?
 	
 
 	// store and parse the received request
-	_req->setRawData(request_data);
-	_req->parseData(request_data);
+	_req->parseData();
 		
 	if (!_req->isValid())
 	{
@@ -456,15 +416,67 @@ void	ServerEngine::stream_in()
 	else
 		_req->findLocation(_server);
 
-	if (!_req->isValid() || _req->identifyType() || _req->checkAccess() || _req->extractBody(request_data))
+	if (!_req->isValid() || _req->identifyType() || _req->checkAccess())
 	{
 		return ;
 	}
+
+	_req->extractBody();
 	
 	// shorten POST request body if it's overflowed
 	if (_server.getClientBufferSize() >= 0)
 		_limit_request_size();
+}
+
+void	ServerEngine::stream_in(int poll_client_fd)
+{
+	int					client_fd;
+	char 				buffer[REQUEST_BUFFER_SIZE + 1] = {0};
+	int 				r;
 	
+	if (poll_client_fd == -1)	// new connection 
+	{
+		client_fd = accept(_socket_fd, 
+			(struct sockaddr*)&_sockaddr,
+			&_peer_addr_size);
+		
+		if (client_fd == -1)
+		{
+			FATAL_ERR("Error while listening to socket\n");
+			throw std::runtime_error("accept");
+		}
+
+		_globalConf->addClientFd(client_fd, POLLOUT | POLLIN, this);
+		fd_set_blocking(client_fd, 0);
+		
+		_req = new Request;
+		_aliveConnections[client_fd] = Connection(_req, NULL);
+	}
+	else
+	{
+		_req = _aliveConnections[poll_client_fd].req;
+		client_fd = poll_client_fd;
+	}	
+
+	// Read from the connection
+
+	r = recv(client_fd, buffer, REQUEST_BUFFER_SIZE, 0);
+	DEBUG("READ QTY: " << r << "\n\n");
+	if (r >= 0)
+	{
+		_req->getRawData().insert(_req->getRawData().end(), buffer, buffer + r);
+		return ; // we can read more
+	}
+	else if (r == -1)
+	{
+		perror("recv");
+		// continue to parse the request
+	}
+	else if (r == 0)
+	{
+		// 
+		return ; // we can read more
+	}	
 }
 
 int	ServerEngine::stream_out(int client_fd)
@@ -473,9 +485,12 @@ int	ServerEngine::stream_out(int client_fd)
 	std::string to_send;
 
 	_req = _aliveConnections[client_fd].req;
+
+	// check if req exists /!!!
 	
-	if (_aliveConnections[client_fd	].resp == NULL)	// new connection 
+	if (_aliveConnections[client_fd].resp == NULL)	// new connection 
 	{
+		_buildRequest();
 		_resp = new Response;
 		_aliveConnections[client_fd].resp = _resp;
 		_buildResponseOnRequest();
@@ -512,8 +527,8 @@ int	ServerEngine::stream_out(int client_fd)
 			still_alive = 1;
 	}
 
-	DEBUG("client_fd =\n" << client_fd << '\n'
-		<< "to_send =\n" << to_send << '\n');
+	// DEBUG("client_fd =\n" << client_fd << '\n'
+	// 	<< "to_send =\n" << to_send << '\n');
 
 	if (send(client_fd, to_send.c_str(), to_send.size(), MSG_NOSIGNAL) == -1)
 		still_alive = 0; // clean 

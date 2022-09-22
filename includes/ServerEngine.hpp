@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:39 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 15:31:25 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 14:21:06 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ class ServerEngine
 		Response		*_resp;
 
 		void			_buildResponseOnRequest();
+		void			_buildRequest();
 		void			_getMethod();
 		void			_init_dictionary();
 		void			_limit_request_size();
@@ -68,7 +69,7 @@ class ServerEngine
 	public:
 
 		void			setGlobalConf(GlobalConfiguration *globalConf);
-		void			stream_in();
+		void			stream_in(int poll_client_fd);
 		int				stream_out(int client_fd);
 		int				getSocketFd() const;
 		struct pollfd	* getInFdPtr();

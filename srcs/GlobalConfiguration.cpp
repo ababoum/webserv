@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 14:32:40 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 15:49:35 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,8 @@ void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
 	
 	for (; i < fds.size(); ++i)
 	{
-		if (fds[i].revents & POLLIN)
+		DEBUG("i: " << i << '\n');
+		if (fds[i].revents == POLLIN || fds[i].revents == (POLLIN | POLLOUT))
 		{
 			DEBUG("FD_IN: " << fds[i].fd << '\n');
 			DEBUG("REVENTS: " << fds[i].revents << "\n\n");
@@ -88,8 +89,10 @@ void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
 			++i;
 			return ;
 		}
-		else if (fds[i].revents & POLLOUT)
+		else if (fds[i].revents == POLLOUT)
 		{
+			DEBUG("FD_OUT: " << fds[i].fd << '\n');
+			DEBUG("REVENTS: " << fds[i].revents << "\n\n");
 			ServerEngine *_targetServ = _fds_ptr[fds[i]];
 			if (_targetServ->stream_out(fds[i].fd))
 				++i;
@@ -107,6 +110,17 @@ void	GlobalConfiguration::addClientFd(int fd, int flag_events, ServerEngine *ser
 	s_fd.fd = fd;
 	s_fd.events = flag_events;
 	
+	_fds_ptr[s_fd] = serv_ptr;
+}
+
+void	GlobalConfiguration::updateClientFd(int fd, int flag_events, ServerEngine *serv_ptr)
+{
+	struct pollfd s_fd;
+
+	s_fd.fd = fd;
+	s_fd.events = flag_events;
+
+	eraseClientFd(fd);
 	_fds_ptr[s_fd] = serv_ptr;
 }
 

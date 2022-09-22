@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 14:44:28 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 15:58:42 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -446,11 +446,13 @@ void	ServerEngine::stream_in(int poll_client_fd)
 			throw std::runtime_error("accept");
 		}
 
-		_globalConf->addClientFd(client_fd, POLLOUT | POLLIN, this);
+		_globalConf->addClientFd(client_fd, POLLIN, this);
 		fd_set_blocking(client_fd, 0);
 		
 		_req = new Request;
 		_aliveConnections[client_fd] = Connection(_req, NULL);
+		
+		return ;
 	}
 	else
 	{
@@ -462,6 +464,7 @@ void	ServerEngine::stream_in(int poll_client_fd)
 
 	r = recv(client_fd, buffer, REQUEST_BUFFER_SIZE, 0);
 	DEBUG("READ QTY: " << r << "\n\n");
+	_globalConf->updateClientFd(client_fd, POLLIN | POLLOUT, this);
 	if (r >= 0)
 	{
 		_req->getRawData().insert(_req->getRawData().end(), buffer, buffer + r);
@@ -470,13 +473,14 @@ void	ServerEngine::stream_in(int poll_client_fd)
 	else if (r == -1)
 	{
 		perror("recv");
-		// continue to parse the request
+		_globalConf->updateClientFd(client_fd, POLLOUT, this);
+		// nothing more to read
 	}
 	else if (r == 0)
 	{
-		// 
-		return ; // we can read more
-	}	
+		_globalConf->updateClientFd(client_fd, POLLOUT, this);
+		return ; // nothing more to read
+	}
 }
 
 int	ServerEngine::stream_out(int client_fd)
@@ -485,6 +489,7 @@ int	ServerEngine::stream_out(int client_fd)
 	std::string to_send;
 
 	_req = _aliveConnections[client_fd].req;
+	_globalConf->updateClientFd(client_fd, POLLOUT, this);
 
 	// check if req exists /!!!
 	
@@ -527,8 +532,8 @@ int	ServerEngine::stream_out(int client_fd)
 			still_alive = 1;
 	}
 
-	// DEBUG("client_fd =\n" << client_fd << '\n'
-	// 	<< "to_send =\n" << to_send << '\n');
+	DEBUG("client_fd =\n" << client_fd << '\n'
+		<< "to_send =\n" << to_send << '\n');
 
 	if (send(client_fd, to_send.c_str(), to_send.size(), MSG_NOSIGNAL) == -1)
 		still_alive = 0; // clean 

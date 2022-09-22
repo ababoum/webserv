@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 11:37:12 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/22 17:17:41 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,11 @@ struct ResponseHeader
 	std::string		status_msg;
 	std::string		content_type;
 	std::size_t		content_length;
-	std::vector<std::string>		cookie_line;
 	std::string		redir_location; // for HTTP redirection
+	std::string		expires; //for session
+	std::string		cache_control; //for session
+	std::string		pragma; //for session
+	std::vector<std::string>		cookie_line;
 
 	ResponseHeader();
 	static const std::string default_protocol;
@@ -79,6 +82,9 @@ class Response
 		void			setRedirectionLocation(std::string url);
 		void			setIfstreamBodyHTML(const char *path);
 		void			setIfstreamBodyMedia(const char *path);
+		void			setExpires(std::string expires);
+		void			setCacheControl(std::string cache);
+		void			setPragma(std::string pragma);
 
 		// for CGI response only
 		void			setCGIText(std::string CGI_text);

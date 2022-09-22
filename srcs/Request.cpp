@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 14:00:15 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 20:12:24 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,12 +129,12 @@ void	Request::parseData()
 		// Content-Type line
 		else if (line_items.size() > 1 && line_items[0] == "Content-Type:")
 		{
-			_header.content_type = (line_items[1]).substr(0, (line_items[1]).size() - 1);
-			std::cout << "content_type = " << _header.content_type << "\n";
+			_header.content_type = (line_items[1]).substr(0, (line_items[1]).size());
+			DEBUG( "content_type = " << _header.content_type << "\n");
 			if (line_items.size() > 2 && !(line_items[2]).compare(0, 9, "boundary="))
 			{
 				_header.boundary = "--" + line_items[2].substr(9);
-				std::cout << "boundary = " << _header.boundary << "\n";
+				DEBUG("boundary = " << _header.boundary << "\n");
 			}
 		}
 		++line_index;
@@ -439,14 +439,18 @@ int		Request::extractBody()
 	if (body_sep == std::string::npos)
 	{
 		_body.content = "";
+		_body.length = 0;
 		return 0;
 	}
 	else
 	{
-		_body.content = requestData.substr(body_sep + 4);
+		_body.content.insert(_body.content.begin(),
+			_raw_data.begin() + body_sep + 4,
+			_raw_data.end());
+		_body.length = std::distance(_raw_data.begin() + body_sep + 4, _raw_data.end());
 	}
 
-	return 0;	
+	return 0;
 }
 
 void			Request::setError(int err)

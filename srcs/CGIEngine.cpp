@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/21 15:56:28 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 20:44:17 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 
 	_req = req;
 	_body = req->getBody().content;
-	if (!_body.empty())
-		_body.erase(_body.begin());
+	// if (!_body.empty())
+	// 	_body.erase(_body.begin());
 	if (_req->getHeader().resource_path != "/")
 	{
 		path = _req->getTargetLocation()->getRoot();

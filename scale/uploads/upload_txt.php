@@ -24,19 +24,32 @@
 		</ul>
 	</div>
 	<div id="content">
-		<div id="gallery">
-			<h2>Images gallery</h2>
+		<div id="upload">
+			<h2>Upload an image to the gallery</h2>
+
+			<form id="form" action="/uploads/upload_txt.php" method="POST">
+				Type text to upload to the server:<br><br>
+				<input id="form_text" type="text" name="textToUpload"><br><br>
+				<input type="submit" value="Send text" name="submit">
+			</form>
+
+		</div>
+
+		<div id="upload">
+			<h2>Read the text uploaded to the server</h2>
 
 			<?php
-			$files = scandir('../images');
-			foreach ($files as $file) {
-				if ($file !== "." && $file !== "..") {
-					echo "<img src='../images/$file' id=\"image\"/>\n";
-				}
+			$file = './tmp_txt.txt';
+			if (!empty($_POST["textToUpload"])) {
+				$txt = htmlspecialchars($_POST['textToUpload']);
+				file_put_contents($file, $txt);
 			}
+			$file = file_get_contents($file, true);
+			echo "<input id=\"read_box\" type=\"text\" value=\"$file\" readonly>";
 			?>
 
 		</div>
+
 	</div>
 	<div id="footer">
 		<p>Copyright &copy; 2006 Sitename.com. Designed by <a href="http://www.freecsstemplates.org" class="link1">Free CSS Templates</a></p>

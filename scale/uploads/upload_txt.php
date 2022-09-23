@@ -40,7 +40,7 @@
 
 			<?php
 			$file = './tmp_txt.txt';
-			if (!empty($_POST["textToUpload"])) {
+			if (isset($_POST["textToUpload"])) {
 				$txt = htmlspecialchars($_POST['textToUpload']);
 				file_put_contents($file, $txt);
 			}

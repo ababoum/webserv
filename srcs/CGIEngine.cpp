@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/22 20:44:17 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/23 14:51:42 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 		_inputFile += _req->getTargetLocation()->getIndexPage();
 		path = _inputFile;
 	}
-	
+
 	_env["SERVER_SOFTWARE"] = "Webserv/1.0";
 	_env["SERVER_NAME"] = serv->getIP();
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";

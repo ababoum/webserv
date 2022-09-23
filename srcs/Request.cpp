@@ -129,7 +129,10 @@ void	Request::parseData()
 		// Content-Type line
 		else if (line_items.size() > 1 && line_items[0] == "Content-Type:")
 		{
-			_header.content_type = (line_items[1]).substr(0, (line_items[1]).size());
+			if (line_items[1][(line_items[1]).size() - 1] == ';')
+				_header.content_type = (line_items[1]).substr(0, (line_items[1]).size() - 1);
+			else
+				_header.content_type = (line_items[1]).substr(0, (line_items[1]).size());
 			DEBUG( "content_type = " << _header.content_type << "\n");
 			if (line_items.size() > 2 && !(line_items[2]).compare(0, 9, "boundary="))
 			{

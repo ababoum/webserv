@@ -267,7 +267,6 @@ void	ServerEngine::_postMethod()
 		std::string file_name;
 		std::string line;
 		std::string reqData = _req->getBody().content.substr(_req->getBody().content.find('\n') + 1);
-		std::cerr << reqData << "\n";
 		//std::vector<std::string>::iterator it = reqData.begin();
 		line = reqData.substr(0,reqData.find('\n'));
 		reqData = reqData.substr(reqData.find('\n') + 1);
@@ -277,9 +276,8 @@ void	ServerEngine::_postMethod()
 			{
 				std::vector<std::string> line_items = split(line, " \r");
 				file_name = line_items[2].substr(6);
-				//std::cerr << file_name.rfind('\"') << std::endl;
 				file_name = file_name.substr(0, file_name.rfind('\"'));
-				std::cout << YELLOW_TXT << "name = " << file_name << std::endl << RESET_TXT;
+				//std::cout << YELLOW_TXT << "name = " << file_name << std::endl << RESET_TXT;
 			}
 			else if (line == "\r")
 			{
@@ -288,18 +286,18 @@ void	ServerEngine::_postMethod()
 				file.open(path.c_str(), std::ios::out);
 				if (!file.is_open())
 				{
-					_resp->setStatusCode(SERVER_ERROR);
+					_resp->setStatusCode(SERVER_ERROR); // good error ??
 					return;
 				}
 				//fill file
 				line = reqData.substr(0,reqData.find('\n'));
 				reqData = reqData.substr(reqData.find('\n') + 1);
-				while (1)
+				while (!reqData.empty())
 				{
 					std::string tmp = line;
 					line = reqData.substr(0,reqData.find('\n'));
 					reqData = reqData.substr(reqData.find('\n') + 1);
-					if (line == _req->getHeader().boundary +"\r" || line == _req->getHeader().boundary + "--\r")
+					if (line == _req->getHeader().boundary +"\r" || line == _req->getHeader().boundary + "--\r" || reqData.empty())
 					{
 						if (tmp.length() >= 1) // removing last '\r' caractere
 							tmp.erase(tmp.end() - 1);
@@ -311,8 +309,11 @@ void	ServerEngine::_postMethod()
 				}
 				file.close();
 			}
-			line = reqData.substr(0,reqData.find('\n'));
-			reqData = reqData.substr(reqData.find('\n') + 1);
+			if (line !=_req->getHeader().boundary + "--\r" && !reqData.empty())
+			{
+				line = reqData.substr(0,reqData.find('\n'));
+				reqData = reqData.substr(reqData.find('\n') + 1);
+			}
 		}
 		
 	}
@@ -465,7 +466,7 @@ void	ServerEngine::stream_in(int poll_client_fd)
 	r = recv(client_fd, buffer, REQUEST_BUFFER_SIZE, 0);
 	// DEBUG("READ QTY: " << r << "\n\n");
 	_globalConf->updateClientFd(client_fd, POLLIN | POLLOUT, this);
-	if (r > 0)
+	if (r >= 0)
 	{
 		_req->getRawData().insert(_req->getRawData().end(), buffer, buffer + r);
 		return ; // we can read more

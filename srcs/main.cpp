@@ -66,10 +66,13 @@ int main(int ac, char **av)
 		ConfigurationParser parser(inputPath, globalConf);	
 		globalConf.startEngines();
 
-		t_fds_map	*fds_ptr = &globalConf.getFdsPtr();
+		std::cout << GREEN_TXT << "Webserv is now ready !\nconnections available on :\n";
+		for(size_t i = 0; i < globalConf.getServersList().size(); i++)
+			std::cout << "- " << globalConf.getServersList()[i].getIP() << ":" << globalConf.getServersList()[i].getPort() << "\n";
+		std::cout << RESET_TXT;
 
+		t_fds_map	*fds_ptr = &globalConf.getFdsPtr();
 		int ready;
-		
 		while (42)
 		{
 			std::vector<struct pollfd> fds;

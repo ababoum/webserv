@@ -6,22 +6,24 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/23 14:51:42 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/23 19:55:24 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/CGIEngine.hpp"
 
-
-static void	free_env(char **env)
+static void free_env(char **env)
 {
-	for (size_t i = 0; env[i]; i++)
-		delete env[i];
-	delete [] env;
+	if (env)
+	{
+		for (size_t i = 0; env[i]; i++)
+			delete [] env[i];
+		delete[] env;
+	}
 }
 
 CGIEngine::CGIEngine(Request *req, Server *serv)
-{	
+{
 	std::string path;
 
 	_req = req;
@@ -71,28 +73,26 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	_env["HTTP_REFERER"] = "";
 }
 
-
 CGIEngine::~CGIEngine() {}
 
-
-char	**CGIEngine::mapToStr(std::map<std::string, std::string> env)
+char **CGIEngine::mapToStr(std::map<std::string, std::string> env)
 {
-	char **c_env = new char* [env.size() + 1];
+	char **c_env = new char *[env.size() + 1]();
 	size_t j = 0;
-	for (std::map<std::string, std::string>::iterator i = env.begin(); i != env.end(); i++)
+	
+	for (std::map<std::string, std::string>::iterator i = env.begin(); i != env.end(); ++i)
 	{
 		std::string key_value = i->first + "=" + i->second;
-		c_env[j] = new char[key_value.size() + 1];
+		c_env[j] = new char[key_value.size() + 1]();
 		strcpy(c_env[j], key_value.c_str());
-		j++;
+		++j;
 	}
 	return c_env;
 }
 
-
-std::string		CGIEngine::exec()
+std::string CGIEngine::exec()
 {
-	pid_t 		pid;
+	pid_t		pid;
 	char 		**env;
 	int 		cgi_pipe_read[2];
 	int 		cgi_pipe_write[2];
@@ -102,27 +102,26 @@ std::string		CGIEngine::exec()
 	std::string	cgi_path;
 	char 		*arg[3] = {0};
 
-	if (_req->getBody().type == "php") 
+	if (_req->getBody().type == "php")
 	{
 		cgi_path = PHP_CGI_PATH;
-		arg[1] = const_cast<char*>(_inputFile.c_str());
+		arg[1] = const_cast<char *>(_inputFile.c_str());
 	}
-	else if (_req->getBody().type == "py") 
+	else if (_req->getBody().type == "py")
 	{
 		cgi_path = PYTHON_CGI_PATH;
-		arg[1] = const_cast<char*>(_inputFile.c_str());
+		arg[1] = const_cast<char *>(_inputFile.c_str());
 	}
-	else if (_req->getBody().type == "pl") 
+	else if (_req->getBody().type == "pl")
 	{
 		cgi_path = PERL_CGI_PATH;
-		arg[1] = const_cast<char*>(_inputFile.c_str());
+		arg[1] = const_cast<char *>(_inputFile.c_str());
 	}
-	arg[0] = const_cast<char*>(cgi_path.c_str());
+	arg[0] = const_cast<char *>(cgi_path.c_str());
 	env = mapToStr(_env);
 	pipe(cgi_pipe_read);
 	pipe(cgi_pipe_write);
 
-	
 	pid = fork();
 	if (pid == -1)
 	{
@@ -133,7 +132,7 @@ std::string		CGIEngine::exec()
 	if (pid == 0)
 	{
 		// input request body into 'input fd' of CGI script
-		write(cgi_pipe_read[1], _body.c_str(), _body.size());	
+		write(cgi_pipe_read[1], _body.c_str(), _body.size());
 		close(cgi_pipe_read[1]);
 		dup2(cgi_pipe_read[0], STDIN_FILENO);
 		close(cgi_pipe_read[0]);
@@ -146,7 +145,7 @@ std::string		CGIEngine::exec()
 		{
 			exit(EXIT_FAILURE);
 		}
-		exit (EXIT_SUCCESS);
+		exit(EXIT_SUCCESS);
 	}
 	else
 	{
@@ -163,14 +162,13 @@ std::string		CGIEngine::exec()
 
 			return ret;
 		}
-		
+
 		while (read(cgi_pipe_write[0], buffer, CGI_BUFFER_SIZE) > 0)
 		{
 			ret += (buffer);
 			memset(buffer, 0, CGI_BUFFER_SIZE);
 		}
 		close(cgi_pipe_write[0]);
-		
 	}
 	free_env(env);
 	return ret;

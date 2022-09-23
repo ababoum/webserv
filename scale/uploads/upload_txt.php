@@ -25,7 +25,7 @@
 	</div>
 	<div id="content">
 		<div id="upload">
-			<h2>Upload an image to the gallery</h2>
+			<h2>Upload a text to the server</h2>
 
 			<form id="form" action="/uploads/upload_txt.php" method="POST">
 				Type text to upload to the server:<br><br>

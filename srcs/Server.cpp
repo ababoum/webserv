@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:14:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/14 20:05:18 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/23 18:11:05 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,8 @@ void Server::setPort(std::string port)
 {
 	if (!isNumber(port))
 		throw std::invalid_argument("Port number is not valid");
+	else if (std::atoi(port.c_str()) > 65535)
+		throw std::invalid_argument("Bad/illegal port format (max value: 65535)");
 	else
 		_port = std::atoi(port.c_str());
 }

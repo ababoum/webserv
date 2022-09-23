@@ -6,51 +6,31 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 20:12:24 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/23 19:46:00 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Request.hpp"
 
 
-// GOOGLE CHROME REQUEST EXAMPLES
-
-// GET / HTTP/1.1
-// Host: localhost:9999
-// Connection: keep-alive
-// sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"
-// sec-ch-ua-mobile: ?0
-// sec-ch-ua-platform: "Linux"
-// DNT: 1
-// Upgrade-Insecure-Requests: 1
-// User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36
-// Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
-// Sec-Fetch-Site: none
-// Sec-Fetch-Mode: navigate
-// Sec-Fetch-User: ?1
-// Sec-Fetch-Dest: document
-// Accept-Encoding: gzip, deflate, br
-// Accept-Language: en-US,en;q=0.9,fr;q=0.8
-
-
-
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Request::Request(): _validRequest(true), _error(NO_ERROR),_targetLocation(NULL)
-{
-
-}
+Request::Request():
+	_header(),
+	_body(),
+	_validRequest(true),
+	_error(NO_ERROR),
+	_targetLocation(NULL),
+	_raw_data()	{}
 
 
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------
 */
 
-Request::~Request()
-{
-}
+Request::~Request() {}
 
 
 /*
@@ -145,11 +125,10 @@ void	Request::parseData()
 }
 
 
-// GET /YoupiBanane/blabla.prout
-
 void	Request::findLocation(Server & serv)
 {
 	std::string URL_to_check = _header.resource_path;
+	std::string	req_method = _header.method;
 	std::string	prefix;
 	
 	location_parse_loop:
@@ -159,6 +138,11 @@ void	Request::findLocation(Server & serv)
 	{
 		prefix = serv.getRoutes()[i].getPrefix();
 		
+		// disqualify locations incompatible method-wise
+		if (!serv.getRoutes()[i].isAllowedMethod(req_method))
+		{
+			continue ;
+		}
 		// check if the location matches
 		if (URL_to_check == prefix)
 		{
@@ -177,8 +161,9 @@ void	Request::findLocation(Server & serv)
 		else if (prefix[0] == '*' && URL_to_check.size() >= prefix.size())
 		{
 			prefix.erase(prefix.begin());
-			if (URL_to_check.compare(URL_to_check.size() - prefix.size(), prefix.size(), prefix))
+			if (!URL_to_check.compare(URL_to_check.size() - prefix.size(), prefix.size(), prefix))
 			{
+				_header.resource_path = getBaseFile(_header.resource_path);
 				_targetLocation = &serv.getRoutes()[i];
 				return ; 
 			}
@@ -208,8 +193,9 @@ void	Request::findLocation(Server & serv)
 
 int		Request::checkAccess()
 {
-	std::string absolute_path = _targetLocation->getRoot() + 
-		(_header.resource_path[0] == '/' ? "" : "/") + _header.resource_path;
+	std::string absolute_path = _targetLocation->getRoot() + _header.resource_path;
+	sanitizePath(absolute_path);
+	
 
 	int 		check = 0;
 	struct stat sb;
@@ -381,21 +367,14 @@ void			Request::_parseURL()
 	if (path_and_query.size() == 2)
 	{
 		_header.resource_path = path_and_query[0];
-		// uniformize resource_path format if it's a folder ('/' at the end)
-		if (_header.resource_path.find('.') == std::string::npos &&
-			str_back(_header.resource_path) != '/')
-			_header.resource_path.append("/"); 
+		uniformizeFolderPath(_header.resource_path);
 		
 		_header.query_string = path_and_query[1];
-		// parsing query string into the map
 	}
 	else if (path_and_query.size() == 1)
 	{
 		_header.resource_path = path_and_query[0];
-		// uniformize resource_path format if it's a folder ('/' at the end)
-		if (_header.resource_path.find('.') == std::string::npos &&
-			str_back(_header.resource_path) != '/')
-			_header.resource_path.append("/"); 
+		uniformizeFolderPath(_header.resource_path);
 	}
 	else
 	{
@@ -422,18 +401,6 @@ int		Request::extractBody()
 {
 	if (_header.method != "POST")
 		return 0;
-
-	// std::string::reverse_iterator rit = requestData.rbegin();
-	// while (*rit != '\n')
-	// 	rit++;
-	// while (rit != requestData.rbegin())
-	// {
-	// 	_body.content.push_back(*rit);
-	// 	rit--;
-	// }
-	// if (rit == requestData.rbegin())
-	// 	_body.content.push_back(*rit);
-	// _body.length = _body.content.size();
 
 	
 	std::string requestData(_raw_data.begin(), _raw_data.end());

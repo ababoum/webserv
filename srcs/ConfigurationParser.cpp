@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 15:49:49 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/23 18:37:50 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,6 @@ ConfigurationParser &	ConfigurationParser::operator=( ConfigurationParser const 
 
 void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_items, std::size_t line_nb)
 {
-
 	if (line_items.size() == 1 && line_items[0] == "}")
 	{
 		_context = "server";
@@ -81,11 +80,11 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 	else if (line_items.back().at(line_items.back().size() - 1) != ';')
 	{
 		FATAL_ERR("Missing ';' at the end of line " << line_nb << '\n');
-		throw syntax_error();
+		throw syntax_error("syntax error");
 	}
 
 	// erase ';' at the end of the line
-	while(line_items.back().at(line_items.back().size() - 1) == ';')
+	while(line_items.back().size() >= 1 && line_items.back().at(line_items.back().size() - 1) == ';')
 		line_items.back().erase(line_items.back().end() - 1);
 
 	// fill root
@@ -119,7 +118,7 @@ void	ConfigurationParser::_parseLocationLine(std::vector<std::string> & line_ite
 		if (!is_digit(line_items[1]))
 		{
 			FATAL_ERR("Return code should be an integer at line " << line_nb << '\n');
-			throw syntax_error();
+			throw syntax_error("invalid http redirection directive");
 		}
 		_currentLocation->setRedirection(std::atoi(line_items[1].c_str()), line_items[2]);
 	}
@@ -166,18 +165,25 @@ void	ConfigurationParser::_parseServerLine(std::vector<std::string> & line_items
 	else if (line_items.back().at(line_items.back().size() - 1) != ';')
 	{
 		FATAL_ERR("Missing ';' at the end of line " << line_nb << '\n');
-		throw syntax_error();
+		throw syntax_error("syntax error");
 	}
 
 	// erase ';' at the end of the line
-	while(line_items.back().at(line_items.back().size() - 1) == ';')
+	while(line_items.back().size() >= 1 && line_items.back().at(line_items.back().size() - 1) == ';')
 		line_items.back().erase(line_items.back().end() - 1);
 
 	// fill port and host (IP)
 	if (line_items[0] == "listen" && line_items.size() == 2)
 	{
-		_currentServer->setIP(split(line_items.back(), ':')[0]);
-		_currentServer->setPort(split(line_items.back(), ':')[1]);
+		std::vector<std::string> host_items = split(line_items.back(), ':');
+		
+		if (host_items.size() != 2)
+		{
+			FATAL_ERR("Invalid IP/Port in line " << line_nb << '\n');
+			throw syntax_error("invalid server directive");
+		}
+		_currentServer->setIP(host_items[0]);
+		_currentServer->setPort(host_items[1]);
 	}
 
 	// fill server names
@@ -287,7 +293,7 @@ void	ConfigurationParser::_parseFile()
 	if (_context != "main")
 	{
 		FATAL_ERR("Syntax error: missing '}' in the configuration file\n");
-		throw syntax_error();
+		throw syntax_error("file syntax error");
 	}
 
 	if (_globalConf.getServersList().empty())
@@ -343,7 +349,8 @@ void	ConfigurationParser::_checkCurrentLocationIntegrity(std::size_t line_nb) co
 	}
 	
 
-	if (_currentLocation->getIndexPage().empty() && !_currentLocation->isAutoindexed())
+	if (_currentLocation->getIndexPage().empty() && !_currentLocation->isAutoindexed()
+		&& is_folder_formatted(_currentLocation->getPrefix()))
 	{
 		FATAL_ERR("Error: location doesn't have an index page: line " << line_nb << '\n');
 		throw std::logic_error("index-less location");

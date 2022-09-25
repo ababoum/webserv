@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/23 19:46:00 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/26 00:50:15 by lcalvie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,12 +113,8 @@ void	Request::parseData()
 				_header.content_type = (line_items[1]).substr(0, (line_items[1]).size() - 1);
 			else
 				_header.content_type = (line_items[1]).substr(0, (line_items[1]).size());
-			DEBUG( "content_type = " << _header.content_type << "\n");
 			if (line_items.size() > 2 && !(line_items[2]).compare(0, 9, "boundary="))
-			{
 				_header.boundary = "--" + line_items[2].substr(9);
-				DEBUG("boundary = " << _header.boundary << "\n");
-			}
 		}
 		++line_index;
 	}

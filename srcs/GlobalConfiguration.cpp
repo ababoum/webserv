@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 17:23:45 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/25 12:55:47 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,12 @@ void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
 			if (_targetServ->stream_out(fds[i].fd))
 				++i;
 			i = (i >= fds.size()) ? 0 : i;
+			return ;
+		}
+		else if (fds[i].revents & POLLERR || fds[i].revents & POLLNVAL)
+		{
+			ServerEngine *_targetServ = _fds_ptr[fds[i]];
+			_targetServ->kill_client(fds[i].fd);
 			return ;
 		}
 	}

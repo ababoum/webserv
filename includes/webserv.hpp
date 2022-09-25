@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 20:42:30 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/23 19:40:09 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,10 @@ bool	operator<(struct pollfd rhs, struct pollfd lhs);
 
 # define RESET_TXT "\e[0m"
 
-# define DEBUG(x)	std::cerr << YELLOW_TXT << x << RESET_TXT;
+# define DEBUG(x)		std::cerr << YELLOW_TXT << x << RESET_TXT;
 # define FATAL_ERR(x)	std::cerr << RED_TXT << x << RESET_TXT;
-# define INFO(x)	std::cerr << ITALIC_TXT << x << RESET_TXT;
+# define INFO(x)		std::cerr << ITALIC_TXT << x << RESET_TXT;
+# define RUNTIME_MSG(x)	std::cerr << GREEN_TXT << x << RESET_TXT;
 
 # define DEFAULT_MAX_CONNECTIONS 	1024
 # define REQUEST_BUFFER_SIZE		1024
@@ -119,7 +120,11 @@ std::string					autoindexPageHtml(std::string directoryName, std::string headerU
 std::string					int_to_string(int n);
 std::string					itohex(std::size_t size);
 bool						is_digit(std::string str);
-char						str_back(std::string str);
+bool						is_folder_formatted(std::string path, bool regexOn = true);
+void						sanitizePath(std::string & path);
+void						uniformizeFolderPath(std::string & folderPath);
+std::string					getParentDirectory(std::string path);
+std::string					getBaseFile(std::string path);
 
 
 #endif

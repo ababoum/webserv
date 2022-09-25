@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 16:59:05 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/23 18:18:27 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ static void	ft_exit(int sig_code)
 
 int main(int ac, char **av)
 {
-	
 	try {
 		signal(SIGINT, ft_exit);
 		
@@ -66,10 +65,12 @@ int main(int ac, char **av)
 		ConfigurationParser parser(inputPath, globalConf);	
 		globalConf.startEngines();
 
-		t_fds_map	*fds_ptr = &globalConf.getFdsPtr();
+		RUNTIME_MSG("Webserv is now ready!\nConnections available on:\n");
+		for(size_t i = 0; i < globalConf.getServersList().size(); i++)
+			RUNTIME_MSG("- " << globalConf.getServersList()[i].getIP() << ":" << globalConf.getServersList()[i].getPort() << "\n");
 
+		t_fds_map	*fds_ptr = &globalConf.getFdsPtr();
 		int ready;
-		
 		while (42)
 		{
 			std::vector<struct pollfd> fds;
@@ -89,6 +90,10 @@ int main(int ac, char **av)
 				return (EXIT_SUCCESS);
 			}
 
+			// DEBUG("ready FDs: " << ready << '\n');
+			// DEBUG("FD0: " << fds.data()[0].revents);
+			// DEBUG("FD1: " << fds.data()[1].revents);
+
 			globalConf.dispatchStream(fds);
 		}
 	}
@@ -98,7 +103,7 @@ int main(int ac, char **av)
 		return (EXIT_FAILURE);
 	}
 	catch (int sig_code) {
-		std::cout << GREEN_TXT << "\nQuitting webserv... Thanks!\n" << RESET_TXT;
+		RUNTIME_MSG("\nQuitting webserv... Thanks!\n");
 		return (sig_code);
 	}
 	

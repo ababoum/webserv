@@ -14,18 +14,19 @@
 	</div>
 	<div id="menu">
 		<ul>
-			<li><a href="#">Home</a></li>
-			<li><a href="#">Gallery</a></li>
-			<li><a href="#">Upload an image</a></li>
-			<li><a href="#">Upload a text</a></li>
-			<li><a href="#">Delete an image</a></li>
-			<li><a href="#">Try some cookies!</a></li>
+			<li><a href="/">Home</a></li>
+			<li><a href="/gallery">Gallery</a></li>
+			<li><a href="/uploads/upload_img.html">Upload an image</a></li>
+			<li><a href="/uploads/upload_txt.php">Upload a text</a></li>
+			<li><a href="/delete/delete.php">Delete an image</a></li>
+			<li><a href="#">Cookies!</a></li>
 			<li><a href="#">Session</a></li>
 		</ul>
 	</div>
 	<div id="content">
 		<div id="gallery">
 			<h2>Images gallery</h2>
+
 			<?php
 			$files = scandir('../images');
 			foreach ($files as $file) {
@@ -34,6 +35,7 @@
 				}
 			}
 			?>
+
 		</div>
 	</div>
 	<div id="footer">

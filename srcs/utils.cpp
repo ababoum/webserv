@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/19 11:40:06 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/23 19:39:29 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,7 @@ bool 						operator<(struct pollfd rhs, struct pollfd lhs)
 	return rhs.fd < lhs.fd;
 }
 
+
 std::string					itohex(std::size_t size)
 {
 	std::string hex;
@@ -137,12 +138,81 @@ std::string					itohex(std::size_t size)
 	return std::string(hex.rbegin(), hex.rend());
 }
 
-char str_back(std::string str)
+
+/**
+ * Checks if the path is likely to be a folder
+ *
+ * @param path String containing the path
+ * @param regexOn Default value = true. Makes the function take into consideration '*' in the path
+ * @return Returns a boolean value. 'true' if the path is likely to be a folder
+ */
+bool	is_folder_formatted(std::string path, bool regexOn)
 {
-	if (str.length() > 0)
+	for (std::string::reverse_iterator rit = path.rbegin(); rit != path.rend(); ++rit)
 	{
-		return str[str.size() - 1];
+		if (*rit == '.')
+			return false;
+		else if (*rit == '*' && regexOn)
+			return true;
+		else if (*rit == '/')
+			return true;
 	}
-	return 0;
+	return true;
 }
 
+/**
+ * Transforms a path by replacing all multiple occurences of '/' by a single one.
+ * Example: "/folder//folder2/file.out" -> "/folder/folder2/file.out"
+ *
+ * @param path String containing the original path
+ */
+void	sanitizePath(std::string & path)
+{
+	while (path.find("//") != std::string::npos)
+	{
+		path.erase(path.find("//"), 1);
+	}
+}
+
+/**
+ * Uniformize a folder path by making it end with '/'
+ *
+ * @param folderPath String containing the original folder path
+ */
+void	uniformizeFolderPath(std::string & folderPath)
+{
+	if (is_folder_formatted(folderPath, false))
+	{
+		folderPath.append("/");
+		sanitizePath(folderPath);
+	}
+}
+
+std::string	getParentDirectory(std::string path)
+{
+	std::string::reverse_iterator rit = path.rbegin();
+
+	while (!path.empty())
+	{
+		if (*rit == '/')
+			break;
+		path.erase(path.end() - 1);
+		++rit;
+	}
+	return path;
+}
+
+std::string	getBaseFile(std::string path)
+{
+	std::string::reverse_iterator rit = path.rbegin();
+	std::string base_path;
+	
+	while (!path.empty())
+	{
+		if (*rit == '/')
+			break;
+		base_path.insert(base_path.begin(), *rit);
+		++rit;
+	}
+	return base_path;
+}

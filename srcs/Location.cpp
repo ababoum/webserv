@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:13:53 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/16 14:17:06 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/23 17:08:22 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void	Location::setAutoindex(std::string on_off)
 	else if (on_off == "off")
 		_autoindex = false;
 	else
-		throw std::invalid_argument("autoindex option can only received \"on\" or \"off\" argument");
+		throw std::invalid_argument("autoindex directive can only be set to \"on\" or \"off\"");
 }
 
 

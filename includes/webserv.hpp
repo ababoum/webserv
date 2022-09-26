@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/26 11:36:38 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/26 15:53:22 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,9 +96,15 @@ enum HTTP_RESPONSE
 	SERVER_ERROR = 500
 };
 
-# define PHP_CGI_PATH		"cgi/php-cgi8.1"
-# define PYTHON_CGI_PATH	"cgi/python3.10"
-# define PERL_CGI_PATH		"cgi/perl"
+# ifdef DELL
+# 	define PHP_CGI_PATH		"cgi/php-cgi8.1"
+# 	define PYTHON_CGI_PATH	"cgi/python3.10"
+# 	define PERL_CGI_PATH	"cgi/perl"
+# else
+# 	define PHP_CGI_PATH		"cgi/php-cgi7.4"
+# 	define PYTHON_CGI_PATH	"cgi/python"
+# 	define PERL_CGI_PATH	"cgi/perl"
+# endif
 
 # define BAD_REQUEST_DEFAULT		"default_error_pages/400.html"
 # define FORBIDDEN_DEFAULT			"default_error_pages/403.html"

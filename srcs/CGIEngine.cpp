@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIEngine.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/26 00:48:03 by lcalvie          ###   ########.fr       */
+/*   Updated: 2022/09/26 15:33:56 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,6 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 
 	_req = req;
 	_body = req->getBody().content;
-	// if (!_body.empty())
-	// 	_body.erase(_body.begin());
 	if (_req->getHeader().resource_path != "/")
 	{
 		path = _req->getTargetLocation()->getRoot();
@@ -63,7 +61,7 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	if (_req->getHeader().content_type == "multipart/form-data" && !_req->getHeader().boundary.empty())
 	{
 		_env["CONTENT_TYPE"] = _req->getHeader().content_type + "; boundary=" + _req->getHeader().boundary.substr(2);
-		DEBUG(_env["CONTENT_TYPE"]);
+		// DEBUG(_env["CONTENT_TYPE"]);
 	}
 	else if (_req->getHeader().content_type.empty())
 		_env["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
@@ -154,7 +152,9 @@ std::string CGIEngine::exec()
 	if (pid == 0)
 	{
 		dup2(fd_read, STDIN_FILENO);
+		close(fd_read);
 		dup2(fd_write, STDOUT_FILENO);
+		close(fd_write);
 		if (execve(arg[0], arg, env) == -1)
 		{
 			free_env(env);

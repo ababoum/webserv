@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/23 18:18:27 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/26 15:52:22 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int main(int ac, char **av)
 {
 	try {
 		signal(SIGINT, ft_exit);
-		
+	
 		if (ac < 2)
 		{
 			FATAL_ERR("Error: webserv needs a configuration file to be launched\n");

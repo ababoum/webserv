@@ -1,6 +1,10 @@
 CXX			= @c++
 
-CXXFLAGS	= -Wall -Werror -Wextra -g -std=c++98
+ifeq ($(shell nproc), 20)
+	CXXFLAGS	= -Wall -Werror -Wextra -g -std=c++98 -DDELL
+else
+	CXXFLAGS	= -Wall -Werror -Wextra -g -std=c++98
+endif
 
 NAME 		= webserv
 
@@ -25,7 +29,6 @@ INCL		= includes/webserv.hpp \
 				includes/Request.hpp \
 				includes/Response.hpp \
 				includes/CGIEngine.hpp
-
 
 OBJS		= $(SRCS:.cpp=.o)
 

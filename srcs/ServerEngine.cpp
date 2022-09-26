@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/26 15:15:26 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/26 18:42:07 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,7 +214,7 @@ void ServerEngine::_buildResponseOnRequest()
 		CGIEngine cgi(_req, &_server);
 		_resp->setFromCGI(true);
 		cgi_output = cgi.exec();
-		std::cerr << cgi_output << std::endl;
+		// DEBUG(cgi_output);
 		_parse_CGI_output(cgi_output);
 	}
 	else if (_req->getHeader().method == "GET")
@@ -398,7 +398,7 @@ void ServerEngine::_parse_CGI_output(std::string cgi_output)
 		cgi_output_body += line;
 		cgi_output_body += "\n";
 	}
-	std::cerr << cgi_output_body << std::endl;
+	// DEBUG(cgi_output_body);
 
 	_resp->setBody(cgi_output_body);
 	_resp->setContentLength(cgi_output_body.size());
@@ -517,7 +517,7 @@ int ServerEngine::stream_out(int client_fd)
 		_resp = new Response;
 		_aliveConnections[client_fd].resp = _resp;
 		_buildResponseOnRequest();
-		if (_resp->isFromCGI())
+		if (_resp->isFromCGI() && _req->isValid())
 			to_send = _resp->getCGIText();
 		else if (_req->getTargetLocation() && _req->getTargetLocation()->isRedirected())
 			to_send = _resp->getRedirText();
@@ -550,7 +550,7 @@ int ServerEngine::stream_out(int client_fd)
 			still_alive = 1;
 	}
 
-	// DEBUG("client_fd =\n" << client_fd << '\n' << "to_send =\n" << to_send << '\n');
+	DEBUG("client_fd =\n" << client_fd << '\n' << "to_send =\n" << to_send << '\n');
 
 	if (send(client_fd, to_send.c_str(), to_send.size(), MSG_NOSIGNAL) == -1)
 		still_alive = 0; // clean
@@ -560,12 +560,13 @@ int ServerEngine::stream_out(int client_fd)
 	// Close the connection
 	delete _resp;
 	_resp = NULL;
+	_aliveConnections[client_fd].resp = NULL;
+	
 	delete _req;
 	_req = NULL;
-	_aliveConnections.erase(client_fd);
-	close(client_fd);
-	_globalConf->eraseClientFd(client_fd);
-
+	_aliveConnections[client_fd].req = NULL;
+	
+	kill_client(client_fd);
 	return still_alive;
 }
 

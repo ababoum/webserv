@@ -7,14 +7,6 @@
 	<link href="../default.css" rel="stylesheet" type="text/css" />
 </head>
 
-	<script>
-		async function refresh {
-		for (int  i = 0; i < 1; ++i)
-			window.location.reload();
-		}
-		refresh();
-	</script>
-
 <body>
 	<div id="header">
 		<h1>HTTP webserv</h1>
@@ -28,7 +20,7 @@
 			<li><a href="/uploads/upload_txt.php">Upload a text</a></li>
 			<li><a href="/delete/delete.php">Delete an image</a></li>
 			<li><a href="/cookies/cookies.php">Cookies!</a></li>
-			<li><a href="#">Session</a></li>
+			<li><a href="/cookies/session.php">Session</a></li>
 		</ul>
 	</div>
 	<div id="content">

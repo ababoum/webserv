@@ -13,7 +13,7 @@
 	{
 		setcookie("fname", $_POST["fname"], time() + (86400 * 30), "/"); // 86400 = 1 day
 		setcookie("lname", $_POST["lname"], time() + (86400 * 30), "/"); // 86400 = 1 day
-		echo "<script> location.href='http://localhost:8080/cookies/cookies2.php'; </script>";
+		echo "<script> location.href='http://localhost:" . $_SERVER['SERVER_PORT'] . "/cookies/cookies2.php'; </script>";
 	}
 ?>
 
@@ -43,9 +43,9 @@
 			<h2>Cookies</h2>
 				<form method="POST">
 					<label for="fname">First name:</label>
-					<input type="text" id="fname" name="fname"><br><br>
+					<input type="text" id="fname" name="fname" required><br><br>
 					<label for="lname">Last name:</label>
-					<input type="text" id="lname" name="lname"><br><br>
+					<input type="text" id="lname" name="lname" required><br><br>
 					<input type="submit" name="submit" value="Submit">
 				</form>
 		</div>

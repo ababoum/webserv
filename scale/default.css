@@ -117,6 +117,14 @@ a:hover {
 	font-weight: bold;
 }
 
+#submit_button {
+	margin-top: 1rem;
+}
+
+#session_form {
+	margin-top: 1rem;
+}
+
 /** FORM TEXT */
 
 #form_text {

@@ -550,7 +550,7 @@ int ServerEngine::stream_out(int client_fd)
 			still_alive = 1;
 	}
 
-	DEBUG("client_fd =\n" << client_fd << '\n' << "to_send =\n" << to_send << '\n');
+	//DEBUG("client_fd =\n" << client_fd << '\n' << "to_send =\n" << to_send << '\n');
 
 	if (send(client_fd, to_send.c_str(), to_send.size(), MSG_NOSIGNAL) == -1)
 		still_alive = 0; // clean

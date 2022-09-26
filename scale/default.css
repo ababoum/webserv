@@ -62,6 +62,15 @@ a:hover {
 	color: #FFFFFF;
 }
 
+#session_info {
+	color: #000000;
+	font-weight: bold;
+	margin: 0em;
+	padding: 0em;
+	font-size: 1em;
+	float: right;
+}
+
 /** MENU */
 
 #menu {

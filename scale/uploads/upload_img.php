@@ -1,55 +1,67 @@
-<?php
-$target_dir = "../images/";
-$target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
-$uploadOk = 1;
-$imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-$msg = "";
+<!DOCTYPE html>
+<html>
 
-// Check if image file is a actual image or fake image
-if(isset($_POST["submit"])) {
-  $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
-  if($check !== false) {
-    $msg = $msg . "File is an image - " . $check["mime"] . ".\\n";
-    $uploadOk = 1;
-  } else {
-    $msg = $msg . "File is not an image.\\n";
-    $uploadOk = 0;
-  }
-}
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>42_webserv</title>
+	<link href="../default.css" rel="stylesheet" type="text/css" />
+</head>
 
-// Check if file already exists
-if (file_exists($target_file)) {
-	$msg = $msg . "File already exists.\\n";
-  $uploadOk = 0;
-}
+<body>
+	<div id="header">
+		<h1>HTTP webserv</h1>
+		<?php
+		if (isset($_COOKIE['PHPSESSID']))
+		{
+			$fp = fopen("../session/session.bdd", "r");
+			if ($fp)
+			{
+				while (($line = fgets($fp)) !== false)
+				{
+					$line_items = explode(";", $line);
+					if ($_COOKIE['PHPSESSID'] == $line_items[0])
+					{
+						$fname_session = $line_items[1];
+						$lname_session = trim($line_items[2]);
+						break;
+					}
+				}
+				fclose($fp);
+				if (isset($fname_session) && isset($lname_session))
+				{
+					echo "<div id=session_info>Welcome back $fname_session $lname_session</div>";
+				}
+			}
+		}
+		?>
+		<h2>by 42</h2>
+	</div>
+	<div id="menu">
+		<ul>
+			<li><a href="/">Home</a></li>
+			<li><a href="/gallery">Gallery</a></li>
+			<li><a href="/uploads/upload_img.php">Upload an image</a></li>
+			<li><a href="/uploads/upload_txt.php">Upload a text</a></li>
+			<li><a href="/delete/delete.php">Delete an image</a></li>
+			<li><a href="/cookies/cookies.php">Cookies!</a></li>
+			<li><a href="/session/session.php">Session</a></li>
+		</ul>
+	</div>
+	<div id="content">
+		<div id="upload">
+			<h2>Upload an image to the gallery</h2>
 
-// Check file size
-if ($_FILES["fileToUpload"]["size"] > 500000) {
-	$msg = $msg . "File is too large.\\n";
-  $uploadOk = 0;
-}
+			<form id="form_img" action="upload_img_php.php" method="post" enctype="multipart/form-data">
+				Select image to upload:
+				<input type="file" name="fileToUpload" id="fileToUpload" required>
+				<input type="submit" value="Upload Image" name="submit">
+			  </form>
 
-// Allow certain file formats
-if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-&& $imageFileType != "gif" ) {
-	$msg = $msg . "Only JPG, JPEG, PNG & GIF files are allowed.\\n";
-  $uploadOk = 0;
-}
+		</div>
 
-// Check if $uploadOk is set to 0 by an error
-if ($uploadOk == 0) {
-	$msg = $msg . "File was not uploaded.\\n";
-// if everything is ok, try to upload file
-} else {
-  if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-    $msg = $msg . "The file ". htmlspecialchars( basename( $_FILES["fileToUpload"]["name"])). " has been uploaded.\\n";
-  } else {
-    $msg = $msg . "There was an error uploading your file.\\n";
-  }
-}
+	</div>
+	<div id="footer">
+		<p>Copyright &copy; 2006 Sitename.com. Designed by <a href="http://www.freecsstemplates.org" class="link1">Free CSS Templates</a></p>
+	</div>
 
-echo "<script> 
-alert(\"$msg\");
-location.href=\"http://localhost:" . $_SERVER['SERVER_PORT'] . "/uploads/upload_img.html\";
-	</script>";
-?>
+</html>

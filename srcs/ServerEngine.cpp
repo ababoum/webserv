@@ -260,13 +260,13 @@ void ServerEngine::_postMethod()
 {
 	std::fstream	file;
 	std::string		path;
-	std::string		upload_directory = "www/uploads/"; // where add files ? ( find the directory, finishing with a '/')
+	std::string		upload_directory;
 
-	// upload_directory = _req->getTargetLocation()->getRoot() + _req->getHeader().URL;
-	DEBUG("upload_directory = " << upload_directory << '\n');
+	upload_directory = _req->getTargetLocation()->getRoot() + _req->getHeader().URL;
 
 	if (_req->getHeader().content_type == "multipart/form-data")
 	{
+		DEBUG("upload_directory = " << upload_directory << '\n');
 		std::string file_name;
 		std::string line;
 		std::string reqData = _req->getBody().content.substr(_req->getBody().content.find('\n') + 1);
@@ -318,6 +318,19 @@ void ServerEngine::_postMethod()
 				reqData = reqData.substr(reqData.find('\n') + 1);
 			}
 		}
+	}
+	else
+	{
+		path = upload_directory;
+		DEBUG("new file address = " << path << '\n');
+		file.open(path.c_str(), std::ios::out);
+		if (!file.is_open())
+		{
+			_resp->setStatusCode(SERVER_ERROR); // good error ??
+			return;
+		}
+		file << _req->getBody().content;
+		file.close();
 	}
 
 	_resp->setStatusCode(CREATED);

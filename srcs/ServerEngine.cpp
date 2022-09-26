@@ -6,7 +6,7 @@
 /*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/25 12:56:11 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/26 11:46:56 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -401,6 +401,7 @@ void ServerEngine::_parse_CGI_output(std::string cgi_output)
 		cgi_output_body += line;
 		cgi_output_body += "\n";
 	}
+	std::cerr << cgi_output_body << std::endl;
 
 	_resp->setBody(cgi_output_body);
 	_resp->setContentLength(cgi_output_body.size());

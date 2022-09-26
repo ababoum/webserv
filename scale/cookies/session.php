@@ -7,14 +7,6 @@
 	<link href="../default.css" rel="stylesheet" type="text/css" />
 </head>
 
-	<script>
-		async function refresh {
-		for (int  i = 0; i < 1; ++i)
-			window.location.reload();
-		}
-		refresh();
-	</script>
-
 <body>
 	<div id="header">
 		<h1>HTTP webserv</h1>
@@ -33,8 +25,19 @@
 	</div>
 	<div id="content">
 		<div id="cookies">
-			<h2>Cookies</h2>
-			Welcome <?php echo $_COOKIE["fname"] . " " . $_COOKIE["lname"]; ?><br>
+			<?php
+			if( isset($_SESSION["fname"]) && isset($_SESSION["lname"]) ) {
+				echo "\nWelcome ". $_SESSION['fname']. " " . $_SESSION['lname'] . "<br />";
+			}
+			?>
+			<h2>Session Cookies</h2>
+				<form action="session2.php" method="POST">
+					<label for="fname">First name:</label>
+					<input type="text" id="fname" name="fname"><br><br>
+					<label for="lname">Last name:</label>
+					<input type="text" id="lname" name="lname"><br><br>
+					<input type="submit" name="submit" value="Submit">
+				</form>
 		</div>
 	</div>
 	<div id="footer">

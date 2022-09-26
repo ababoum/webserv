@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/23 18:37:50 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/26 14:52:08 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -350,6 +350,7 @@ void	ConfigurationParser::_checkCurrentLocationIntegrity(std::size_t line_nb) co
 	
 
 	if (_currentLocation->getIndexPage().empty() && !_currentLocation->isAutoindexed()
+		&& !_currentLocation->isRedirected()
 		&& is_folder_formatted(_currentLocation->getPrefix()))
 	{
 		FATAL_ERR("Error: location doesn't have an index page: line " << line_nb << '\n');

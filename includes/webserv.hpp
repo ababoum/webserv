@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/23 19:40:09 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/26 11:36:38 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ enum HTTP_RESPONSE
 	SERVER_ERROR = 500
 };
 
-# define PHP_CGI_PATH		"cgi/php-cgi7.4"
+# define PHP_CGI_PATH		"cgi/php-cgi8.1"
 # define PYTHON_CGI_PATH	"cgi/python3.10"
 # define PERL_CGI_PATH		"cgi/perl"
 

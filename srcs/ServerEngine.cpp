@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/23 19:59:31 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/26 15:11:54 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,10 +103,6 @@ ServerEngine::~ServerEngine()
 {
 	if (_socket_fd != -1)
 		close(_socket_fd);
-	// if (_req != NULL)
-	// 	delete _req;
-	// if (_resp != NULL)
-	// 	delete _resp;
 
 	for (std::map<int, Connection>::iterator it = _aliveConnections.begin(); 
 		it != _aliveConnections.end(); ++it)
@@ -121,6 +117,7 @@ ServerEngine::~ServerEngine()
 			delete it->second.resp;
 			it->second.resp = NULL;
 		}
+		close(it->first);
 	}
 }
 

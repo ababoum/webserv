@@ -1,49 +1,55 @@
 <?php
-$target_dir = "../images";
+$target_dir = "../images/";
 $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
 $uploadOk = 1;
 $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+$msg = "";
 
 // Check if image file is a actual image or fake image
 if(isset($_POST["submit"])) {
   $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
   if($check !== false) {
-    echo "File is an image - " . $check["mime"] . ".";
+    $msg = $msg . "File is an image - " . $check["mime"] . ".\\n";
     $uploadOk = 1;
   } else {
-    echo "File is not an image.\n";
+    $msg = $msg . "File is not an image.\\n";
     $uploadOk = 0;
   }
 }
 
 // Check if file already exists
 if (file_exists($target_file)) {
-  echo "Sorry, file already exists.\n";
+	$msg = $msg . "File already exists.\\n";
   $uploadOk = 0;
 }
 
 // Check file size
 if ($_FILES["fileToUpload"]["size"] > 500000) {
-  echo "Sorry, your file is too large.\n";
+	$msg = $msg . "File is too large.\\n";
   $uploadOk = 0;
 }
 
 // Allow certain file formats
 if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
 && $imageFileType != "gif" ) {
-  echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.\n";
+	$msg = $msg . "Only JPG, JPEG, PNG & GIF files are allowed.\\n";
   $uploadOk = 0;
 }
 
 // Check if $uploadOk is set to 0 by an error
 if ($uploadOk == 0) {
-  echo "Sorry, your file was not uploaded.\n";
+	$msg = $msg . "File was not uploaded.\\n";
 // if everything is ok, try to upload file
 } else {
   if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-    echo "The file ". htmlspecialchars( basename( $_FILES["fileToUpload"]["name"])). " has been uploaded.";
+    $msg = $msg . "The file ". htmlspecialchars( basename( $_FILES["fileToUpload"]["name"])). " has been uploaded.\\n";
   } else {
-    echo "Sorry, there was an error uploading your file.\n";
+    $msg = $msg . "There was an error uploading your file.\\n";
   }
 }
+
+echo "<script> 
+alert(\"$msg\");
+location.href=\"http://localhost:" . $_SERVER['SERVER_PORT'] . "/uploads/upload_img.html\";
+	</script>";
 ?>

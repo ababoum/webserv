@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lcalvie <lcalvie@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/26 00:50:15 by lcalvie          ###   ########.fr       */
+/*   Updated: 2022/09/26 15:02:18 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,6 +236,9 @@ int		Request::identifyType()
 	std::string extension;
 
 	std::string::reverse_iterator rit = file_to_check.rbegin();
+
+	if (_targetLocation->isRedirected())
+		return 0;
 	for (; rit != file_to_check.rend(); ++rit)
 	{
 		if (*rit == '.')

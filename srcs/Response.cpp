@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/21 20:48:44 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/22 17:21:18 by tidurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,23 @@ std::string		ResponseHeader::getCGIText() const
 		ret.append(*it);
 		ret += "\r\n";
 	}
+	
+	//lines session
+	if (!expires.empty())
+	{
+		ret.append(expires);
+		ret += "\r\n";
+	}
+	if (!cache_control.empty())
+	{
+		ret.append(cache_control);
+		ret += "\r\n";
+	}
+	if (!pragma.empty())
+	{
+		ret.append(pragma);
+		ret += "\r\n";
+	}
 
 	return ret;	
 }
@@ -185,6 +202,21 @@ void	Response::setCGIText(std::string CGI_text)
 	_cgi_output = CGI_text;
 }
 
+void	Response::setExpires(std::string expires)
+{
+	_header.expires = expires;
+}
+
+void	Response::setCacheControl(std::string cache)
+{
+	_header.cache_control = cache;
+}
+
+void	Response::setPragma(std::string pragma)
+{
+	_header.pragma = pragma;
+}
+
 void	Response::reset()
 {
 	_header.status_code = 0;
@@ -222,6 +254,7 @@ void	Response::setIfstreamBodyMedia(const char *path)
 		_body.length = 65;
 	}
 }
+
 
 /*
 ** --------------------------------- ACCESSOR ---------------------------------

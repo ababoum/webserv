@@ -1,3 +1,8 @@
+<?php
+	if( isset($_SESSION["fname"]) && isset($_SESSION["lname"]) ) {
+		echo "\n(SESSION) Welcome ". $_SESSION['fname']. " " . $_SESSION['lname'] . "<br />";
+	}
+	?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

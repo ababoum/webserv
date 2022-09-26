@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/26 15:11:54 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/26 15:15:26 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,7 +214,7 @@ void ServerEngine::_buildResponseOnRequest()
 		CGIEngine cgi(_req, &_server);
 		_resp->setFromCGI(true);
 		cgi_output = cgi.exec();
-
+		std::cerr << cgi_output << std::endl;
 		_parse_CGI_output(cgi_output);
 	}
 	else if (_req->getHeader().method == "GET")
@@ -375,6 +375,18 @@ void ServerEngine::_parse_CGI_output(std::string cgi_output)
 		{
 			cookies.push_back(line);
 		}
+		else if (line_items.size() > 0 && line_items[0] == "Expires:")
+		{
+			_resp->setExpires(line);
+		}
+		else if (line_items.size() > 0 && line_items[0] == "Cache-Control:")
+		{
+			_resp->setCacheControl(line);
+		}
+		else if (line_items.size() > 0 && line_items[0] == "Pragma:")
+		{
+			_resp->setPragma(line);
+		}
 	}
 
 	if (!cookies.empty())
@@ -386,6 +398,7 @@ void ServerEngine::_parse_CGI_output(std::string cgi_output)
 		cgi_output_body += line;
 		cgi_output_body += "\n";
 	}
+	std::cerr << cgi_output_body << std::endl;
 
 	_resp->setBody(cgi_output_body);
 	_resp->setContentLength(cgi_output_body.size());

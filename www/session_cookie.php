@@ -1,6 +1,7 @@
 <?php
 	session_start();
 	$_SESSION["fname"] = $_POST["fname"];
+	$_SESSION["lname"] = $_POST["lname"];
 ?>
 
 <!DOCTYPE html>
@@ -13,7 +14,7 @@
 </head>
 <body>
 
-	Welcome <?php echo $_SESSION["fname"]; ?><br>
+	Welcome <?php echo $_SESSION["fname"] . " " . $_SESSION["lname"]; ?><br>
 
 </body>
 </html>

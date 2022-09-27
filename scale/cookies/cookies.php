@@ -4,16 +4,25 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title>42_webserv</title>
-	<link href="../default.css" rel="stylesheet" type="text/css" />
+	<?php
+		if (isset($_COOKIE['color_mode']) && $_COOKIE['color_mode'] =="dark")
+		{
+			echo '<link href="../dark.css" rel="stylesheet" type="text/css" />';
+		}
+		else
+		{
+			echo '<link href="../light.css" rel="stylesheet" type="text/css" />';
+		}
+	?>
 </head>
 
 <?php
 
 	if(isset($_POST["submit"]))
 	{
-		setcookie("fname", $_POST["fname"], time() + (86400 * 30), "/"); // 86400 = 1 day
-		setcookie("lname", $_POST["lname"], time() + (86400 * 30), "/"); // 86400 = 1 day
-		echo "<script> location.href='http://localhost:" . $_SERVER['SERVER_PORT'] . "/cookies/cookies2.php'; </script>";
+		setcookie("color_mode", $_POST["color_mode"], time() + (86400 * 30), "/"); // 86400 = 1 day
+		//setcookie("lname", $_POST["lname"], time() + (86400 * 30), "/"); // 86400 = 1 day
+		echo "<script> location.href='http://localhost:" . $_SERVER['SERVER_PORT'] . "/cookies/cookies.php'; </script>";
 	}
 ?>
 
@@ -60,16 +69,14 @@
 	<div id="content">
 		<div id="cookies">
 			<?php
-			if( isset($_COOKIE["fname"]) && isset($_COOKIE["lname"]) ) {
-				echo "\nWelcome ". $_COOKIE['fname']. " " . $_COOKIE['lname'] . "<br />";
-			}
+			// if( isset($_COOKIE["fname"]) && isset($_COOKIE["lname"]) ) {
+				// echo "\nWelcome ". $_COOKIE['fname']. " " . $_COOKIE['lname'] . "<br />";
+			// }
 			?>
-			<h2>Cookies</h2>
+			<h2>Cookies</h2> <br>
 				<form method="POST">
-					<label for="fname">First name:</label>
-					<input type="text" id="fname" name="fname" required><br><br>
-					<label for="lname">Last name:</label>
-					<input type="text" id="lname" name="lname" required><br><br>
+					<label for="color_mode" id="label_color_mode">Choose your color mode <br>Type dark or light <br><br></label>
+					<input type="text" id="color_mode" name="color_mode" required pattern="dark|light" title="\nOnly dark or light are accepted"><br><br>
 					<input type="submit" name="submit" value="Submit">
 				</form>
 		</div>

@@ -4,7 +4,16 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title>42_webserv</title>
-	<link href="../default.css" rel="stylesheet" type="text/css" />
+	<?php
+		if (isset($_COOKIE['color_mode']) && $_COOKIE['color_mode'] =="dark")
+		{
+			echo '<link href="../dark.css" rel="stylesheet" type="text/css" />';
+		}
+		else
+		{
+			echo '<link href="../light.css" rel="stylesheet" type="text/css" />';
+		}
+	?>
 </head>
 
 <script>

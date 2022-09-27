@@ -1,0 +1,178 @@
+/** BASIC */
+
+html {
+	height: 100%;
+}
+
+body {
+	margin: 0em;
+	padding: 0em;
+	font-family: "Courier New", Courier, monospace;
+	height: 100%;
+	background-color: #2f2c3d;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0em;
+	padding: 0em;
+}
+
+p,
+ol,
+ul {
+	font-size: .8em;
+}
+
+ul {
+	list-style-type: circle;
+}
+
+a {
+	color: #838383;
+}
+
+a:hover {
+	text-decoration: none;
+	background-color: #000000;
+	color: #FFFFFF;
+}
+
+/** HEADER */
+
+#header {
+	margin: 0em 0em 1em 0em;
+	padding: 1em 1em;
+	background-color: #000000;
+}
+
+#header h1 {
+	margin: 0em;
+	padding: 0em;
+	color: #FFFFFF;
+}
+
+#header h2 {
+	margin: 0em;
+	padding: 0em;
+	font-size: 1em;
+	color: #FFFFFF;
+}
+
+#session_info {
+	color: #FFFFFF;
+	font-weight: bold;
+	margin: 0em;
+	padding: 0em;
+	font-size: 1em;
+	float: right;
+}
+
+/** MENU */
+
+#menu {
+	float: left;
+	width: 15%;
+	padding: 1em;
+	color: #838383;
+}
+
+#menu ul {
+	margin: 0em;
+	padding: 0em;
+	list-style: none;
+	text-align: center;
+	line-height: 3em;
+}
+
+#team {
+	color: #838383;
+}
+
+#nav {
+	color: #838383;
+}
+
+/** CONTENT */
+
+#content {
+	float: left;
+	width: 70%;
+}
+
+#image {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 1em;
+	width: 50%;
+}
+
+#upload {
+	margin: 1em 1em 1em 1em;
+}
+
+/** FORM IMG */
+
+#form_img {
+	text-align: left;
+	margin:3rem 2rem;
+}
+
+#form_del {
+	margin: 2rem 2rem;
+	display: inline-block;
+	display: flex;
+    justify-content: space-between;
+	align-items: center;
+}
+
+#del_button {
+	height: 2rem;
+	font-weight: bold;
+}
+
+#submit_button {
+	margin-top: 1rem;
+}
+
+#session_form {
+	margin-top: 1rem;
+}
+
+/** FORM TEXT */
+
+#form_text {
+
+	text-align: left;
+	height: 8rem;
+	width: 80%;
+}
+
+/** READ BOX */
+
+#read_box {
+	text-align: start;
+	height: 10rem;
+	width: 80%;
+}
+
+/** FOOTER */
+
+#footer {
+	text-align: left;
+}
+
+#footer p {
+	width: 100%;
+	padding: 0em 1em;
+	position: fixed;
+	bottom: -0.5rem;
+	font-weight: bold;
+	color: #ff8400;
+	background: #c7c2c2;
+}

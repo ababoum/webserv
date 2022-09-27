@@ -55,17 +55,7 @@
 		?>
 		<h2>by 42</h2>
 	</div>
-	<div id="menu">
-		<ul>
-			<li><a href="/">Home</a></li>
-			<li><a href="/gallery">Gallery</a></li>
-			<li><a href="/uploads/upload_img.php">Upload an image</a></li>
-			<li><a href="/uploads/upload_txt.php">Upload a text</a></li>
-			<li><a href="/delete/delete.php">Delete an image</a></li>
-			<li><a href="/cookies/cookies.php">Cookies!</a></li>
-			<li><a href="/session/session.php">Session</a></li>
-		</ul>
-	</div>
+	<div id="menu"></div>
 	<div id="content">
 		<div id="cookies">
 			<?php
@@ -84,5 +74,5 @@
 	<div id="footer">
 		<p>Copyright &copy; 2006 Sitename.com. Designed by <a href="http://www.freecsstemplates.org" class="link1">Free CSS Templates</a></p>
 	</div>
-
+	<script type="text/javascript" src="../menu.js"></script>
 </html>

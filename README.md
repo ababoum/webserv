@@ -25,11 +25,6 @@ upload a text file:
 curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d 'Hello World!' 127.0.0.1:9900/uploads/test.txt
 ```
 
-upload an image:
-```sh
-curl -X POST -H "Content-Type: application/form-data" -d "$(cat ~/Pictures/minishell.jpg)" 127.0.0.1:9900/uploads/minishell.jpg
-```
-
 ## DELETE requests
 
 delete a resource that exists:

@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/26 18:42:07 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/27 16:12:56 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -262,7 +262,8 @@ void ServerEngine::_postMethod()
 	std::string		path;
 	std::string		upload_directory;
 
-	upload_directory = _req->getTargetLocation()->getRoot() + _req->getHeader().URL;
+	upload_directory = _req->getTargetLocation()->getRoot() + "/" + _req->getHeader().URL;
+	sanitizePath(upload_directory);
 
 	if (_req->getHeader().content_type == "multipart/form-data")
 	{
@@ -503,7 +504,6 @@ void ServerEngine::stream_in(int poll_client_fd)
 	}
 	else if (r == -1)
 	{
-		perror("recv");
 		_globalConf->updateClientFd(client_fd, POLLOUT, this);
 		// nothing more to read
 	}

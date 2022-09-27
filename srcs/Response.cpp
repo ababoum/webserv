@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 17:21:18 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/27 20:05:21 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,11 +132,13 @@ std::string		ResponseHeader::getCGIText() const
 	return ret;	
 }
 
+
+
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Response::Response() : _from_cgi(false)
+Response::Response() : _from_cgi(false), _validResponse(true)
 {
 }
 
@@ -160,6 +162,11 @@ Response::~Response()
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+
+void	Response::setValidity(bool val)
+{
+	_validResponse = val;
+}
 
 void	Response::setStatusCode(int code)
 {
@@ -217,19 +224,6 @@ void	Response::setPragma(std::string pragma)
 	_header.pragma = pragma;
 }
 
-void	Response::reset()
-{
-	_header.status_code = 0;
-	_header.status_msg = "";
-	_header.content_length = 0;
-	_header.content_type = "";
-	
-	_body.content = "";
-	_body.length = 0;
-	
-	_file_path = "";
-}
-
 void	Response::setRedirectionLocation(std::string url)
 {
 	_header.redir_location = url;
@@ -260,6 +254,13 @@ void	Response::setIfstreamBodyMedia(const char *path)
 ** --------------------------------- ACCESSOR ---------------------------------
 */
 
+
+bool		Response::isValid() const
+{
+	return _validResponse;
+}
+
+
 std::string	Response::getHeaderText() const
 {
 	return (_header.getText(_ifstream_body.is_open()));
@@ -269,17 +270,8 @@ std::string	Response::getRedirText() const
 {
 	return _header.getRedirText();
 }
-/*
-std::size_t	Response::size() const
-{
-	if (_from_cgi == true)
-		return _cgi_output.size();
-	else if (!_header.redir_location.empty())
-		return _header.getRedirText().size();
-	else
-		return _header.getText( _body.content.size()).size() + _body.content.size() + 1;
-}
-*/
+
+
 bool		Response::isFromCGI() const
 {
 	return _from_cgi;

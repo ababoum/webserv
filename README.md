@@ -4,7 +4,7 @@
 ## Virtual server
 
 ```sh
-curl --resolve facedeprout.com:9900:127.0.0.1 facedeprout.com:9900
+curl --resolve webserv42.fr:8080:127.0.0.1 webserv42.fr:8080
 ```
 
 ## GET requests

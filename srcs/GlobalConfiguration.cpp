@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   GlobalConfiguration.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:13:51 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/25 12:55:47 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/27 19:37:28 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,6 @@ void	GlobalConfiguration::addServer(void)
 	_serversList.push_back(Server());
 }
 
-void	GlobalConfiguration::setAllowedConnections(int nbConnectionsMax)
-{
-	_nbAllowedConnections = nbConnectionsMax;
-}
-
 void	GlobalConfiguration::startEngines()
 {
 	for (std::size_t i = 0; i < _serversList.size(); ++i)
@@ -72,11 +67,8 @@ void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
 	
 	for (; i < fds.size(); ++i)
 	{
-		// DEBUG("i: " << i << '\n');
 		if (fds[i].revents == POLLIN || fds[i].revents == (POLLIN | POLLOUT))
 		{
-			// DEBUG("FD_IN: " << fds[i].fd << '\n');
-			// DEBUG("REVENTS: " << fds[i].revents << "\n\n");
 			ServerEngine *_targetServ = _fds_ptr[fds[i]];
 			if (i < threshold)
 			{
@@ -91,8 +83,6 @@ void	GlobalConfiguration::dispatchStream(std::vector<struct pollfd> fds)
 		}
 		else if (fds[i].revents == POLLOUT)
 		{
-			// DEBUG("FD_OUT: " << fds[i].fd << '\n');
-			// DEBUG("REVENTS: " << fds[i].revents << "\n\n");
 			ServerEngine *_targetServ = _fds_ptr[fds[i]];
 			if (_targetServ->stream_out(fds[i].fd))
 				++i;
@@ -141,11 +131,6 @@ void	GlobalConfiguration::eraseClientFd(int fd)
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
-
-int		GlobalConfiguration::getAllowedConnections() const
-{
-	return _nbAllowedConnections;
-}
 
 std::vector<Server> & GlobalConfiguration::getServersList()
 {

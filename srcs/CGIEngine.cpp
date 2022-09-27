@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/13 08:16:38 by tidurand          #+#    #+#             */
-/*   Updated: 2022/09/26 15:33:56 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/27 19:26:53 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ CGIEngine::CGIEngine(Request *req, Server *serv)
 	else
 		_env["CONTENT_TYPE"] = _req->getHeader().content_type;
 	_env["CONTENT_LENGTH"] = int_to_string(req->getBody().length);
-	_env["REDIRECT_STATUS"] = "200"; // careful to what status code to fill
+	_env["REDIRECT_STATUS"] = "200";
 	_env["HTTP_ACCEPT"] = "*/*";
 	_env["HTTP_ACCEPT_LANGUAGE"] = "en-US,en";
 	_env["HTTP_USER_AGENT"] = req->getHeader().user_agent;

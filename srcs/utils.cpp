@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:13:24 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/23 19:39:29 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/27 20:30:42 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,46 +59,6 @@ std::vector<std::string>	split(const std::string &str, const char *set_delim)
 	return list;
 }
 
-std::string 				media_to_string(const char *img_path) // a supprimer
-{
-	std::ifstream 		media_file;
-	std::vector<char> 	tab;
-	char				byte;
-
-	media_file.open(img_path);
-	if (!media_file)
-	{
-		// string is empty if image file cannot be opened
-		return std::string("<title>Media Page Not Found</title><H1>Media Page Not Found</H1>");
-	}
-	while (media_file.get(byte)) {
-        tab.push_back(byte);
-    }
-	
-	std::string ret(tab.begin(), tab.end());
-	media_file.close();
-	return ret;	
-}
-
-std::string					htmlPath_to_string(const char *html_path) // a supprimer
-{
-	std::string		ret;
-	std::ifstream	file;
-
-	file.open(html_path, std::ios::in);
-	if (!file)
-	{
-		ret += "<title>Error Page Not Found</title><H1>Error Page Not Found</H1>";
-		return ret;
-	}
-	for (std::string line; std::getline(file, line);)
-	{
-		ret.append(line);
-	}
-	file.close();
-
-	return ret;
-}
 
 std::string					int_to_string(int n)
 {

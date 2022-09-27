@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 15:08:25 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/26 14:52:08 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/27 19:31:57 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,7 +258,6 @@ void	ConfigurationParser::_parseFile()
 	inputStream.open(_inputFilePath.c_str());
 
 	// check file opening integrity
-	// if (inputStream.fail() || inputStream.eof() || inputStream.bad())
 	if (!inputStream)
 	{
 		throw std::ios_base::failure("Error while opening configuration file");

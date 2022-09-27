@@ -61,7 +61,7 @@
 	<div id="menu">
 		<ul>
 			<li><a href="/">Home</a></li>
-			<li><a href="/gallery">Gallery</a></li>
+			<li><a href="/gallery/gallery.php">Gallery</a></li>
 			<li><a href="/uploads/upload_img.php">Upload an image</a></li>
 			<li><a href="/uploads/upload_txt.php">Upload a text</a></li>
 			<li><a href="/delete/delete.php">Delete an image</a></li>
@@ -79,7 +79,7 @@
 				if ($file !== "." && $file !== "..") {
 					echo "<div id=\"form_del\">";
 					echo "<img src='../images/$file' id=\"image\"/>\n";
-					echo "<button type=\"button\" id=\"del_button\" onclick=\"deleteSomething('../images/$file')\">";
+					echo "<button type=\"button\" id=\"del_button\" onclick=\"deleteSomething('../$file')\">";
 					echo "Delete this image</button>";
 					echo "</div>";
 				}

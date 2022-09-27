@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 20:07:54 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/27 16:12:04 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/27 20:30:51 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,8 +120,6 @@ enum HTTP_RESPONSE
 // CPP functions
 std::vector<std::string>	split(const std::string &str, char delim);
 std::vector<std::string>	split(const std::string &str, const char *set_delim);
-std::string 				media_to_string(const char *img_path);
-std::string					htmlPath_to_string(const char *html_path);
 std::string					autoindexPageHtml(std::string directoryName, std::string headerURL);
 std::string					int_to_string(int n);
 std::string					itohex(std::size_t size);

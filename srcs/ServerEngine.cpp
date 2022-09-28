@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/27 20:34:27 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/28 14:54:15 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -520,8 +520,8 @@ void ServerEngine::stream_in(int poll_client_fd)
 	}
 	else if (r == -1)
 	{
-		_globalConf->updateClientFd(client_fd, POLLOUT, this);
-		// nothing more to read
+		kill_client(client_fd);
+		// nothing to read, close client
 	}
 	else if (r == 0)
 	{

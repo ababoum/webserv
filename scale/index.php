@@ -51,7 +51,7 @@
 		<p>Navigate in the pages listed in the left panel:</p>
 		<ul>
 			<li><a href="/">Home</a></li>
-			<li><a href="/gallery">Gallery</a></li>
+			<li><a href="/gallery/gallery.php">Gallery</a></li>
 			<li><a href="/uploads/upload_img.php">Upload an image</a></li>
 			<li><a href="/uploads/upload_txt.php">Upload a text</a></li>
 			<li><a href="/delete/delete.php">Delete an image</a></li>

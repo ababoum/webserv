@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 14:00:22 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/27 20:00:54 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,8 +75,6 @@ class Request
 
 	private:
 		void			_parseURL();
-		void			_parseCookieString(std::vector<std::string> line_items);
-		void			_parseCookieVariables(std::string cookie_string);
 };
 
 

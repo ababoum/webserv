@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tidurand <tidurand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:40:05 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/22 17:17:41 by tidurand         ###   ########.fr       */
+/*   Updated: 2022/09/27 20:05:25 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ class Response
 		std::string		_file_path;
 		bool			_from_cgi;
 		std::string		_cgi_output;
+		bool			_validResponse;
 	
 	public:
 
@@ -71,7 +72,9 @@ class Response
 		ResponseHeader	&getHeader();
 		ResponseBody	&getBody();
 		std::ifstream	&getIfstreamBody();
+		bool			isValid() const;
 
+		void			setValidity(bool val);
 		void			setStatusCode(int code);
 		void			setStatusMsg(std::string msg);
 		void			setContentType(std::string type);
@@ -88,7 +91,6 @@ class Response
 
 		// for CGI response only
 		void			setCGIText(std::string CGI_text);
-		void			reset();
 };
 
 

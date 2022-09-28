@@ -45,7 +45,21 @@
 		?>
 		<h2>by 42</h2>
 	</div>
+<<<<<<< HEAD
 	<div id="menu"></div>
+=======
+	<div id="menu">
+		<ul>
+			<li><a href="/">Home</a></li>
+			<li><a href="/gallery/gallery.php">Gallery</a></li>
+			<li><a href="/uploads/upload_img.php">Upload an image</a></li>
+			<li><a href="/uploads/upload_txt.php">Upload a text</a></li>
+			<li><a href="/delete/delete.php">Delete an image</a></li>
+			<li><a href="/cookies/cookies.php">Cookies!</a></li>
+			<li><a href="/session/session.php">Session</a></li>
+		</ul>
+	</div>
+>>>>>>> master
 	<div id="content">
 		<div id="upload">
 			<h2>Upload a text to the server</h2>

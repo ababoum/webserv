@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/22 19:54:34 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/26 15:52:22 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/27 19:42:56 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,11 +89,6 @@ int main(int ac, char **av)
 				FATAL_ERR("poll failed to execute\n");
 				return (EXIT_SUCCESS);
 			}
-
-			// DEBUG("ready FDs: " << ready << '\n');
-			// DEBUG("FD0: " << fds.data()[0].revents);
-			// DEBUG("FD1: " << fds.data()[1].revents);
-
 			globalConf.dispatchStream(fds);
 		}
 	}

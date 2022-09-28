@@ -1,30 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Webserv test</title>
 </head>
+<script>
+	async function deleteSomething(path) {
+		await doDelete(path);
+		window.location.reload();
+	}
+
+	async function doDelete(path) {
+		return fetch(path, {
+			method: 'DELETE'
+		})
+	}
+</script>
+
 <body>
 	<h1>Webserv test</h1>
-	<h2>Get test</h2>
-	<form action="test_method.php" method="GET">
-		<label for="fname">First name:</label>
-		<input type="text" id="fname" name="fname"><br><br>
-		<label for="lname">Last name:</label>
-		<input type="text" id="lname" name="lname"><br><br>
-		<input type="submit" value="Submit">
-	</form>
 	<br>
-	<h2>Post test with cgi</h2>
-	<form action="test_method.php" method="POST">
-		<label for="login">Login</label>
-		<input type="text" name="login"><br><br>
-		<label for="password">Password</label>
-		<input type="password" name="password"><br><br>
-		<input type="submit" value="Submit">
-	</form>
-	<h2>Post test without cgi</h2>
+	<h2>Post test without CGI</h2>
 	<form action="test" method="POST">
 		<label for="login">Login</label>
 		<input type="text" name="login"><br><br>
@@ -32,17 +30,24 @@
 		<input type="password" name="password"><br><br>
 		<input type="submit" value="Submit">
 	</form>
+
 	<h2>Delete test</h2>
 	<p>In terminal : curl -X DELETE /www/test</p>
+	<h2>Uploads test (POST)</h2>
+	<form action="/" method="POST" enctype="multipart/form-data">
+		<input type="file" id="file" placeholder="upload a file" name="last_uploaded_file.png" accept=".png">
+		<input type="submit" value="Submit">
+	</form>
+
 	<h2>Download test</h2>
-		<a href="favicon.ico" download>
-			<img src="favicon.ico" alt="img">
-		</a>
+	<a href="favicon.ico" download>
+		<img src="favicon.ico" alt="img">
+	</a>
+	
 	<h2>Cookie test</h2>
-		<button onclick="random_color()">Click me !</button>
+	<button onclick="random_color()">Click me!</button>
 	<script>
-		function random_color()
-		{
+		function random_color() {
 			let red = Math.floor(Math.random() * 256);
 			let green = Math.floor(Math.random() * 256);
 			let blue = Math.floor(Math.random() * 256);
@@ -56,4 +61,5 @@
 			document.body.style.background = document.cookie;
 	</script>
 </body>
+
 </html>

@@ -4,7 +4,7 @@
 ## Virtual server
 
 ```sh
-curl --resolve facedeprout.com:9900:127.0.0.1 facedeprout.com:9900
+curl --resolve webserv42.fr:8080:127.0.0.1 webserv42.fr:8080
 ```
 
 ## GET requests
@@ -23,11 +23,6 @@ curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "param1=val
 upload a text file:
 ```sh
 curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d 'Hello World!' 127.0.0.1:9900/uploads/test.txt
-```
-
-upload an image:
-```sh
-curl -X POST -H "Content-Type: application/form-data" -d "$(cat ~/Pictures/minishell.jpg)" 127.0.0.1:9900/uploads/minishell.jpg
 ```
 
 ## DELETE requests

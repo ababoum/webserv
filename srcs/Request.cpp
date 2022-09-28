@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/04 12:11:55 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/26 15:02:18 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/27 20:35:56 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,17 +43,26 @@ Request::~Request() {}
 ** --------------------------------- METHODS ----------------------------------
 */
 
+/**
+ * Parses the header of the current request stored in the server engine.
+ * Populates attributes (method, content type, cookies, etc.)
+ * 
+ */
 void	Request::parseData()
 {
 	std::string req_string(_raw_data.begin(), _raw_data.end());
 
 	// extract header only
 	size_t 		header_sep = req_string.find("\r\n\r\n");
-
 	if (header_sep != std::string::npos)
 	{
 		req_string.resize(header_sep);
 	}
+
+
+	// for information only
+	std::cerr << "Request received:\n"
+			<< BLUE_TXT << req_string << RESET_TXT << '\n' << std::endl;
 
 	std::istringstream 	data(req_string);
 	std::string			line;
@@ -93,7 +102,7 @@ void	Request::parseData()
 		// Host line
 		else if (line_items.size() > 1 && line_items[0] == "Host:")
 		{
-			_header.host = line_items[1];
+			_header.host = line_items[1].substr(0, line_items[1].rfind(':'));
 		}
 		// User-Agent line
 		else if (line_items.size() > 1 && line_items[0] == "User-Agent:")
@@ -103,8 +112,9 @@ void	Request::parseData()
 		// Cookie line
 		else if (line_items.size() > 1 && line_items[0] == "Cookie:")
 		{
-			_parseCookieString(line_items);
-			_parseCookieVariables(_header.cookie_string);
+			_header.cookie_string = line.substr(7);
+			if (_header.cookie_string[_header.cookie_string.length() - 1] == '\r')
+				_header.cookie_string.erase(_header.cookie_string.end() - 1);
 		}
 		// Content-Type line
 		else if (line_items.size() > 1 && line_items[0] == "Content-Type:")
@@ -145,15 +155,6 @@ void	Request::findLocation(Server & serv)
 			_targetLocation = &serv.getRoutes()[i];
 			return ;
 		}
-		else if (prefix[prefix.size() - 1] == '*')
-		{
-			prefix.erase(prefix.end() - 1);
-			if (prefix.compare(0, prefix.size(), URL_to_check))
-			{
-				_targetLocation = &serv.getRoutes()[i];
-				return ;
-			}
-		}
 		else if (prefix[0] == '*' && URL_to_check.size() >= prefix.size())
 		{
 			prefix.erase(prefix.begin());
@@ -166,6 +167,7 @@ void	Request::findLocation(Server & serv)
 		}
 	}
 
+	// start to shorten the URL to continue location-finding
 	URL_to_check.erase(URL_to_check.end() - 1);
 	if (URL_to_check.empty())
 	{
@@ -189,7 +191,7 @@ void	Request::findLocation(Server & serv)
 
 int		Request::checkAccess()
 {
-	std::string absolute_path = _targetLocation->getRoot() + _header.resource_path;
+	std::string absolute_path = _targetLocation->getRoot() + "/" + _header.resource_path;
 	sanitizePath(absolute_path);
 	
 
@@ -197,7 +199,6 @@ int		Request::checkAccess()
 	struct stat sb;
 
 	// for GET and DELETE and file-overwriting POST
-
 	if (!access(absolute_path.c_str(), F_OK) || (
 		stat(absolute_path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)
 	))
@@ -220,7 +221,7 @@ int		Request::checkAccess()
 	}
 	else
 	{
-		if (_header.method == "POST") // we need to check if location folder is W & R & X
+		if (_header.method == "POST")
 			return 0;
 		setError(NOT_FOUND);
 		setIsRequestValid(false);
@@ -268,7 +269,7 @@ int		Request::identifyType()
 		return 1;
 	}
 	
-	// DELETE requests can take any kind of file (or directory?)
+	// DELETE requests can take any kind of file
 	if (_header.method == "DELETE")
 	{
 		_body.type = extension;
@@ -354,7 +355,7 @@ Server	*Request::enableVirtualServer(GlobalConfiguration *globalConf, const Serv
 
 	// if no virtual server is found
 	setIsRequestValid(false);
-	setError(NOT_FOUND);
+	setError(SERVER_ERROR);
 	
 	return NULL;	
 }
@@ -382,19 +383,8 @@ void			Request::_parseURL()
 	}
 }
 
-void			Request::_parseCookieString(std::vector<std::string> line_items)
-{
-	for (size_t i = 1; i < line_items.size(); i++)
-	{
-		_header.cookie_string += line_items[i];
-	}
-	
-}
 
-void			Request::_parseCookieVariables(std::string cookie_string)
-{
-	std::vector<std::string> cookies = split(cookie_string, ";");
-}
+
 
 int		Request::extractBody()
 {

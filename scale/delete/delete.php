@@ -69,7 +69,7 @@
 				if ($file !== "." && $file !== "..") {
 					echo "<div id=\"form_del\">";
 					echo "<img src='../images/$file' id=\"image\"/>\n";
-					echo "<button type=\"button\" id=\"del_button\" onclick=\"deleteSomething('../images/$file')\">";
+					echo "<button type=\"button\" id=\"del_button\" onclick=\"deleteSomething('../$file')\">";
 					echo "Delete this image</button>";
 					echo "</div>";
 				}

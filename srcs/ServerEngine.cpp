@@ -6,7 +6,7 @@
 /*   By: mababou <mababou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 18:11:38 by mababou           #+#    #+#             */
-/*   Updated: 2022/09/26 18:42:07 by mababou          ###   ########.fr       */
+/*   Updated: 2022/09/27 20:34:27 by mababou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,18 +142,16 @@ void ServerEngine::_getMethod()
 		std::string body;
 		if (_req->getTargetLocation()->isAutoindexed())
 		{
-			if (!path.empty() && path[path.size() - 1] == '/')
-				path.append(_req->getHeader().URL.begin() + 1, _req->getHeader().URL.end());
-			else
-				path += _req->getHeader().URL;
+			path += "/" + _req->getHeader().URL;
+			sanitizePath(path);
 			body = autoindexPageHtml(path, _req->getHeader().URL);
 			_resp->setBody(body);
 			_resp->setContentLength(body.size());
 		}
 		else
 		{
-			path += (_req->getTargetLocation()->getIndexPage()[0] == '/' ? "" : "/");
-			path += _req->getTargetLocation()->getIndexPage();
+			path += "/" + _req->getTargetLocation()->getIndexPage();
+			sanitizePath(path);
 			_resp->setIfstreamBodyHTML(path.c_str());
 		}
 	}
@@ -165,8 +163,8 @@ void ServerEngine::_getMethod()
 		_resp->setContentType(_req->getBody().type);
 
 		std::string path = _req->getTargetLocation()->getRoot();
-		path += (_req->getHeader().resource_path[0] == '/' ? "" : "/");
-		path += _req->getHeader().resource_path;
+		path += "/" + _req->getHeader().resource_path;
+		sanitizePath(path);
 		_resp->setIfstreamBodyHTML(path.c_str());
 	}
 	// return a media (image, video, etc.)
@@ -177,8 +175,8 @@ void ServerEngine::_getMethod()
 		_resp->setContentType(_req->getBody().type);
 
 		std::string path = _req->getTargetLocation()->getRoot();
-		path += (_req->getHeader().resource_path[0] == '/' ? "" : "/");
-		path += _req->getHeader().resource_path;
+		path += "/" + _req->getHeader().resource_path;
+		sanitizePath(path);
 
 		_resp->setIfstreamBodyMedia(path.c_str());
 	}
@@ -238,11 +236,18 @@ void ServerEngine::_buildResponseOnRequest()
 		_resp->setStatusMsg(err_dictionary.find(_req->getError())->second);
 		_resp->setContentType("text/html");
 
-		std::string		body;
-		std::fstream	file;
 		std::string		path;
 
 		path = _server.getErrorPagePath(_req->getError());
+		_resp->setIfstreamBodyHTML(path.c_str());
+	}
+	else if (!_resp->isValid())
+	{
+		_resp->setContentType("text/html");
+
+		std::string		path;
+
+		path = _server.getErrorPagePath(_resp->getHeader().status_code);
 		_resp->setIfstreamBodyHTML(path.c_str());
 	}
 }
@@ -262,18 +267,18 @@ void ServerEngine::_postMethod()
 	std::string		path;
 	std::string		upload_directory;
 
-	upload_directory = _req->getTargetLocation()->getRoot() + _req->getHeader().URL;
+	upload_directory = _req->getTargetLocation()->getRoot() + "/" + _req->getHeader().URL;
+	sanitizePath(upload_directory);
 
 	if (_req->getHeader().content_type == "multipart/form-data")
 	{
-		DEBUG("upload_directory = " << upload_directory << '\n');
+		// DEBUG("upload_directory = " << upload_directory << '\n');
 		std::string file_name;
 		std::string line;
 		std::string reqData = _req->getBody().content.substr(_req->getBody().content.find('\n') + 1);
-		// std::vector<std::string>::iterator it = reqData.begin();
 		line = reqData.substr(0, reqData.find('\n'));
 		reqData = reqData.substr(reqData.find('\n') + 1);
-		while (line != _req->getHeader().boundary + "--\r")
+		while (line != _req->getHeader().boundary + "--\r" && !reqData.empty())
 		{
 			if (line.substr(0, 20) == "Content-Disposition:")
 			{
@@ -289,7 +294,9 @@ void ServerEngine::_postMethod()
 				file.open(path.c_str(), std::ios::out);
 				if (!file.is_open())
 				{
-					_resp->setStatusCode(SERVER_ERROR); // good error ??
+					_resp->setValidity(false);
+					_resp->setStatusCode(SERVER_ERROR);
+					_resp->setStatusMsg(err_dictionary.find(SERVER_ERROR)->second);
 					return;
 				}
 				// fill file
@@ -302,7 +309,7 @@ void ServerEngine::_postMethod()
 					reqData = reqData.substr(reqData.find('\n') + 1);
 					if (line == _req->getHeader().boundary + "\r" || line == _req->getHeader().boundary + "--\r" || reqData.empty())
 					{
-						if (tmp.length() >= 1) // removing last '\r' caractere
+						if (tmp.length() >= 1) // removing last '\r' character
 							tmp.erase(tmp.end() - 1);
 						file << tmp;
 						break;
@@ -318,15 +325,31 @@ void ServerEngine::_postMethod()
 				reqData = reqData.substr(reqData.find('\n') + 1);
 			}
 		}
+		if (line != _req->getHeader().boundary + "--\r")
+		{
+			_resp->setValidity(false);
+			_resp->setStatusCode(BAD_REQUEST);
+			_resp->setStatusMsg(err_dictionary.find(BAD_REQUEST)->second);
+			return;
+		}
 	}
-	else
+	else // other than form-data POST file (text, etc.)
 	{
 		path = upload_directory;
-		DEBUG("new file address = " << path << '\n');
+		// DEBUG("new file address = " << path << '\n');
+		if (is_folder_formatted(upload_directory))
+		{
+			_resp->setValidity(false);
+			_resp->setStatusCode(BAD_REQUEST);
+			_resp->setStatusMsg(err_dictionary.find(BAD_REQUEST)->second);
+			return;
+		}
 		file.open(path.c_str(), std::ios::out);
 		if (!file.is_open())
 		{
-			_resp->setStatusCode(SERVER_ERROR); // good error ??
+			_resp->setValidity(false);
+			_resp->setStatusCode(SERVER_ERROR);
+			_resp->setStatusMsg(err_dictionary.find(SERVER_ERROR)->second);
 			return;
 		}
 		file << _req->getBody().content;
@@ -344,10 +367,13 @@ void ServerEngine::_deleteMethod()
 	std::string	path;
 
 	path = _req->getTargetLocation()->getRoot() + "/" + _req->getHeader().URL;
+	sanitizePath(path);
+	
 	if (unlink(path.c_str()) == -1)
 	{
-		_resp->setStatusCode(NOT_FOUND);
-		_resp->setStatusMsg(err_dictionary.find(NOT_FOUND)->second);
+		_resp->setValidity(false);
+		_resp->setStatusCode(SERVER_ERROR);
+		_resp->setStatusMsg(err_dictionary.find(SERVER_ERROR)->second);
 	}
 	else
 	{
@@ -424,14 +450,6 @@ void ServerEngine::_parse_CGI_output(std::string cgi_output)
 
 void ServerEngine::_buildRequest()
 {
-	// for information only
-
-	std::string req_str(_req->getRawData().begin(), _req->getRawData().end());
-	std::cerr << "Request received:\n"
-			  << BLUE_TXT << req_str << RESET_TXT << std::endl;
-
-	// unchunk ?
-
 	// store and parse the received request
 	_req->parseData();
 
@@ -494,23 +512,21 @@ void ServerEngine::stream_in(int poll_client_fd)
 	// Read from the connection
 
 	r = recv(client_fd, buffer, REQUEST_BUFFER_SIZE, 0);
-	// DEBUG("READ QTY: " << r << "\n\n");
 	_globalConf->updateClientFd(client_fd, POLLIN | POLLOUT, this);
 	if (r >= 0)
 	{
 		_req->getRawData().insert(_req->getRawData().end(), buffer, buffer + r);
-		return; // we can read more
+		// we can read more
 	}
 	else if (r == -1)
 	{
-		perror("recv");
 		_globalConf->updateClientFd(client_fd, POLLOUT, this);
 		// nothing more to read
 	}
 	else if (r == 0)
 	{
 		_globalConf->updateClientFd(client_fd, POLLOUT, this);
-		return; // nothing more to read
+		// nothing more to read
 	}
 }
 
@@ -520,9 +536,15 @@ int ServerEngine::stream_out(int client_fd)
 	std::string to_send;
 
 	_req = _aliveConnections[client_fd].req;
-	_globalConf->updateClientFd(client_fd, POLLOUT, this);
 
-	// check if req exists /!!!
+	// check if req exists before building a response
+	if (_aliveConnections[client_fd].req == NULL)
+	{
+		_globalConf->updateClientFd(client_fd, POLLIN, this);
+		return still_alive;
+	}
+	
+	_globalConf->updateClientFd(client_fd, POLLOUT, this);
 
 	if (_aliveConnections[client_fd].resp == NULL) // new connection
 	{
@@ -563,7 +585,7 @@ int ServerEngine::stream_out(int client_fd)
 			still_alive = 1;
 	}
 
-	//DEBUG("client_fd =\n" << client_fd << '\n' << "to_send =\n" << to_send << '\n');
+	// DEBUG("client_fd =\n" << client_fd << '\n' << "to_send =\n" << to_send << '\n');
 
 	if (send(client_fd, to_send.c_str(), to_send.size(), MSG_NOSIGNAL) == -1)
 		still_alive = 0; // clean

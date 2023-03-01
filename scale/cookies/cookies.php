@@ -1,7 +1,19 @@
+<?php
+
+	if(isset($_POST["submit"]))
+	{
+		setcookie("color_mode", $_POST["color_mode"], time() + (86400 * 30), "/"); // 86400 = 1 day
+		//setcookie("lname", $_POST["lname"], time() + (86400 * 30), "/"); // 86400 = 1 day
+		echo "<script> location.href='http://localhost:" . $_SERVER['SERVER_PORT'] . "/cookies/cookies.php'; </script>";
+		//echo $_POST["color_mode"];
+	}
+?>
+
+
 <!DOCTYPE html>
 <html>
 
-<head>
+<head>`
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title>42_webserv</title>
 	<?php
@@ -15,16 +27,6 @@
 		}
 	?>
 </head>
-
-<?php
-
-	if(isset($_POST["submit"]))
-	{
-		setcookie("color_mode", $_POST["color_mode"], time() + (86400 * 30), "/"); // 86400 = 1 day
-		//setcookie("lname", $_POST["lname"], time() + (86400 * 30), "/"); // 86400 = 1 day
-		echo "<script> location.href='http://localhost:" . $_SERVER['SERVER_PORT'] . "/cookies/cookies.php'; </script>";
-	}
-?>
 
 <body>
 	<div id="header">

@@ -1,5 +1,41 @@
+<?php
+	$continue = 0;
+	$db_sessions = "./session.bdd";
+	if (isset($_GET['logout']))
+	{
+		session_start();
+		$fp = fopen($db_sessions, "r");
+			if ($fp) {
+				while (($line = fgets($fp)) !== false) {
+					$line_items = explode(";", $line);
+					if ($_COOKIE['PHPSESSID'] == $line_items[0]) {
+						$contents = file_get_contents($db_sessions);
+						$contents = str_replace($line, "", $contents);
+						file_put_contents($db_sessions, $contents);
+						break;
+					}
+				}
+				fclose($fp);
+			} else {
+				echo "Session database is inaccessible\n";
+			}
+		setcookie('PHPSESSID', $_COOKIE["PHPSESSID"], time() - 3600, "/");
+		$continue = 2;
+	}
+	if (!isset($_COOKIE['PHPSESSID']) && isset($_POST['fname']) && isset($_POST['lname'])) 
+	{
+		session_start(['cookie_lifetime' => 86400,]);
+		$fp = fopen($db_sessions, "a");
+		fwrite($fp, session_id() . ";" . $_POST['fname'] . ";" . $_POST['lname'] . "\n");
+		fclose($fp);
+		$continue = 1;
+	}
+?>
+
+
 <!DOCTYPE html>
 <html>
+
 
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -37,44 +73,7 @@
 			<h2>Session</h2>
 			<?php
 
-			$db_sessions = "./session.bdd";
-			$continue = 0;
-
-			if (isset($_GET['logout']))
-			{
-				session_start();
-				$fp = fopen($db_sessions, "r");
-					if ($fp) {
-						while (($line = fgets($fp)) !== false) {
-							$line_items = explode(";", $line);
-							if ($_COOKIE['PHPSESSID'] == $line_items[0]) {
-								$contents = file_get_contents($db_sessions);
-								$contents = str_replace($line, "", $contents);
-								file_put_contents($db_sessions, $contents);
-								break;
-							}
-						}
-						fclose($fp);
-					} else {
-						echo "Session database is inaccessible\n";
-					}
-				setcookie('PHPSESSID', $_COOKIE["PHPSESSID"], time() - 3600, "/");
-				$continue = 2;
-			}
-
-			if (
-				!isset($_COOKIE['PHPSESSID'])
-				&& isset($_POST['fname'])
-				&& isset($_POST['lname'])
-			) {
-				session_start([
-					'cookie_lifetime' => 86400,
-				]);
-				$fp = fopen($db_sessions, "a");
-				fwrite($fp, session_id() . ";" . $_POST['fname'] . ";" . $_POST['lname'] . "\n");
-				fclose($fp);
-				$continue = 1;
-			} elseif (!isset($_COOKIE['PHPSESSID']) || empty($_COOKIE['PHPSESSID']) || $continue == 2) {
+			if ($continue != 1 && (!isset($_COOKIE['PHPSESSID']) || empty($_COOKIE['PHPSESSID']) || $continue == 2)) {
 				echo '<form id=session_form action="session.php" method="POST">
 				<label for="fname">First name:</label>
 				<input type="text" id="fname" name="fname" required pattern="[a-zA-Z0-9]+[a-zA-Z0-9 ]+"><br><br>

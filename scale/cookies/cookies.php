@@ -13,7 +13,7 @@
 <!DOCTYPE html>
 <html>
 
-<head>`
+<head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title>42_webserv</title>
 	<?php
